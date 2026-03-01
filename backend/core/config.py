@@ -1,9 +1,9 @@
 ﻿from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://postgres:password@localhost:5432/gutiq"
-    JWT_SECRET: str = "supersecretkeychangeme"
-    GEMINI_API_KEY: str = ""
+    DATABASE_URL: str
+    JWT_SECRET: str 
+    ACCESS_TOKEN_EXPIRE_HOURS: int = 24
     
     class Config:
         env_file = ".env"
