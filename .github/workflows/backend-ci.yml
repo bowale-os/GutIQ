@@ -64,7 +64,7 @@ jobs:
             sleep 2
           done
         
-        - name: Setup test database
+      - name: Setup test database
         env:
           DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/gutiq
         run: |
