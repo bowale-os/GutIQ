@@ -2,6 +2,7 @@
 from pydantic import ConfigDict
 class Settings(BaseSettings):
     DATABASE_URL: str
+    DATABASE_URL_SYNC: str
     JWT_SECRET: str 
     ACCESS_TOKEN_EXPIRE_HOURS: int = 24
     
