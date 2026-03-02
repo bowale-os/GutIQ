@@ -11,8 +11,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    print(f"Password length: {len(password)} bytes")  # Debug
-    print(f"Password bytes: {password.encode('utf-8')}")  # Debug  
     return pwd_context.hash(password[:72])
 
 
