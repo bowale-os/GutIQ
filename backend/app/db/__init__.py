@@ -6,11 +6,9 @@ from contextlib import asynccontextmanager
 from app.models import User, Log
 from app.core.config import settings
 
-# Sync engine (for alembic/migrations)
-engine = create_engine(settings.DATABASE_URL, echo=True)
+async_engine = create_async_engine(settings.DATABASE_URL)  # ← NO .replace()
 
-# Async engine (for FastAPI)
-async_engine = create_async_engine(settings.DATABASE_URL.replace("postgresql", "postgresql+asyncpg"))
+engine = create_engine(settings.DATABASE_URL_SYNC, echo=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
