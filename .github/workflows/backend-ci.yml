@@ -72,8 +72,9 @@ jobs:
         run: |
           python -c "
           from app.db import engine
-          from app.db.models import Base  
-          Base.metadata.create_all(bind=engine)
+          import app.models
+          from sqlmodel import SQLModel
+          SQLModel.metadata.create_all(bind=engine)
           print('✅ Database tables created!')
           "
       
