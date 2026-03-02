@@ -38,6 +38,6 @@ jobs:
 
       - name: Run tests
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DATABASE_URL: postgresql+**asyncpg**://postgres:postgres@localhost:5432/gutiq  # ← ADD +asyncpg
+          JWT_SECRET: testsecret123
         run: pytest tests/ -v
