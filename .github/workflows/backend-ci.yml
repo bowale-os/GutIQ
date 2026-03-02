@@ -65,14 +65,14 @@ jobs:
           done
         
       - name: Setup test database
-        env:
+        env:  # ← ADD ALL REQUIRED ENV VARS
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/gutiq
           DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/gutiq
+          JWT_SECRET: testsecret123
         run: |
           python -c "
-          import sqlalchemy
-          from sqlalchemy import create_engine
-          from app.db.models import Base
-          engine = create_engine('$DATABASE_URL_SYNC')
+          from app.db import engine
+          from app.db.models import Base  
           Base.metadata.create_all(bind=engine)
           print('✅ Database tables created!')
           "
