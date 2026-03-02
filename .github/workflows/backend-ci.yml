@@ -63,6 +63,20 @@ jobs:
             echo "⏳ Waiting for Postgres... ($i/30)"
             sleep 2
           done
+        
+        - name: Setup test database
+        env:
+          DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/gutiq
+        run: |
+          python -c "
+          import sqlalchemy
+          from sqlalchemy import create_engine
+          from app.db.models import Base
+          engine = create_engine('$DATABASE_URL_SYNC')
+          Base.metadata.create_all(bind=engine)
+          print('✅ Database tables created!')
+          "
+      
       
       - name: Run tests
         env:
