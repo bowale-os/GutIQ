@@ -10,7 +10,7 @@ from app.core.config import settings
 engine = create_engine(settings.DATABASE_URL, echo=True)
 
 # Async engine (for FastAPI)
-async_engine = create_async_engine(settings.DATABASE_URL)
+async_engine = create_async_engine(settings.DATABASE_URL.replace("postgresql", "postgresql+asyncpg"))
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

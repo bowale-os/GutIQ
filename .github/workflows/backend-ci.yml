@@ -38,6 +38,7 @@ jobs:
 
       - name: Run tests
         env:
-          DATABASE_URL: postgresql+**asyncpg**://postgres:postgres@localhost:5432/gutiq  # ← ADD +asyncpg
+          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/gutiq
+          DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/gutiq
           JWT_SECRET: testsecret123
         run: pytest tests/ -v
