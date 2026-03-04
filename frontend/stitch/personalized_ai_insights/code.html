@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ca6a2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#201812",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>GutIQ | Personalized AI Insights</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-6 md:px-20 py-4 bg-white dark:bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">temp_preferences_custom</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-black leading-tight tracking-tight">GutIQ</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" href="#">Logs</a>
+<a class="text-primary text-sm font-bold border-b-2 border-primary" href="#">AI Insights</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary transition-colors text-sm font-semibold" href="#">Research</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden lg:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-full h-full bg-primary/5 dark:bg-primary/10 border border-primary/10 px-4">
+<div class="flex items-center justify-center text-primary/60">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full bg-transparent border-none focus:ring-0 text-sm placeholder:text-primary/40" placeholder="Search insights..."/>
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-full size-10 bg-primary/10 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-full size-10 bg-primary/10 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-primary/20 rounded-full size-10 border-2 border-primary/20 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile picture showing a friendly face" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgy1CWn6UaxUO31UPVJaNR_a0eWFS7TMlxco0QTqyzXVULeYJ8XH1Tkr9eAr_B-IVrEGqhcr_DBNfUU2jO2foZAi51Rjn9jwLtU9GMOlgFt_2yyXMRfrVlOibx1C9ZIh55DHspwhy0igx0a131dmdloa2_NSZN_OG1zZ5Im8jdIaDQbNF9X4zqglpmSpv5zxcNO4F4hLaDOmtQ1YPjqw3X-J2rc0mdjIU35GQS2fZhGWKe6zwKooUNHCp94At5K7KarAs4OLAGoBWB"/>
+</div>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto w-full px-6 py-10">
+<!-- Header Section -->
+<div class="mb-10">
+<h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-slate-100 tracking-tight mb-3">Personalized AI Insights</h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg max-w-2xl">Your voice-logged data processed through our medical-grade AI to find patterns in your GERD and IBS symptoms.</p>
+</div>
+<!-- Summary Stats -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm flex items-center gap-4">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">mic</span>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Total Logs</p>
+<p class="text-2xl font-black text-slate-900 dark:text-slate-100">14 <span class="text-xs text-green-600 font-bold ml-1">+2 this week</span></p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm flex items-center gap-4">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">bedtime</span>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Avg Sleep</p>
+<p class="text-2xl font-black text-slate-900 dark:text-slate-100">6.2h <span class="text-xs text-red-500 font-bold ml-1">-0.5h avg</span></p>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm flex items-center gap-4">
+<div class="size-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">psychology_alt</span>
+</div>
+<div>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-medium">High Stress Days</p>
+<p class="text-2xl font-black text-slate-900 dark:text-slate-100">5 <span class="text-xs text-amber-600 font-bold ml-1">Requires Attention</span></p>
+</div>
+</div>
+</div>
+<!-- Main AI Insight Card -->
+<div class="mb-12">
+<div class="bg-white dark:bg-slate-900 rounded-xl border-l-8 border-primary shadow-xl overflow-hidden flex flex-col lg:flex-row">
+<div class="lg:w-1/3 h-64 lg:h-auto bg-cover bg-center relative" data-alt="A warm cup of herbal tea and coffee beans representing dietary choices" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBjpNDEwweS3pTUQx3E-41igRwvGlAlBlR605m72Lq9pO4Wb3FQdjr-EKe0ZrNd9w9as4pKKjl-DOXxN9VcoyxnaArx4eWn_WTiE-U-TciI59HAMyolAobzf29bbAgbpsKVEvKNs_NPiH4IqWOkMQq_lxIOkDrON-w2qZEGD70-Jn1c_RR33TtqRUxw5I-3H6deD5qZf-Q0PtrCZlf-rCCJtT5B-08o0KS8GhqnWxJmkXlNPFKaKRr9GkyJ9aOZgH3IDVbhMFEGj3Cz')">
+<div class="absolute inset-0 bg-primary/20 backdrop-blur-[2px]"></div>
+<div class="absolute bottom-6 left-6">
+<span class="bg-primary text-white text-[10px] px-2 py-1 rounded-full font-bold tracking-widest uppercase">High Confidence Pattern</span>
+</div>
+</div>
+<div class="p-8 lg:w-2/3">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h3 class="text-primary font-bold tracking-wider text-sm uppercase">Your Patterns</h3>
+</div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-4">Caffeine Correlation Detected</h2>
+<div class="text-slate-700 dark:text-slate-300 text-lg leading-relaxed mb-6 space-y-4">
+<p>We've noticed a <strong class="text-slate-900 dark:text-white underline decoration-primary/40 decoration-4">strong correlation</strong> between late-night caffeine intake and your <strong class="text-slate-900 dark:text-white underline decoration-primary/40 decoration-4">GERD flare-ups</strong> the following morning.</p>
+<p>Based on 4 specific logs from this week, reducing intake after 4 PM may improve symptoms by up to <span class="font-bold text-primary">40%</span>. Your heart rate variability (HRV) during sleep was also significantly lower on caffeine-active nights.</p>
+</div>
+<div class="flex flex-wrap gap-4">
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-full font-bold flex items-center gap-2 transition-transform active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add_alert</span>
+                                Set Caffeine Reminder
+                            </button>
+<button class="border border-primary/20 text-primary hover:bg-primary/5 px-6 py-3 rounded-full font-bold transition-colors">
+                                Dismiss Insight
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Supporting Research Section -->
+<div class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100">Supporting Research</h2>
+<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="#">
+                        View Library <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Research Card 1 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-black">94% Relevance</div>
+<span class="material-symbols-outlined text-slate-400">article</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-2 leading-tight">Effect of late-day caffeine on lower esophageal sphincter pressure</h4>
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">Journal of Gastroenterology (2023). Study correlates nocturnal reflux with late afternoon stimulant use.</p>
+<div class="flex items-center justify-between">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">PubMed ID: 382910</span>
+<button class="text-primary text-xs font-bold underline">Read abstract</button>
+</div>
+</div>
+<!-- Research Card 2 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-black">81% Relevance</div>
+<span class="material-symbols-outlined text-slate-400">article</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-2 leading-tight">Dietary Triggers and IBS: A Longitudinal AI-Driven Study</h4>
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">Oxford Academic Press. Explores how machine learning identifies non-obvious triggers.</p>
+<div class="flex items-center justify-between">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">NIDDK Ref: 2024-B</span>
+<button class="text-primary text-xs font-bold underline">Read abstract</button>
+</div>
+</div>
+<!-- Research Card 3 -->
+<div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-4">
+<div class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-black">75% Relevance</div>
+<span class="material-symbols-outlined text-slate-400">article</span>
+</div>
+<h4 class="font-bold text-slate-900 dark:text-slate-100 mb-2 leading-tight">The Sleep-Gut Connection: HRV as an Early Indicator of GI Flare-ups</h4>
+<p class="text-slate-500 dark:text-slate-400 text-sm mb-4 line-clamp-2">Nature Digital Medicine. Research into biometric markers and digestive health.</p>
+<div class="flex items-center justify-between">
+<span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">DOI: 10.1038/s41746</span>
+<button class="text-primary text-xs font-bold underline">Read abstract</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Log Summary Expandable Section -->
+<div class="mb-12">
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 overflow-hidden">
+<button class="w-full flex items-center justify-between p-6 bg-primary/5 hover:bg-primary/10 transition-colors">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">analytics</span>
+<span class="text-lg font-bold text-slate-900 dark:text-slate-100">Log Summary: Stress Correlation Data</span>
+</div>
+<span class="material-symbols-outlined">expand_more</span>
+</button>
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+<div class="space-y-4">
+<div class="flex items-center justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-400 font-medium">Work Stress Intensity</span>
+<span class="text-slate-900 dark:text-white font-bold">High (8/10)</span>
+</div>
+<div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[80%]"></div>
+</div>
+<div class="flex items-center justify-between text-sm pt-2">
+<span class="text-slate-600 dark:text-slate-400 font-medium">Correlation with Symptoms</span>
+<span class="text-primary font-bold">Extreme</span>
+</div>
+<p class="text-xs text-slate-500 italic">"You recorded 'feeling overwhelmed' in 90% of your flare-up voice notes."</p>
+</div>
+<div class="bg-primary/5 p-4 rounded-xl flex flex-col justify-center">
+<h5 class="text-primary font-bold text-xs uppercase mb-2">AI Recommendation</h5>
+<p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic">
+                                    "Your voice logs indicate a tighter, higher pitch during these days. Consider the 'Gut-Brain Reset' 5-minute breathing exercise before meals on high-stress days."
+                                </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Export Buttons -->
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 py-10 border-t border-primary/10">
+<p class="text-slate-500 dark:text-slate-400 font-medium text-sm mr-2">Share these insights with your doctor:</p>
+<div class="flex gap-4">
+<button class="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-6 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+                        Export PDF
+                    </button>
+<button class="bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-6 py-3 rounded-full font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">ios_share</span>
+                        Share Securely
+                    </button>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-slate-100 dark:bg-slate-900/80 px-20 py-10 border-t border-primary/10">
+<div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 text-primary opacity-60 grayscale hover:grayscale-0 transition-all cursor-pointer">
+<span class="material-symbols-outlined font-bold">temp_preferences_custom</span>
+<span class="font-black text-lg">GutIQ</span>
+</div>
+<div class="flex gap-8 text-sm font-medium text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Medical Disclaimer</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+</div>
+<p class="text-slate-500 text-xs">© 2024 GutIQ Health AI. All rights reserved.</p>
+</div>
+</footer>
+</div>
+</body></html>

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GutIQ User Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ca6a2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#201812",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-gradient {
+            background: linear-gradient(180deg, rgba(202, 106, 43, 0.1) 0%, rgba(202, 106, 43, 0) 100%);
+        }
+        .insight-gradient {
+            background: linear-gradient(135deg, #ca6a2b 0%, #8ca67a 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-primary/10 px-6 lg:px-20 py-4">
+<div class="max-w-7xl mx-auto flex items-center justify-between gap-8">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-3xl font-bold">clinical_notes</span>
+<h1 class="text-xl font-black tracking-tight">GutIQ</h1>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-semibold text-primary" href="#">Dashboard</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Logs</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Insights</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary transition-colors" href="#">Recipes</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end items-center gap-4">
+<div class="relative hidden sm:block w-full max-w-xs">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+<input class="w-full bg-primary/5 border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary/20 text-sm" placeholder="Search insights..." type="text"/>
+</div>
+<button class="p-2 rounded-full bg-primary/5 hover:bg-primary/10 text-slate-700 dark:text-slate-300 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary/20 border-2 border-primary/10 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile avatar of Alex" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDoLE49aC7GUujrjFKE-y3ze9uVTsh2ia2PRbYbLRwjUHY2dDSKvEluiEB7KPa2UdT2paLlFr5vFXbofHwQIB1MFawhUWuwNlUiH2rhUPvdLy0GZ_MAihgw6OGwkhaqHjXcFNeTUaUwohwGL92uft5cujjHPR92NuQNCs9ZZAX-ZVUNTPWmiqnnk2p7n2rri-Ei42rUYnlFUZJaOCgcQ5JzCnQdYgtofAJ8-u_i4UUGoRC1KMiN80y7L9V2YSpfKoqbGk0eYSlVsl5E"/>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 lg:px-20 py-8 space-y-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div class="space-y-1">
+<h2 class="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-50">Good morning, Alex 👋</h2>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined fill-1">local_fire_department</span>
+<span>Day 5 streak</span>
+</div>
+</div>
+<button class="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary px-6 py-2.5 rounded-full font-bold transition-all text-sm self-start md:self-auto">
+<span>View Health Profile</span>
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Status & Overview -->
+<div class="lg:col-span-8 space-y-8">
+<!-- Today's Status / Voice Log Card -->
+<section class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 p-8 shadow-sm">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<div class="relative">
+<!-- Pulsing amber mic button -->
+<div class="absolute inset-0 bg-primary/20 rounded-full animate-ping"></div>
+<button class="relative w-24 h-24 bg-primary text-white rounded-full shadow-lg shadow-primary/40 flex items-center justify-center hover:scale-105 transition-transform group">
+<span class="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">mic</span>
+</button>
+</div>
+<div class="flex-1 text-center md:text-left space-y-2">
+<h3 class="text-xl font-bold">Update your gut health</h3>
+<p class="text-slate-500 dark:text-slate-400">Tap the mic to log your symptoms, meals, or stress levels via voice. AI will handle the rest.</p>
+<button class="mt-2 text-primary font-bold text-sm hover:underline">How does voice logging work?</button>
+</div>
+</div>
+</section>
+<!-- 7-Day Overview Chart -->
+<section class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 p-6 shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<h3 class="text-lg font-bold">7-Day Overview</h3>
+<div class="flex items-center gap-4 text-xs font-medium">
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 border-t-2 border-dashed border-red-500"></span>
+<span class="text-slate-500">Severity</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-3 h-0.5 bg-primary"></span>
+<span class="text-slate-500">Stress</span>
+</div>
+</div>
+</div>
+<!-- Simplified Visual Chart Placeholder using Tailwind -->
+<div class="h-64 w-full relative pt-4">
+<div class="absolute inset-0 flex items-end justify-between px-2">
+<!-- Bars/Lines visualization grid -->
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 absolute bottom-0"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 absolute bottom-1/4"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 absolute bottom-2/4"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-slate-800 absolute bottom-3/4"></div>
+</div>
+<!-- Simulated Chart Path -->
+<svg class="relative z-10 w-full h-full overflow-visible" viewbox="0 0 700 200">
+<!-- Stress Line (Amber Solid) -->
+<path d="M0,150 Q50,140 100,160 T200,100 T300,130 T400,80 T500,110 T600,140 T700,90" fill="none" stroke="#ca6a2b" stroke-width="3"></path>
+<!-- Severity Line (Red Dashed) -->
+<path d="M0,100 Q50,120 100,80 T200,130 T300,70 T400,110 T500,90 T600,60 T700,120" fill="none" stroke="#ef4444" stroke-dasharray="8,4" stroke-width="3"></path>
+</svg>
+<div class="flex justify-between mt-4 text-xs font-medium text-slate-400">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+</section>
+<!-- Recent Logs -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold px-1">Recent Logs</h3>
+<button class="text-sm font-bold text-primary">View All</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Log Card 1 -->
+<div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-primary/5 shadow-sm space-y-3">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-red-50 dark:bg-red-950 text-red-600 flex items-center justify-center">
+<span class="material-symbols-outlined">warning</span>
+</div>
+<div>
+<p class="font-bold text-sm">Reflux Episode</p>
+<p class="text-xs text-slate-500">2 hours ago</p>
+</div>
+</div>
+<div class="flex gap-1">
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="w-2 h-2 rounded-full bg-red-500"></span>
+<span class="w-2 h-2 rounded-full bg-slate-200"></span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold text-slate-600 dark:text-slate-400">🔥 Burning</span>
+<span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold text-slate-600 dark:text-slate-400">🌶️ Spicy Food</span>
+</div>
+</div>
+<!-- Log Card 2 -->
+<div class="p-4 bg-white dark:bg-slate-900 rounded-xl border border-primary/5 shadow-sm space-y-3">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-green-50 dark:bg-green-950 text-green-600 flex items-center justify-center">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<p class="font-bold text-sm">Oatmeal &amp; Banana</p>
+<p class="text-xs text-slate-500">8:15 AM</p>
+</div>
+</div>
+<div class="flex gap-1">
+<span class="w-2 h-2 rounded-full bg-green-500"></span>
+<span class="w-2 h-2 rounded-full bg-slate-200"></span>
+<span class="w-2 h-2 rounded-full bg-slate-200"></span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold text-slate-600 dark:text-slate-400">🥣 Breakfast</span>
+<span class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-[10px] font-bold text-slate-600 dark:text-slate-400">😌 Calm</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Insights & Recommendations -->
+<div class="lg:col-span-4 space-y-8">
+<!-- Insights Card -->
+<section class="insight-gradient p-6 rounded-xl text-white shadow-lg shadow-primary/20 space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined">lightbulb</span>
+<h3 class="font-bold uppercase tracking-wider text-sm">AI Insights</h3>
+</div>
+<p class="text-lg font-medium leading-snug">We've noticed a 40% correlation between your late-night snacks and reflux severity.</p>
+<div class="pt-2">
+<button class="bg-white/20 hover:bg-white/30 backdrop-blur-md px-4 py-2 rounded-full text-xs font-bold transition-colors">Learn More</button>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="bg-white dark:bg-slate-900 rounded-xl border border-primary/10 p-6 shadow-sm">
+<h3 class="text-lg font-bold mb-4">Recommended for You</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">self_improvement</span>
+</div>
+<div>
+<p class="text-sm font-bold">5-min Vagus Nerve exercise</p>
+<p class="text-xs text-slate-500">Reduce stress-related flares</p>
+</div>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<div>
+<p class="text-sm font-bold">Low-acid dinner ideas</p>
+<p class="text-xs text-slate-500">12 new safe recipes added</p>
+</div>
+</div>
+<div class="flex items-center gap-4 group cursor-pointer">
+<div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined">relax</span>
+</div>
+<div>
+<p class="text-sm font-bold">IBS Support Group</p>
+<p class="text-xs text-slate-500">Live chat starting soon</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Health Summary Mini Widget -->
+<section class="bg-primary/5 rounded-xl p-6 border border-primary/10">
+<h4 class="text-sm font-bold text-primary mb-4">Health Trends</h4>
+<div class="space-y-4">
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-600 dark:text-slate-400">Sleep Quality</span>
+<span class="font-bold text-green-600">+12%</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full w-[75%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center text-sm">
+<span class="text-slate-600 dark:text-slate-400">Water Intake</span>
+<span class="font-bold text-primary">1.8L / 2.5L</span>
+</div>
+<div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[60%] rounded-full"></div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile View) -->
+<div class="fixed bottom-0 left-0 right-0 md:hidden bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 px-6 py-3 flex justify-between items-center z-50">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-bold">Logs</span>
+</button>
+<div class="-mt-12">
+<button class="w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined">mic</span>
+</button>
+</div>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">insights</span>
+<span class="text-[10px] font-bold">Insights</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">group</span>
+<span class="text-[10px] font-bold">Social</span>
+</button>
+</div>
+</body></html>

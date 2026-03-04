@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mobile Manual Log Form - GutIQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#f4a825", // Amber
+                "secondary": "#2d7a7f", // Teal
+                "background-light": "#fdfbf7", // Warm Cream
+                "background-dark": "#221b10",
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        .severity-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(to right, #10b981, #2d7a7f, #f4a825, #ef4444);
+            border-radius: 9999px;
+            outline: none;
+        }
+        .severity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 3px solid #221b10;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .severity-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            background: white;
+            border: 3px solid #221b10;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center">
+<!-- Main Container (Simulating Mobile Viewport on Desktop) -->
+<div class="relative w-full max-w-[480px] min-h-screen bg-background-light dark:bg-background-dark shadow-2xl flex flex-col pb-24">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-light/80 backdrop-blur-md px-6 py-4 flex items-center justify-between border-b border-primary/10">
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">arrow_back</span>
+</button>
+<h1 class="text-lg font-bold tracking-tight">Daily Log</h1>
+<button class="p-2 hover:bg-primary/10 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-700 dark:text-slate-300">calendar_month</span>
+</button>
+</header>
+<!-- Form Content -->
+<main class="px-6 py-6 space-y-8 flex-1">
+<!-- Quick Date/Time Info -->
+<div class="flex items-center gap-2 text-secondary font-medium text-sm">
+<span class="material-symbols-outlined text-base">schedule</span>
+<span>Today, 12:45 PM</span>
+</div>
+<!-- Symptoms Section (Teal) -->
+<section class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">healing</span>
+<h2 class="text-xl font-bold">Symptoms</h2>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary border-2 border-secondary/20 rounded-full font-medium hover:bg-secondary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">waves</span> Bloating
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary text-white border-2 border-secondary rounded-full font-medium shadow-md shadow-secondary/20">
+<span class="material-symbols-outlined text-[18px]">local_fire_department</span> Acid Reflux
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary border-2 border-secondary/20 rounded-full font-medium hover:bg-secondary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">sick</span> Nausea
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary border-2 border-secondary/20 rounded-full font-medium hover:bg-secondary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">gastroenterology</span> Cramping
+                    </button>
+<button class="flex items-center gap-1 px-4 py-2 border-2 border-dashed border-secondary/30 text-secondary/60 rounded-full font-medium">
+<span class="material-symbols-outlined text-[18px]">add</span> More
+                    </button>
+</div>
+</section>
+<!-- Severity Slider -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h2 class="text-lg font-bold">Severity</h2>
+<span class="text-primary font-bold text-2xl">6/10</span>
+</div>
+<div class="relative px-2">
+<input class="severity-slider" max="10" min="0" type="range" value="6"/>
+<div class="flex justify-between mt-2 text-xs font-semibold text-slate-500 uppercase tracking-widest">
+<span>Mild</span>
+<span>Moderate</span>
+<span>Severe</span>
+</div>
+</div>
+</section>
+<!-- Foods Section (Amber) -->
+<section class="space-y-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">restaurant</span>
+<h2 class="text-xl font-bold">Food &amp; Drink</h2>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border-2 border-primary/20 rounded-full font-medium hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">coffee</span> Coffee
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border-2 border-primary/20 rounded-full font-medium hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">nutrition</span> Dairy
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary border-2 border-primary/20 rounded-full font-medium hover:bg-primary hover:text-white transition-all">
+<span class="material-symbols-outlined text-[18px]">fastfood</span> Spicy Food
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white border-2 border-primary rounded-full font-medium shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-[18px]">bakery_dining</span> Gluten
+                    </button>
+<button class="flex items-center gap-1 px-4 py-2 border-2 border-dashed border-primary/30 text-primary/60 rounded-full font-medium">
+<span class="material-symbols-outlined text-[18px]">search</span> Add Food
+                    </button>
+</div>
+</section>
+<!-- Stress Section -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h2 class="text-lg font-bold">Stress Level</h2>
+<span class="text-secondary font-bold text-2xl">Low</span>
+</div>
+<div class="relative px-2">
+<input class="severity-slider" max="100" min="0" type="range" value="20"/>
+</div>
+</section>
+<!-- Voice Log CTA -->
+<div class="bg-primary/5 rounded-xl p-6 border border-primary/10 flex flex-col items-center gap-3 text-center">
+<div class="bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-3xl">mic</span>
+</div>
+<div>
+<h3 class="font-bold">Try Voice Logging</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400">"I had a coffee and now I'm feeling bloated"</p>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-secondary text-white font-bold py-5 rounded-xl text-lg shadow-lg shadow-secondary/20 active:scale-95 transition-transform">
+                Save Daily Log
+            </button>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full max-w-[480px] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 h-20 flex items-center justify-around px-4 rounded-t-lg">
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Stats</span>
+</a>
+<!-- Lifted Log Button -->
+<div class="relative -top-6">
+<button class="bg-primary text-white size-16 rounded-full flex items-center justify-center shadow-xl shadow-primary/40 border-4 border-background-light dark:border-background-dark">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Insights</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Profile</span>
+</a>
+</nav>
+</div>
+</body></html>

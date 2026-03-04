@@ -11,3 +11,16 @@
   - Updated User and Log classes
   - Connected to NeonDB
   -Set up alembic for clean database updates and migration
+
+
+- **2026‑03‑02 – v0.1**
+  - I set up CI with github actions.
+  - Update User class, added age-range field and migrated it.
+
+
+- **2026‑03‑04 – v0.1**
+  - I completed the onboarding route
+  - Made schemas for onboarding requests and responses.
+  
+
+

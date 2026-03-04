@@ -65,10 +65,11 @@ jobs:
           done
         
       - name: Setup test database
-        env:  # ← ADD ALL REQUIRED ENV VARS
+        env:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/gutiq
           DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/gutiq
           JWT_SECRET: testsecret123
+          JWT_ALGORITHM: HS256
         run: |
           python -c "
           from app.db import engine
@@ -84,4 +85,5 @@ jobs:
           DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/gutiq
           DATABASE_URL_SYNC: postgresql://postgres:postgres@localhost:5432/gutiq
           JWT_SECRET: testsecret123
+          JWT_ALGORITHM: HS256
         run: pytest tests/ -v

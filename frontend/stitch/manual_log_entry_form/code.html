@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#ca6a2b",
+                "background-light": "#f8f7f6",
+                "background-dark": "#201812",
+              },
+              fontFamily: {
+                "display": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+<style>
+        input[type='range'] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+        input[type='range']::-webkit-slider-runnable-track {
+            background: linear-gradient(to right, #22c55e, #eab308, #ef4444);
+            height: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        input[type='range']::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: -8px;
+            background-color: #ffffff;
+            border: 2px solid #ca6a2b;
+            border-radius: 50%;
+            height: 1.5rem;
+            width: 1.5rem;
+        }
+    </style>
+<title>Manual Log Entry - GutIQ</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-4 md:px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<span class="material-symbols-outlined text-3xl">vital_signs</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-tight">GutIQ</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-semibold" href="#">Logs</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Insights</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Profile</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-4 items-center">
+<label class="hidden sm:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-full bg-primary/5 dark:bg-primary/10 border border-primary/10 overflow-hidden">
+<div class="text-primary/60 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full border-none bg-transparent focus:ring-0 text-sm placeholder:text-primary/40 px-3" placeholder="Search insights..." value=""/>
+</div>
+</label>
+<button class="bg-primary hover:bg-primary/90 text-white rounded-full px-5 py-2 text-sm font-bold transition-all shadow-sm">
+                                Log Entry
+                            </button>
+<div class="aspect-square rounded-full size-10 border-2 border-primary/20 bg-cover bg-center" data-alt="User profile avatar smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBDsw3H5cOq1-nMiFeUG6Elak43sSsgfKeiCdtAIikLWN51bn76QmG2qLSbrWHTk_tErKOVkkP_LctNzBo19hGwESJbnhMtcMMMzgbqyDBlBUbM2EKO__oTyn1si9rf1hm_WhtcZcuYstVgf4jSWz1NSZyb7tLX_gEAFNhoSLtAJsK0frQHG7pLEeDNTXP80ueqczz35LtANBTHqIcG6qc7tbz5S49jBvOH0VXSx08TGs4Zhpsa_5gONghkxfy1rskLh_vwyotzBdM8");'></div>
+</div>
+</header>
+<!-- Breadcrumbs & Header -->
+<div class="flex flex-col gap-1 p-4 mt-4">
+<div class="flex items-center gap-2 text-sm font-medium text-primary/60">
+<a class="hover:text-primary" href="#">Dashboard</a>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-slate-900 dark:text-slate-100">Manual Log Entry</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-3xl md:text-4xl font-black leading-tight tracking-tight mt-2">Log Your Symptoms &amp; Habits</h1>
+<p class="text-slate-600 dark:text-slate-400 text-base max-w-2xl">Daily tracking helps our AI identify triggers for your IBS and GERD symptoms.</p>
+</div>
+<!-- Main Form -->
+<main class="flex flex-col gap-8 p-4 bg-white dark:bg-background-dark/50 rounded-xl shadow-sm border border-primary/5 mt-4">
+<!-- Food Tags Section -->
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">restaurant</span>
+<h2 class="text-xl font-bold">Foods Eaten</h2>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group">
+<span class="text-sm font-semibold">Coffee</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group">
+<span class="text-sm font-semibold">Spicy Food</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group">
+<span class="text-sm font-semibold">Dairy</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group">
+<span class="text-sm font-semibold">Alcohol</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary hover:text-white transition-all group">
+<span class="text-sm font-semibold">Gluten</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary/50 border border-dashed border-primary/20 hover:border-primary transition-all">
+<span class="text-sm font-semibold italic">+ Custom</span>
+</button>
+</div>
+</section>
+<!-- Symptoms Tags Section -->
+<section>
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">ecg_heart</span>
+<h2 class="text-xl font-bold">Symptoms</h2>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/10 text-red-600 border border-red-200 dark:border-red-900/30 hover:bg-red-600 hover:text-white transition-all">
+<span class="text-sm font-semibold">Heartburn</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/10 text-red-600 border border-red-200 dark:border-red-900/30 hover:bg-red-600 hover:text-white transition-all">
+<span class="text-sm font-semibold">Bloating</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/10 text-red-600 border border-red-200 dark:border-red-900/30 hover:bg-red-600 hover:text-white transition-all">
+<span class="text-sm font-semibold">Acid Reflux</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-red-50 dark:bg-red-900/10 text-red-600 border border-red-200 dark:border-red-900/30 hover:bg-red-600 hover:text-white transition-all">
+<span class="text-sm font-semibold">Nausea</span>
+<span class="material-symbols-outlined text-sm">add</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/5 text-primary/50 border border-dashed border-primary/20 hover:border-primary transition-all">
+<span class="text-sm font-semibold italic">+ Custom</span>
+</button>
+</div>
+</section>
+<!-- Sliders Section -->
+<section class="grid md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<label class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">warning</span>
+                                        Symptom Severity
+                                    </label>
+<span class="text-sm font-medium text-primary">Moderate</span>
+</div>
+<input class="w-full h-2 rounded-lg cursor-pointer" max="100" min="0" type="range" value="45"/>
+<div class="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
+<span>Mild</span>
+<span>Severe</span>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between items-center">
+<label class="font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">psychology</span>
+                                        Stress Levels
+                                    </label>
+<span class="text-sm font-medium text-primary">Calm</span>
+</div>
+<input class="w-full h-2 rounded-lg cursor-pointer" max="100" min="0" type="range" value="20"/>
+<div class="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-widest">
+<span>Relaxed</span>
+<span>Burnt Out</span>
+</div>
+</div>
+</section>
+<!-- Number Steppers and Toggle -->
+<section class="grid md:grid-cols-3 gap-8 items-end">
+<div class="space-y-3">
+<label class="font-bold block text-sm">Sleep (Hours)</label>
+<div class="flex items-center bg-primary/5 rounded-xl border border-primary/10 p-1">
+<button class="size-10 flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-primary">remove</span>
+</button>
+<input class="bg-transparent border-none text-center flex-1 font-bold text-lg focus:ring-0" type="number" value="7"/>
+<button class="size-10 flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-primary">add</span>
+</button>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-bold block text-sm">Exercise (Mins)</label>
+<div class="flex items-center bg-primary/5 rounded-xl border border-primary/10 p-1">
+<button class="size-10 flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-primary">remove</span>
+</button>
+<input class="bg-transparent border-none text-center flex-1 font-bold text-lg focus:ring-0" type="number" value="30"/>
+<button class="size-10 flex items-center justify-center hover:bg-primary/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-primary">add</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between bg-primary/5 p-4 rounded-xl border border-primary/10">
+<div class="flex flex-col">
+<span class="font-bold text-sm">Lied down after meal</span>
+<span class="text-xs text-slate-500">Affects reflux risk</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-primary"></div>
+</label>
+</div>
+</section>
+<!-- Submit Button -->
+<div class="pt-6 border-t border-primary/5 flex flex-col sm:flex-row gap-4">
+<button class="flex-1 bg-primary text-white text-lg font-bold py-4 rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">save</span>
+                                Save Daily Log
+                            </button>
+<button class="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold rounded-xl hover:bg-slate-200 transition-all">
+                                Cancel
+                            </button>
+</div>
+</main>
+<!-- Bottom Insight Card -->
+<div class="mt-8 p-6 bg-primary/5 rounded-xl border border-primary/10 flex items-start gap-4">
+<div class="bg-primary/20 p-3 rounded-full">
+<span class="material-symbols-outlined text-primary">lightbulb</span>
+</div>
+<div>
+<h3 class="font-bold text-primary">Quick Tip</h3>
+<p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Based on your logs last week, avoiding coffee within 2 hours of bedtime reduced your morning heartburn by 40%. Consistency is key!</p>
+</div>
+</div>
+<footer class="py-10 text-center text-slate-400 text-sm">
+<p>© 2024 GutIQ Health. Warmly designed for your gut health journey.</p>
+</footer>
+</div>
+</div>
+</div>
+</div>
+</body></html>

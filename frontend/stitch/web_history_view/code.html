@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Web History View - GutIQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#11ced4",
+                        "amber-accent": "#f59e0b",
+                        "background-light": "#fdfbf7", // Warm cream
+                        "background-dark": "#102122",
+                        "surface-light": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Epilogue", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Epilogue', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .severity-high { background-color: #ef4444; }
+        .severity-medium { background-color: #f59e0b; }
+        .severity-low { background-color: #10b981; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between border-b border-primary/10 bg-surface-light dark:bg-background-dark px-6 py-3 lg:px-20">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">ecg_heart</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight">GutIQ</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-primary text-sm font-semibold border-b-2 border-primary pb-1" href="#">History</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Insights</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center bg-slate-100 dark:bg-slate-800 rounded-full px-4 py-1.5 gap-2 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-32 lg:w-48 placeholder:text-slate-400" placeholder="Search logs..." type="text"/>
+</div>
+<button class="p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-amber-accent rounded-full border-2 border-white"></span>
+</button>
+<div class="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 rounded-full size-9 flex items-center justify-center text-primary font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="User profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2pFcnn9linzYLFv8_KLL_j9nMfu1kbruHyhkUUAid5qUmVHMCFJqwjGdwgVpR3kMxqQRC1esg37SD2sRelhmnmU_WjOhzg6_jrh9Zor0wL9iptHkMF3aK4lXDVc2etA4S2pqHAasMBXUm_zZ1C53NlN9XBeXlSyPoLY3XQ4bTwfAbNyjrSCV_ZAarUXXxBTg4H21NUGF6iVF5a1Loq9xy1nvuYXseymEWLALc1UJRZkd8_98CcP2o4daqhDHsEjMhLyVBAnGhO2hI"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 px-6 py-8 lg:px-20 max-w-[1400px] mx-auto w-full">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+<div>
+<h1 class="text-3xl font-extrabold text-slate-900 dark:text-slate-100">Log History</h1>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Reflect on your journey. Track patterns, find triggers.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-surface-light dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-sm hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                            Export
+                        </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-white font-bold text-sm shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+                            Voice Log
+                        </button>
+</div>
+</div>
+<!-- Filters & Layout -->
+<div class="flex flex-col lg:flex-row gap-8">
+<!-- Sidebar Filters -->
+<aside class="w-full lg:w-64 flex flex-col gap-6">
+<div class="bg-surface-light dark:bg-slate-800/50 p-5 rounded-xl border border-primary/5 shadow-sm">
+<h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">filter_list</span>
+                                Filter Logs
+                            </h3>
+<div class="space-y-4">
+<div class="space-y-2">
+<label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Timeframe</label>
+<select class="w-full bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary">
+<option>Last 30 Days</option>
+<option>Last 7 Days</option>
+<option>Custom Range</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Severity</label>
+<div class="flex flex-col gap-2 mt-2">
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors">
+<input checked="" class="rounded text-primary focus:ring-primary" type="checkbox"/> All
+                                        </label>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors">
+<input class="rounded text-red-500 focus:ring-red-500" type="checkbox"/> Severe
+                                        </label>
+<label class="flex items-center gap-2 text-sm cursor-pointer hover:text-primary transition-colors">
+<input class="rounded text-amber-500 focus:ring-amber-500" type="checkbox"/> Moderate
+                                        </label>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Insights Card -->
+<div class="bg-gradient-to-br from-primary/10 to-amber-accent/10 p-5 rounded-xl border border-white/50">
+<p class="text-xs font-bold text-primary uppercase tracking-widest mb-2">Weekly Summary</p>
+<p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                                You logged <span class="font-bold text-slate-900 dark:text-slate-100">12 entries</span> this week. Symptoms decreased by <span class="text-emerald-600 font-bold">15%</span> compared to last week.
+                            </p>
+<button class="mt-4 text-xs font-bold text-primary flex items-center gap-1 hover:underline">
+                                Full Insight Report <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+</button>
+</div>
+</aside>
+<!-- History Table Content -->
+<div class="flex-1 flex flex-col gap-4">
+<div class="bg-surface-light dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-100 dark:border-slate-700">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Date &amp; Time</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Symptoms</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Food &amp; Drink</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Severity</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Details</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+<!-- Row 1: High Severity -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group cursor-pointer">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">Oct 24, 2023</span>
+<span class="text-xs text-slate-400">08:15 PM</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] font-bold rounded-full">Bloating</span>
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] font-bold rounded-full">Heartburn</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Spicy Tacos</span>
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Soda</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2.5 rounded-full severity-high"></span>
+<span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Severe</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+<!-- Row 2: Low Severity -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group cursor-pointer">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">Oct 23, 2023</span>
+<span class="text-xs text-slate-400">12:30 PM</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="text-xs italic text-slate-400">No symptoms</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Grilled Chicken</span>
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Brown Rice</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2.5 rounded-full severity-low"></span>
+<span class="text-xs font-semibold text-slate-700 dark:text-slate-300">None</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+<!-- Row 3: Medium Severity -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group cursor-pointer">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">Oct 22, 2023</span>
+<span class="text-xs text-slate-400">09:00 AM</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] font-bold rounded-full">Nausea</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Oatmeal</span>
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Coffee</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2.5 rounded-full severity-medium"></span>
+<span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Moderate</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+<!-- Row 4: High Severity -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group cursor-pointer">
+<td class="px-6 py-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-slate-900 dark:text-slate-100">Oct 21, 2023</span>
+<span class="text-xs text-slate-400">11:45 PM</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] font-bold rounded-full">Acid Reflux</span>
+<span class="px-2 py-0.5 bg-primary/10 text-primary text-[11px] font-bold rounded-full">Chest Pain</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Pepperoni Pizza</span>
+<span class="px-2 py-0.5 bg-amber-accent/10 text-amber-accent text-[11px] font-bold rounded-full">Beer</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="flex items-center gap-2">
+<span class="size-2.5 rounded-full severity-high"></span>
+<span class="text-xs font-semibold text-slate-700 dark:text-slate-300">Severe</span>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">chevron_right</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between py-4">
+<p class="text-xs text-slate-500 font-medium">Showing <span class="text-slate-900 dark:text-slate-100">1-4</span> of 48 entries</p>
+<div class="flex items-center gap-2">
+<button class="size-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 hover:bg-slate-50 disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="size-9 rounded-lg bg-primary text-white font-bold text-sm">1</button>
+<button class="size-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 hover:bg-slate-50">2</button>
+<button class="size-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 hover:bg-slate-50">3</button>
+<button class="size-9 rounded-lg border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-600 hover:bg-slate-50">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Floating Action for Tablet/Mobile -->
+<div class="fixed bottom-8 right-8 md:hidden">
+<button class="size-14 rounded-full bg-primary text-white shadow-xl shadow-primary/30 flex items-center justify-center">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Side Panel Preview (Mockup of Detailed View) -->
+<div class="fixed top-0 right-0 h-full w-full max-w-md bg-surface-light dark:bg-slate-900 shadow-2xl z-50 border-l border-slate-200 dark:border-slate-800 transform translate-x-full transition-transform duration-300 pointer-events-none">
+<!-- Close button & Header -->
+<div class="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+<h2 class="text-lg font-bold">Log Details</h2>
+<button class="p-2 hover:bg-slate-100 rounded-full"><span class="material-symbols-outlined">close</span></button>
+</div>
+<div class="p-6 space-y-8 overflow-y-auto">
+<div class="space-y-2">
+<p class="text-xs font-bold text-slate-400 uppercase">Timestamp</p>
+<p class="text-lg font-bold text-slate-900 dark:text-slate-100">October 24, 2023 at 08:15 PM</p>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<p class="text-xs font-bold text-slate-400 uppercase">Symptoms</p>
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-1 bg-primary/10 text-primary text-xs font-bold rounded-lg">Bloating</span>
+<span class="px-2 py-1 bg-primary/10 text-primary text-xs font-bold rounded-lg">Heartburn</span>
+</div>
+</div>
+<div class="space-y-2">
+<p class="text-xs font-bold text-slate-400 uppercase">Severity</p>
+<div class="flex items-center gap-2">
+<span class="size-3 rounded-full severity-high"></span>
+<span class="font-bold text-red-500">Severe (8/10)</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<p class="text-xs font-bold text-slate-400 uppercase">Meal Log</p>
+<div class="p-4 bg-amber-accent/5 border border-amber-accent/10 rounded-xl">
+<p class="font-semibold text-slate-800 dark:text-slate-200">Spicy Beef Tacos &amp; Lemonade</p>
+<p class="text-sm text-slate-500 mt-1">Ingredients: Flour tortilla, ground beef, cayenne pepper, jalapeños, onions.</p>
+</div>
+</div>
+<div class="space-y-2">
+<p class="text-xs font-bold text-slate-400 uppercase">Voice Notes Transcription</p>
+<p class="text-sm italic leading-relaxed text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                    "I had three tacos with extra spicy salsa. About 45 minutes later, I started feeling a sharp burning sensation in my lower chest and felt quite bloated. It's been persisting for about an hour now despite taking an antacid."
+                </p>
+</div>
+<div class="pt-6 border-t border-slate-100 dark:border-slate-800 flex gap-3">
+<button class="flex-1 py-3 bg-slate-100 dark:bg-slate-800 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors">Edit Log</button>
+<button class="flex-1 py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] transition-all">Done</button>
+</div>
+</div>
+</div>
+</body></html>

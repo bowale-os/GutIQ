@@ -14,6 +14,7 @@ class Log(SQLModel, table=True):
     logged_at: datetime = Field(default_factory=datetime.now)
     
     # populated by AI after submission
+    log_type: Optional[str] = None
     parsed_foods: Optional[str] = None
     parsed_symptoms: Optional[str] = None
     parsed_severity: Optional[int] = None

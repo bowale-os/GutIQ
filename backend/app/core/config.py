@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     DATABASE_URL_SYNC: str
     JWT_SECRET: str 
     ACCESS_TOKEN_EXPIRE_HOURS: int = 24
-    
-    model_config = ConfigDict(env_file="../.env")
+    JWT_ALGORITHM: str
+    model_config = ConfigDict(env_file=".env")
 
 settings = Settings()

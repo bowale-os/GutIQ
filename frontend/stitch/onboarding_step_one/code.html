@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding Step One - GutIQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ca6a2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#201812",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col items-center">
+<!-- Mobile-first Container Frame for Desktop -->
+<div class="layout-content-container flex flex-col w-full max-w-[480px] flex-1 bg-white dark:bg-slate-900 shadow-2xl min-h-screen md:min-h-[850px] md:my-8 md:rounded-xl overflow-hidden border border-primary/10">
+<!-- Top Header -->
+<header class="flex items-center justify-between px-6 py-4 border-b border-primary/10">
+<div class="flex items-center gap-2 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary/10 rounded-full">
+<span class="material-symbols-outlined text-primary text-xl">vital_signs</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold tracking-tight">GutIQ</h2>
+</div>
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</header>
+<!-- Progress Section -->
+<div class="flex flex-col gap-3 p-6">
+<div class="flex items-center justify-between mb-1">
+<p class="text-primary text-sm font-semibold uppercase tracking-wider">Step 1 of 4</p>
+<div class="flex gap-1.5">
+<div class="h-1.5 w-8 rounded-full bg-primary"></div>
+<div class="h-1.5 w-8 rounded-full bg-primary/20"></div>
+<div class="h-1.5 w-8 rounded-full bg-primary/20"></div>
+<div class="h-1.5 w-8 rounded-full bg-primary/20"></div>
+</div>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-3xl font-bold leading-tight">What's your main condition?</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base">Select the primary concern you'd like to manage. This helps us personalize your AI insights.</p>
+</div>
+<!-- Condition Cards Grid -->
+<div class="flex-1 px-6 pb-24 overflow-y-auto">
+<div class="grid grid-cols-1 gap-4">
+<!-- Option 1: Selected State -->
+<div class="group relative flex items-center p-4 gap-4 rounded-xl border-2 border-primary bg-primary/5 cursor-pointer transition-all hover:bg-primary/10">
+<div class="size-16 rounded-lg bg-primary/20 flex items-center justify-center text-primary overflow-hidden">
+<span class="material-symbols-outlined text-4xl">water_drop</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-slate-100">GERD / Acid Reflux</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Heartburn and regurgitation</p>
+</div>
+<div class="flex items-center justify-center size-6 rounded-full bg-primary text-white">
+<span class="material-symbols-outlined text-sm font-bold">check</span>
+</div>
+</div>
+<!-- Option 2 -->
+<div class="group relative flex items-center p-4 gap-4 rounded-xl border-2 border-transparent bg-slate-50 dark:bg-slate-800/50 cursor-pointer transition-all hover:border-primary/30 hover:bg-white dark:hover:bg-slate-800">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 overflow-hidden">
+<span class="material-symbols-outlined text-4xl">healing</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-slate-100">Peptic Ulcer</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Stomach lining irritation</p>
+</div>
+</div>
+<!-- Option 3 -->
+<div class="group relative flex items-center p-4 gap-4 rounded-xl border-2 border-transparent bg-slate-50 dark:bg-slate-800/50 cursor-pointer transition-all hover:border-primary/30 hover:bg-white dark:hover:bg-slate-800">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 overflow-hidden">
+<span class="material-symbols-outlined text-4xl">gastroenterology</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-slate-100">IBS</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Irritable Bowel Syndrome</p>
+</div>
+</div>
+<!-- Option 4 -->
+<div class="group relative flex items-center p-4 gap-4 rounded-xl border-2 border-transparent bg-slate-50 dark:bg-slate-800/50 cursor-pointer transition-all hover:border-primary/30 hover:bg-white dark:hover:bg-slate-800">
+<div class="size-16 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-400 overflow-hidden">
+<span class="material-symbols-outlined text-4xl">help_outline</span>
+</div>
+<div class="flex-1">
+<h3 class="font-bold text-slate-900 dark:text-slate-100">Not sure yet</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">I need help identifying it</p>
+</div>
+</div>
+</div>
+<!-- Voice Assistant Prompt -->
+<div class="mt-8 p-4 rounded-xl bg-primary/5 border border-primary/10 flex items-start gap-3">
+<span class="material-symbols-outlined text-primary">mic</span>
+<p class="text-sm text-slate-600 dark:text-slate-400 italic">
+                            "You can also say something like: 'I've been feeling a lot of heartburn lately' and I'll help you categorize it."
+                        </p>
+</div>
+</div>
+<!-- Footer Action -->
+<div class="p-6 border-t border-primary/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky bottom-0">
+<button class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-[0.98]">
+                        Continue
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</body></html>
