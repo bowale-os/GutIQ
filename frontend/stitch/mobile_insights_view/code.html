@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GutIQ - Mobile Insights View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ca6a2b",
+                        "background-light": "#f8f7f6",
+                        "background-dark": "#201812",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="mx-auto flex w-full max-w-[480px] flex-col bg-background-light dark:bg-background-dark shadow-2xl min-h-screen pb-24">
+<!-- Top Nav Bar -->
+<header class="sticky top-0 z-10 flex items-center justify-between border-b border-primary/10 bg-background-light/80 backdrop-blur-md px-6 py-4 dark:bg-background-dark/80">
+<div class="flex items-center gap-3">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-white">
+<span class="material-symbols-outlined text-xl">fluid</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900 dark:text-slate-100">GutIQ</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 bg-primary/5">
+<img class="h-full w-full object-cover" data-alt="User profile avatar placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG_fmdLQpu779-_lQFetWqFJJx6o1N3COl6J3aXRUh6qsPt5GyFQGhEdLqRfr5YuD0dLtociqndOjG8Hgpxn84vIZSKtVe22FpKw_UwH7PMBFsvP1GtQHqxHp80QT9tLypyaXVgx5D2636A-c4ngTscsi_lJV2_5if4Hulrn7a6Z4iPy7K5UWJOkNfB0OFaJmBfibb6B5XxLim7kpNGooQ_uTjPApgmWgll_JHVhq6Ek0yw5m_vX3ViOAsAGsniLJCPONh0YYuLIZj"/>
+</div>
+</div>
+</header>
+<main class="flex flex-col gap-6 px-6 py-6">
+<!-- Header Section -->
+<div class="flex flex-col gap-1">
+<h2 class="text-3xl font-extrabold tracking-tight">Your Insights</h2>
+<p class="text-slate-600 dark:text-slate-400">AI-driven patterns based on your voice logs.</p>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2 rounded-2xl border border-primary/10 bg-white p-5 dark:bg-slate-800/50">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Flare Frequency</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold">-12%</span>
+<span class="text-xs font-bold text-green-600">Improving</span>
+</div>
+<div class="mt-2 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full w-3/4 rounded-full bg-primary"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-2xl border border-primary/10 bg-white p-5 dark:bg-slate-800/50">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Avg Stress</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold">6.2</span>
+<span class="text-xs text-slate-400">/10</span>
+</div>
+<div class="mt-2 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full w-[62%] rounded-full bg-primary/60"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-2xl border border-primary/10 bg-white p-5 dark:bg-slate-800/50">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Trigger Match</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold">85%</span>
+</div>
+<div class="mt-2 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full w-[85%] rounded-full bg-primary"></div>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-2xl border border-primary/10 bg-white p-5 dark:bg-slate-800/50">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Fiber Goal</span>
+<div class="flex items-baseline gap-2">
+<span class="text-2xl font-bold">92%</span>
+</div>
+<div class="mt-2 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full w-[92%] rounded-full bg-primary"></div>
+</div>
+</div>
+</div>
+<!-- AI Analysis Card -->
+<div class="rounded-2xl bg-primary/10 border border-primary/20 p-6">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h3 class="font-bold text-lg text-primary">Key Discovery</h3>
+</div>
+<p class="text-slate-800 dark:text-slate-200 leading-relaxed">
+                        We've identified a <span class="font-bold underline decoration-primary/40">strong correlation</span> between your late-night voice logs and morning acid reflux. Flare-ups are 40% more likely when you eat less than 3 hours before sleep.
+                    </p>
+<div class="mt-4 flex flex-wrap gap-2">
+<span class="rounded-full bg-white/50 px-3 py-1 text-xs font-medium dark:bg-slate-800/50">#StressCorrelation</span>
+<span class="rounded-full bg-white/50 px-3 py-1 text-xs font-medium dark:bg-slate-800/50">#GERDPatterns</span>
+</div>
+</div>
+<!-- Visual Chart Placeholder -->
+<div class="flex flex-col gap-4 rounded-2xl border border-primary/10 bg-white p-6 dark:bg-slate-800/50">
+<div class="flex items-center justify-between">
+<h3 class="font-bold">Stress vs. Symptoms</h3>
+<span class="material-symbols-outlined text-slate-400">info</span>
+</div>
+<div class="relative h-48 w-full overflow-hidden rounded-xl bg-slate-50 dark:bg-slate-900/50">
+<!-- Abstract Chart Representation -->
+<div class="absolute bottom-0 left-0 flex h-full w-full items-end justify-around px-2">
+<div class="w-4 rounded-t-full bg-primary/20 h-[30%]"></div>
+<div class="w-4 rounded-t-full bg-primary/40 h-[45%]"></div>
+<div class="w-4 rounded-t-full bg-primary/60 h-[60%]"></div>
+<div class="w-4 rounded-t-full bg-primary h-[85%]"></div>
+<div class="w-4 rounded-t-full bg-primary/80 h-[70%]"></div>
+<div class="w-4 rounded-t-full bg-primary/50 h-[40%]"></div>
+<div class="w-4 rounded-t-full bg-primary/30 h-[25%]"></div>
+</div>
+<div class="absolute top-0 left-0 h-full w-full p-4 flex flex-col justify-between pointer-events-none opacity-20">
+<div class="border-t border-slate-300 dark:border-slate-600 w-full"></div>
+<div class="border-t border-slate-300 dark:border-slate-600 w-full"></div>
+<div class="border-t border-slate-300 dark:border-slate-600 w-full"></div>
+</div>
+</div>
+<div class="flex justify-between text-[10px] uppercase font-bold text-slate-400">
+<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+</div>
+</div>
+<!-- Research Sources -->
+<div class="flex flex-col gap-4">
+<h3 class="text-lg font-bold">Recommended Reading</h3>
+<div class="flex flex-col gap-3">
+<div class="group flex flex-col gap-2 rounded-2xl border border-primary/5 bg-white p-4 transition-all hover:border-primary/20 dark:bg-slate-800/30">
+<h4 class="font-semibold text-sm leading-snug">The Impact of Circadian Rhythm on Gastric Acid Secretion</h4>
+<p class="text-xs text-slate-500 line-clamp-2">Recent clinical trials suggest a direct link between meal timing and LES pressure...</p>
+<a class="mt-1 flex items-center gap-1 text-xs font-bold text-primary group-hover:underline" href="#">
+                                View abstract <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+<div class="group flex flex-col gap-2 rounded-2xl border border-primary/5 bg-white p-4 transition-all hover:border-primary/20 dark:bg-slate-800/30">
+<h4 class="font-semibold text-sm leading-snug">Mind-Gut Axis: Stress and Irritable Bowel Syndrome</h4>
+<p class="text-xs text-slate-500 line-clamp-2">Meta-analysis of over 500 patients showing the efficacy of mindful breathing...</p>
+<a class="mt-1 flex items-center gap-1 text-xs font-bold text-primary group-hover:underline" href="#">
+                                View abstract <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-1/2 z-20 flex w-full max-w-[480px] -translate-x-1/2 items-center justify-around border-t border-primary/10 bg-background-light/95 backdrop-blur-xl px-2 py-3 dark:bg-background-dark/95">
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">mic</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Log</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined fill-1">trending_up</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Insights</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">restaurant</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Diet</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+</button>
+</nav>
+</div>
+</div>
+</body></html>

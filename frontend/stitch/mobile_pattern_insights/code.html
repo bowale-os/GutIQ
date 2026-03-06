@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13e5ec",
+                        "amber-accent": "#f59e0b",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#102122",
+                        "teal-deep": "#0d1b1b",
+                        "teal-muted": "#4c979a",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>GutIQ | Mobile Pattern Insights</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-teal-muted/20 bg-background-light/80 backdrop-blur-md sticky top-0 z-50 px-6 py-3 lg:px-40">
+<div class="flex items-center gap-4 text-teal-deep">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-4xl">waves</span>
+</div>
+<h2 class="text-teal-deep dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">GutIQ</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-teal-deep dark:text-slate-100 text-sm font-medium hover:text-primary transition-colors" href="#">Insights</a>
+<a class="text-teal-deep dark:text-slate-100 text-sm font-medium hover:text-primary transition-colors" href="#">Patterns</a>
+<a class="text-teal-deep dark:text-slate-100 text-sm font-medium hover:text-primary transition-colors" href="#">Research</a>
+<a class="text-teal-deep dark:text-slate-100 text-sm font-medium hover:text-primary transition-colors" href="#">History</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary/10 text-teal-deep dark:text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="flex items-center justify-center rounded-lg h-10 w-10 bg-primary/10 text-teal-deep dark:text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">person</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBs8CnC2bct8AeA-An9QEeI07O2CTG5E6kq71k5fv_n0O-bI05w4PdqNr9u7MSKQ8VL1XgKCpa3lavh-gLLUkhFYZNUOGDg8mtPdmTbvk9kwteEMtzUPwQvpIh1hi9mjRPSp8dDGK-NgKaEM42L-lw-oXaSJyjPQH4j5d7NxmH807RPESv4Sp2vEy_qYBaa9UK49ijAbNeRvXq7-CcloG7KrrjhhF4mTFHEFCDcteH-uQ52fbPeDm2NiDaGLk7h0dF1J1t7NxY_MrEl");'></div>
+</div>
+</header>
+<main class="flex flex-1 justify-center py-8">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1 px-4 md:px-10">
+<!-- Progress/Sync State -->
+<div class="flex flex-col gap-3 p-6 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-primary/10 mb-6">
+<div class="flex gap-6 justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary animate-pulse">analytics</span>
+<p class="text-teal-deep dark:text-slate-100 text-base font-semibold">Analyzing your voice logs for healing patterns...</p>
+</div>
+<p class="text-amber-accent text-sm font-bold bg-amber-accent/10 px-2 py-1 rounded">LIVE SYNC</p>
+</div>
+<div class="rounded-full bg-primary/10 h-3 overflow-hidden">
+<div class="h-full rounded-full bg-gradient-to-r from-primary to-amber-accent" style="width: 82%;"></div>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-teal-muted text-sm italic">"I've noticed your voice sounds calmer today. Let's look at why."</p>
+<p class="text-teal-muted text-xs font-mono uppercase tracking-widest">v2.4.0-INSIGHT</p>
+</div>
+</div>
+<!-- Hero Section -->
+<div class="flex flex-col gap-4 mb-8">
+<h1 class="text-teal-deep dark:text-slate-50 text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+                        Your Mobile <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-amber-accent">Pattern Insights</span>
+</h1>
+<p class="text-teal-muted text-lg max-w-2xl">
+                        Based on your logs this week, we've identified three significant triggers. You're making progress—your digestive comfort score is up 12% compared to last Tuesday.
+                    </p>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-800 border-l-4 border-primary shadow-md">
+<p class="text-teal-muted text-xs font-bold uppercase tracking-wider">Symptom Intensity</p>
+<div class="flex items-baseline gap-2">
+<p class="text-teal-deep dark:text-slate-100 text-3xl font-black">-15%</p>
+<span class="material-symbols-outlined text-green-500 text-sm font-bold">trending_down</span>
+</div>
+<p class="text-green-600 dark:text-green-400 text-sm font-medium">Lower than avg.</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-800 border-l-4 border-amber-accent shadow-md">
+<p class="text-teal-muted text-xs font-bold uppercase tracking-wider">Primary Trigger</p>
+<p class="text-teal-deep dark:text-slate-100 text-3xl font-black">Late Meals</p>
+<p class="text-teal-muted text-sm font-medium">8:00 PM - 10:00 PM</p>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-white dark:bg-slate-800 border-l-4 border-primary shadow-md">
+<p class="text-teal-muted text-xs font-bold uppercase tracking-wider">Gut Wellness Score</p>
+<div class="flex items-baseline gap-2">
+<p class="text-teal-deep dark:text-slate-100 text-3xl font-black">82/100</p>
+<span class="material-symbols-outlined text-primary text-sm font-bold">verified_user</span>
+</div>
+<p class="text-primary text-sm font-bold">+5 points today</p>
+</div>
+</div>
+<!-- Clinical Insight Section -->
+<h2 class="text-teal-deep dark:text-slate-100 text-2xl font-bold px-1 mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-amber-accent">biotech</span>
+                    Clinical Pattern Breakdown
+                </h2>
+<div class="space-y-4 mb-10">
+<!-- Key Insight Card -->
+<div class="relative group p-[2px] rounded-2xl bg-gradient-to-br from-primary via-primary/20 to-amber-accent shadow-lg">
+<div class="bg-white dark:bg-slate-900 rounded-[14px] p-8">
+<div class="flex flex-col md:flex-row gap-6">
+<div class="flex-1">
+<div class="flex items-center gap-3 mb-4">
+<span class="bg-amber-accent/10 text-amber-accent px-3 py-1 rounded-full text-xs font-bold uppercase">High Correlation</span>
+<span class="text-teal-muted text-xs">Analysis from 14 voice entries</span>
+</div>
+<h3 class="text-teal-deep dark:text-slate-100 text-2xl font-bold mb-3">The "Evening Reflux" Loop</h3>
+<p class="text-teal-muted leading-relaxed mb-6">
+                                        Our AI detected a pattern where your voice strain increases significantly within 45 minutes of logs mentioning "dinner" after 8:30 PM. This correlates with a 40% spike in reported nighttime heartburn.
+                                    </p>
+<div class="flex flex-wrap gap-3">
+<button class="bg-primary hover:bg-primary/90 text-teal-deep font-bold py-2 px-6 rounded-lg transition-all flex items-center gap-2">
+                                            View Solution Path
+                                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+</button>
+<button class="border border-teal-muted/30 text-teal-muted hover:bg-teal-muted/5 font-bold py-2 px-6 rounded-lg transition-all">
+                                            Ignore Pattern
+                                        </button>
+</div>
+</div>
+<div class="w-full md:w-48 flex items-center justify-center">
+<div class="relative size-32 rounded-full border-8 border-primary/10 flex items-center justify-center">
+<div class="absolute inset-0 rounded-full border-t-8 border-amber-accent -rotate-45"></div>
+<span class="text-amber-accent font-black text-2xl">84%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Research Sources Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="bg-white dark:bg-slate-800 border border-teal-muted/10 p-5 rounded-xl flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-tighter">Clinical Standard</span>
+<span class="text-teal-muted text-xs">2023 Study</span>
+</div>
+<h4 class="text-teal-deep dark:text-slate-100 font-bold leading-tight">Postprandial Latency &amp; LES Function</h4>
+<p class="text-teal-muted text-sm line-clamp-2">Research indicates that lying down within 2 hours of a high-acid meal increases esophageal exposure...</p>
+<div class="flex items-center gap-2 mt-auto pt-2 border-t border-teal-muted/5">
+<span class="material-symbols-outlined text-primary text-sm">link</span>
+<a class="text-primary text-xs font-bold hover:underline" href="#">Read on PubMed</a>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 border border-teal-muted/10 p-5 rounded-xl flex flex-col gap-3 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start">
+<span class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-tighter">Peer Reviewed</span>
+<span class="text-teal-muted text-xs">Mayo Clinic</span>
+</div>
+<h4 class="text-teal-deep dark:text-slate-100 font-bold leading-tight">Circadian Gut Motility Patterns</h4>
+<p class="text-teal-muted text-sm line-clamp-2">Digestion efficiency decreases by up to 30% during the biological night (10 PM - 4 AM)...</p>
+<div class="flex items-center gap-2 mt-auto pt-2 border-t border-teal-muted/5">
+<span class="material-symbols-outlined text-primary text-sm">link</span>
+<a class="text-primary text-xs font-bold hover:underline" href="#">Read Research Paper</a>
+</div>
+</div>
+</div>
+</div>
+<!-- Disclaimer Box -->
+<div class="mb-12 rounded-xl border-2 border-dashed border-primary/30 p-6 bg-primary/5">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary">info</span>
+<div class="flex flex-col gap-2">
+<p class="text-teal-deep dark:text-slate-100 text-sm font-bold uppercase tracking-wider">A Note from Your Health Coach</p>
+<p class="text-teal-muted text-sm leading-relaxed">
+                                These insights are based on AI analysis of your personal logs and clinical literature. While highly accurate for tracking trends, GutIQ is not a medical device. Always consult with your gastroenterologist before making significant changes to your prescribed treatment plan. You're doing great—consistency is the key to gut healing!
+                            </p>
+</div>
+</div>
+</div>
+<!-- CTA Footer -->
+<div class="flex flex-col items-center justify-center py-10 border-t border-teal-muted/10 text-center">
+<p class="text-teal-deep dark:text-slate-100 text-lg font-bold mb-4 italic">"Small changes today lead to a quieter gut tomorrow."</p>
+<button class="flex items-center gap-3 bg-teal-deep dark:bg-slate-100 text-white dark:text-teal-deep px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-transform">
+<span class="material-symbols-outlined">mic</span>
+                        Record Today's Progress
+                    </button>
+</div>
+</div>
+</main>
+<footer class="bg-white dark:bg-slate-900 py-6 border-t border-teal-muted/10 px-6 lg:px-40 flex flex-col md:flex-row justify-between items-center gap-4">
+<p class="text-teal-muted text-xs">© 2024 GutIQ Health Systems. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-teal-muted hover:text-primary text-xs transition-colors" href="#">Privacy Policy</a>
+<a class="text-teal-muted hover:text-primary text-xs transition-colors" href="#">Terms of Service</a>
+<a class="text-teal-muted hover:text-primary text-xs transition-colors" href="#">Contact Support</a>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Mobile Voice Log Interface - GutIQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2a60d", // Amber
+                        "accent-teal": "#14b8a6", // Healing Teal
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#1C1917", // Charcoal Black
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glow-amber {
+            box-shadow: 0 0 40px 10px rgba(242, 166, 13, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display antialiased text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<div class="relative flex h-screen w-full flex-col overflow-hidden">
+<!-- Header / Navigation -->
+<header class="flex items-center justify-between px-6 pt-8 pb-4">
+<button class="p-2 rounded-full hover:bg-slate-800/50 transition-colors">
+<span class="material-symbols-outlined text-3xl">arrow_back</span>
+</button>
+<div class="flex flex-col items-center">
+<span class="text-xs uppercase tracking-widest text-primary font-bold">Voice Log</span>
+<div class="h-1 w-1 rounded-full bg-primary mt-1"></div>
+</div>
+<div class="w-12"></div> <!-- Spacer for balance -->
+</header>
+<!-- Main Voice Interaction Area -->
+<main class="flex flex-1 flex-col items-center justify-center px-8 text-center">
+<!-- Pulsing Mic Icon -->
+<div class="relative mb-12">
+<div class="absolute inset-0 animate-ping rounded-full bg-primary/20 opacity-75"></div>
+<div class="relative flex h-32 w-32 items-center justify-center rounded-full bg-primary text-background-dark glow-amber">
+<span class="material-symbols-outlined text-[64px]">mic</span>
+</div>
+</div>
+<!-- Live Transcript -->
+<div class="max-w-md space-y-4">
+<p class="text-2xl font-medium leading-relaxed text-slate-100 opacity-90">
+                    "I just finished a spicy chicken pasta with a side of garlic bread and some lemon water."
+                </p>
+<div class="flex justify-center gap-1">
+<div class="h-1 w-1 bg-primary rounded-full"></div>
+<div class="h-1 w-1 bg-primary/60 rounded-full"></div>
+<div class="h-1 w-1 bg-primary/30 rounded-full"></div>
+</div>
+</div>
+<!-- AI Coaching Bubble -->
+<div class="mt-16 flex w-full max-w-sm flex-col items-start animate-in fade-in slide-in-from-bottom-4 duration-700">
+<div class="flex items-center gap-2 mb-2 ml-4">
+<div class="h-6 w-6 rounded-full bg-accent-teal flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-white">auto_awesome</span>
+</div>
+<span class="text-xs font-semibold text-accent-teal tracking-wide uppercase">GutIQ Coach</span>
+</div>
+<div class="relative rounded-2xl rounded-tl-none bg-accent-teal/10 border border-accent-teal/20 px-6 py-4 text-left">
+<p class="text-lg text-accent-teal leading-snug">
+                        Got it — what time was that meal?
+                    </p>
+</div>
+</div>
+</main>
+<!-- Footer / Action Area -->
+<footer class="flex flex-col items-center pb-12 pt-4 px-8">
+<button class="group flex items-center justify-center gap-3 rounded-full bg-slate-800 px-10 py-5 transition-all hover:bg-red-500/20 active:scale-95">
+<span class="material-symbols-outlined text-red-500 group-hover:scale-110 transition-transform">stop_circle</span>
+<span class="text-lg font-bold tracking-wide">Stop Recording</span>
+</button>
+<p class="mt-6 text-sm text-slate-500 font-medium">
+                Tap to save your entry
+            </p>
+</footer>
+<!-- Decorative UI elements -->
+<div class="absolute -top-24 -left-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
+<div class="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-accent-teal/5 blur-3xl"></div>
+</div>
+</body></html>

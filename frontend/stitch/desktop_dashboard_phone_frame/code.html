@@ -1,0 +1,218 @@
+<html class="light" lang="en"><head>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-[#f4efe7] min-h-screen flex items-center justify-center p-8 font-display">split
+
+
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GutIQ Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@400,FILL@0..1" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f2a60d", // Amber
+                        "secondary": "#0d9488", // Teal
+                        "background-light": "#fcfbf8",
+                        "background-dark": "#221c10",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .phone-frame {
+            max-width: 430px;
+            height: 932px;
+            box-shadow: 0 0 0 12px #1c170d, 0 0 0 15px #3a3222;
+        }
+    </style>
+<!-- Desktop Background Wrapper -->
+<div class="w-full h-full flex items-center justify-center">
+<!-- Mobile Device Frame -->
+<div class="phone-frame w-full bg-background-light dark:bg-background-dark rounded-xl relative overflow-hidden flex flex-col border-[8px] border-[#1c170d]">
+<!-- Status Bar Placeholder -->
+<div class="h-10 w-full flex justify-between items-center px-8 pt-4 text-slate-900 dark:text-slate-100">
+<span class="text-xs font-bold">9:41</span>
+<div class="flex gap-1.5">
+<span class="material-symbols-outlined text-sm">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-sm">wifi</span>
+<span class="material-symbols-outlined text-sm">battery_full</span>
+</div>
+</div>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto px-6 pb-24">
+<!-- Header -->
+<header class="py-6 flex justify-between items-start">
+<div>
+<h1 class="text-slate-900 dark:text-slate-100 text-2xl font-bold leading-tight">Good morning, Alex 👋</h1>
+<p class="text-primary font-bold text-sm mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-base">local_fire_department</span>
+                            Day 5 streak
+                        </p>
+</div>
+<button class="size-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-700">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<!-- Voice Log Card -->
+<div class="bg-primary/10 rounded-lg p-6 mb-8 border border-primary/20 relative overflow-hidden group">
+<div class="relative z-10">
+<h2 class="text-slate-900 font-bold text-xl">How's your gut today?</h2>
+<p class="text-slate-700 text-sm mt-1">Tap the mic to log symptoms or meals</p>
+<div class="mt-6 flex justify-center">
+<button class="size-20 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/40 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-white text-4xl font-bold">mic</span>
+</button>
+</div>
+</div>
+<!-- Decorative background pattern -->
+<div class="absolute -right-4 -bottom-4 opacity-10">
+<span class="material-symbols-outlined text-9xl">waves</span>
+</div>
+</div>
+<!-- Trends Section -->
+<section class="mb-8">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">7-Day Trends</h3>
+<div class="flex gap-3 text-[10px] font-bold uppercase tracking-wider">
+<span class="flex items-center gap-1 text-secondary"><div class="size-2 bg-secondary rounded-full"></div> Stress</span>
+<span class="flex items-center gap-1 text-primary"><div class="size-2 bg-primary rounded-full"></div> Severity</span>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm h-40 flex items-end justify-between gap-2 border border-slate-100 dark:border-slate-700">
+<!-- Simplified Chart Bars -->
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 40%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 60%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">M</span>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 70%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 30%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">T</span>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 30%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 80%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">W</span>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 50%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 40%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">T</span>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 90%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 20%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">F</span>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 40%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 50%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">S</span>
+</div>
+<div class="flex-1 flex flex-col justify-end gap-1 h-full">
+<div class="w-full bg-secondary/20 rounded-t-sm relative" style="height: 60%"><div class="absolute bottom-0 w-full bg-primary/40" style="height: 10%"></div></div>
+<span class="text-[10px] text-slate-400 text-center">S</span>
+</div>
+</div>
+</section>
+<!-- Recent Logs -->
+<section class="mb-8">
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg mb-4">Recent Logs</h3>
+<div class="space-y-3">
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg flex items-center justify-between border border-slate-100 dark:border-slate-700">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">restaurant</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-100 text-sm">Spicy Ramen</p>
+<p class="text-xs text-slate-500">12:30 PM • Lunch</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase">Food</span>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-lg flex items-center justify-between border border-slate-100 dark:border-slate-700">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">medical_services</span>
+</div>
+<div>
+<p class="font-bold text-slate-900 dark:text-slate-100 text-sm">Mild Heartburn</p>
+<p class="text-xs text-slate-500">2:15 PM • Symptom</p>
+</div>
+</div>
+<span class="px-3 py-1 bg-secondary/10 text-secondary text-[10px] font-bold rounded-full uppercase">Symptom</span>
+</div>
+</div>
+</section>
+<!-- Insights Teaser -->
+<section class="mb-12">
+<div class="bg-gradient-to-br from-primary/20 to-secondary/20 p-6 rounded-lg border border-white/50">
+<div class="flex items-start gap-4">
+<div class="size-12 shrink-0 rounded-xl bg-white flex items-center justify-center text-primary shadow-sm">
+<span class="material-symbols-outlined text-3xl">lightbulb</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 text-base">New Insight Found</h4>
+<p class="text-slate-700 text-sm mt-1">Stress levels are 40% higher on days you skip breakfast. Let's look at your patterns.</p>
+<button class="mt-3 text-primary font-bold text-sm flex items-center gap-1">
+                                    Read full report <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom Navigation -->
+<nav class="absolute bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-8 py-4 flex justify-between items-center">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined font-fill text-2xl">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-2xl">history</span>
+<span class="text-[10px] font-bold">History</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-2xl">insights</span>
+<span class="text-[10px] font-bold">Trends</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-400">
+<span class="material-symbols-outlined text-2xl">person</span>
+<span class="text-[10px] font-bold">Profile</span>
+</button>
+</nav>
+</div>
+<!-- Sidebar Decorative Elements (Desktop only) -->
+<div class="hidden lg:flex flex-col ml-12 gap-8 max-w-xs">
+<div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+<h3 class="text-slate-900 font-bold mb-2">Voice-First Tracking</h3>
+<p class="text-slate-500 text-sm">Simply say "I just had a coffee and I'm feeling bloated" and GutIQ handles the rest.</p>
+</div>
+<div class="bg-white p-6 rounded-lg shadow-sm border border-slate-100">
+<h3 class="text-slate-900 font-bold mb-2">Healing &amp; Energy</h3>
+<p class="text-slate-500 text-sm">Our palette is designed to promote calm healing with teal and positive energy with amber.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">shield_moon</span>
+</div>
+<div class="size-12 rounded-full bg-secondary flex items-center justify-center text-white">
+<span class="material-symbols-outlined">spa</span>
+</div>
+</div>
+</div>
+</div>
+</body></html>

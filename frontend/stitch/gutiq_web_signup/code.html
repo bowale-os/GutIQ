@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ca6a2b",
+                        "secondary": "#2c7a7b",
+                        "background-light": "#fdfaf6",
+                        "background-dark": "#201812",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .gut-swirl-gradient {
+            background: linear-gradient(135deg, #ca6a2b 0%, #2c7a7b 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display min-h-screen">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-6 md:px-20 py-4 bg-background-light/80 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-3">
+<div class="size-10 flex items-center justify-center rounded-xl gut-swirl-gradient text-white">
+<span class="material-symbols-outlined text-2xl">waves</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-2xl font-black leading-tight tracking-tight">GutIQ</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8">
+<nav class="flex items-center gap-8">
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Science</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Methodology</a>
+<a class="text-slate-700 dark:text-slate-300 text-sm font-semibold hover:text-primary transition-colors" href="#">Community</a>
+</nav>
+<div class="flex gap-3">
+<button class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-full h-11 px-5 border-2 border-primary/20 text-slate-900 dark:text-slate-100 text-sm font-bold transition-all hover:bg-primary/5">
+                            Log In
+                        </button>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col lg:flex-row items-center justify-center px-6 md:px-20 py-12 gap-16">
+<!-- Left Content: Value Proposition -->
+<div class="flex flex-col gap-8 max-w-xl">
+<div class="flex flex-col gap-4">
+<span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-bold uppercase tracking-wider w-fit">
+<span class="material-symbols-outlined text-sm">record_voice_over</span>
+                            Voice-First Healing
+                        </span>
+<h1 class="text-slate-900 dark:text-slate-100 text-5xl md:text-6xl font-black leading-[1.1] tracking-tight">
+                            Understand your gut. <span class="text-primary">One voice note</span> a day.
+                        </h1>
+<p class="text-slate-600 dark:text-slate-400 text-lg md:text-xl leading-relaxed">
+                            GutIQ translates your daily check-ins into empathetic health insights. Built specifically for GERD and IBS management through the power of sound and science.
+                        </p>
+</div>
+<!-- Dashboard Preview Mockup -->
+<div class="relative mt-8 group">
+<div class="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-xl blur-2xl group-hover:opacity-75 transition-opacity"></div>
+<div class="relative bg-white dark:bg-slate-800 rounded-xl shadow-2xl overflow-hidden border border-primary/10 flex items-center p-4 gap-4 max-w-md">
+<div class="size-20 rounded-lg bg-secondary/5 flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-secondary text-4xl">analytics</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-slate-900 dark:text-slate-100">Weekly Gut Score</h4>
+<span class="text-secondary font-bold text-sm">+12%</span>
+</div>
+<div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full w-[78%]"></div>
+</div>
+<p class="text-xs text-slate-500 mt-2 italic">"Your acid reflux triggers are 20% lower this week after morning walks."</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-6 pt-4">
+<div class="flex -space-x-3">
+<div class="size-10 rounded-full border-2 border-background-light bg-cover bg-center" data-alt="Portrait of a smiling woman user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD4MY9x2pY8fjIo2XtJ23DFhAeXTjnJlbMPvxrwAbtkgJ-jV5-IS19MTJYCknosVQJh4FHoCXqTiWZu9HReUsJF5yEuNxZ7qk7GSDuu48-4ZC_gkXNi_5qnonSXb3ebF9kJ9AuA2k2PIxvHH59qBEhNJ17j4ggQvoBrDwgLhYMWpwb00c62m0fD2oOe8iEkCcuwnIl07wOmYbES2MqGgnnw1kySyIhfo3kt62knnR_qOAVwlO8Hpmrt5RHzc0R8OaF8cl_lA-YCC-_x')"></div>
+<div class="size-10 rounded-full border-2 border-background-light bg-cover bg-center" data-alt="Portrait of a smiling man user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB3tYz-8n3KtQ4Z1CA_phYxIUKxiqVEpIRv39p-jKkfCGVXn58_gFilfDSlnMMaw4nWH0AAiZcT0og58peTK2FehZaLtKr52FH569tTxfK3Nl_Yo8TCryqnodnMbJ0Fk12yo6id8klFTYpEO7yoGtVnD3n3fbIyki3XCFtXj15vzBNj1zbYQHNojCktVjQhn7f3968YFCmilDxwQ_wopWukZAK6kmb-7D-FU-JRb9wMjDs-u2lWYv6GuMQPN0ne5awAlBK6UjDNE-NJ')"></div>
+<div class="size-10 rounded-full border-2 border-background-light bg-cover bg-center" data-alt="Portrait of a diverse woman user" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDlfFibhYiSV2ErNpG_pndsdYEovd2JveaMCvRS1KZCqjFLT04VSYjonW9AF1-b4RFYZjEHGE09jafZ1w0yWtencX_qsvbBidXlScDcBJiYET2paPBYVAOChy-9udgUg1T_aMEExDrk_2MZ4ZW_gP1zpbTyNFYx9pv7tib-POMOdL1tcGoi_IqrwOlwA2y4VFJM80pq06SOGo6iBRqwL30jY91NEjfGEi4fjfE7xGpQWF1cgv3dBIWtqo-BVA9MnKAW3MjdpbQ_Fc0c')"></div>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-400 font-medium">Joined by <span class="font-bold text-slate-900 dark:text-slate-100">2,400+</span> healing journeys this month.</p>
+</div>
+</div>
+<!-- Right Content: Signup Form Card -->
+<div class="w-full max-w-[480px]">
+<div class="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-xl shadow-[0_20px_50px_rgba(202,106,43,0.1)] border border-primary/5">
+<div class="mb-8">
+<h3 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Start your journey</h3>
+<p class="text-slate-500 text-sm">Create your empathetic health profile in 60 seconds.</p>
+</div>
+<form class="space-y-5">
+<div>
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Full Name</label>
+<div class="relative">
+<input class="w-full h-14 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="Alex Thompson" type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-secondary text-xl">check_circle</span>
+</div>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email Address</label>
+<input class="w-full h-14 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="alex@healing.com" type="email"/>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Focus Area</label>
+<select class="w-full h-14 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-600 appearance-none">
+<option>IBS Management</option>
+<option>GERD &amp; Reflux</option>
+<option>General Gut Health</option>
+<option>Food Sensitivity Tracking</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Password</label>
+<input class="w-full h-14 px-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400" placeholder="••••••••" type="password"/>
+</div>
+<div class="flex items-start gap-3 py-2">
+<input checked="" class="mt-1 size-5 rounded border-slate-300 text-primary focus:ring-primary" type="checkbox"/>
+<p class="text-xs text-slate-500 leading-relaxed">
+                                    I agree to the <a class="text-primary font-bold hover:underline" href="#">Terms of Service</a> and <a class="text-primary font-bold hover:underline" href="#">Privacy Policy</a>, including how GutIQ handles my voice data.
+                                </p>
+</div>
+<button class="w-full h-14 bg-primary text-white font-bold rounded-full shadow-lg shadow-primary/30 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2" type="submit">
+                                Create Account
+                                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</form>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+<p class="text-sm text-slate-500">Already have an account? <a class="text-secondary font-bold hover:underline" href="#">Log in</a></p>
+</div>
+</div>
+<!-- Trust Badge -->
+<div class="mt-6 flex items-center justify-center gap-2 text-slate-400 text-xs font-medium uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm">lock</span>
+                        HIPAA Compliant &amp; Encrypted
+                    </div>
+</div>
+</main>
+<!-- Footer Stats -->
+<footer class="px-6 md:px-20 py-10 border-t border-primary/5 bg-white/50 dark:bg-slate-900/50">
+<div class="flex flex-wrap justify-between gap-8 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="flex items-center gap-2 font-black text-xl"><span class="material-symbols-outlined text-primary">health_and_safety</span> HealthLine</div>
+<div class="flex items-center gap-2 font-black text-xl"><span class="material-symbols-outlined text-secondary">eco</span> Wellness</div>
+<div class="flex items-center gap-2 font-black text-xl"><span class="material-symbols-outlined text-primary">psychology</span> MindGut</div>
+<div class="flex items-center gap-2 font-black text-xl"><span class="material-symbols-outlined text-secondary">science</span> BioLab</div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

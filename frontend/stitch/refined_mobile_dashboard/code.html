@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Refined Mobile Dashboard - GutIQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ca6a2b", // Amber
+                        "secondary": "#2b8c8a", // Teal (matching amber hue)
+                        "background-light": "#FDFAF6", // Warm Cream
+                        "background-dark": "#201812",
+                        "card-bg": "#ffffff",
+                    },
+                    fontFamily: {
+                        "display": ["Epilogue"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Epilogue', sans-serif; }
+        .amber-glow {
+            box-shadow: 0 0 20px rgba(202, 106, 43, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex flex-col w-full max-w-[480px] mx-auto bg-background-light dark:bg-background-dark min-h-screen pb-24">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 py-6 sticky top-0 bg-background-light/80 backdrop-blur-md z-10">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl font-bold">water_drop</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-slate-900">GutIQ</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary font-bold">Health companion</p>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="size-10 rounded-full bg-white border border-slate-100 flex items-center justify-center text-slate-600 shadow-sm">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="size-10 rounded-full bg-white border border-slate-100 p-0.5 shadow-sm">
+<div class="w-full h-full rounded-full bg-cover bg-center" data-alt="User profile avatar close up" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDthku2_rHGUJHesWNBgjnPzoQKSsVlgSllBrdafWmMJiZWrrlwx4m4aOQ6zhTa86FPgmTinLysX7ntuVIZtA6jzssf4t2T2gKxck-2A2hl7_W5XPsFXTJtDAxaLprRs_hejGQczMdcLi8HVZMNTi2mrMsvuiFO4y-7MWRCB5K4XdSY95fezWSk03_xOiP1O-AEml7f-IJNcPyZPTQ5Xpw8e_FWG1NGIrtOzV6XWeN-chXpzepwvvoT7w_Ks6gjN-dVtXjWzk-Hwj9z')"></div>
+</div>
+</div>
+</header>
+<main class="px-6 space-y-8">
+<!-- Welcome Message -->
+<div class="space-y-1">
+<h2 class="text-3xl font-extrabold tracking-tight">How's your gut?</h2>
+<p class="text-slate-500 font-medium">Tracking for GERD &amp; IBS management</p>
+</div>
+<!-- Pulse Mic Section (Primary Action) -->
+<div class="relative group">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+<div class="relative bg-white rounded-2xl p-6 shadow-sm border border-slate-50 flex flex-col items-center text-center space-y-4 amber-glow">
+<button class="size-20 rounded-full bg-primary/10 flex items-center justify-center relative">
+<div class="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping"></div>
+<div class="size-16 rounded-full bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/30">
+<span class="material-symbols-outlined text-3xl">mic</span>
+</div>
+</button>
+<div class="space-y-1">
+<h3 class="text-lg font-bold">Voice Logging</h3>
+<p class="text-sm text-slate-500 max-w-[200px]">"I feel bloated after lunch" or "Had a light salad"</p>
+</div>
+</div>
+</div>
+<!-- 7-Day Overview Chart -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold">7-Day Progress</h3>
+<span class="text-xs font-bold text-secondary bg-secondary/10 px-2 py-1 rounded-full">+12% Stability</span>
+</div>
+<div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-50">
+<div class="h-40 w-full relative">
+<!-- Simple SVG Chart Representation -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 400 150">
+<defs>
+<lineargradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:rgba(43, 140, 138, 0.2);stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:rgba(43, 140, 138, 0);stop-opacity:0"></stop>
+</lineargradient>
+<lineargradient id="grad2" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" style="stop-color:rgba(202, 106, 43, 0.1);stop-opacity:1"></stop>
+<stop offset="100%" style="stop-color:rgba(202, 106, 43, 0);stop-opacity:0"></stop>
+</lineargradient>
+</defs>
+<!-- Secondary (Teal) Line -->
+<path d="M0,100 C50,80 100,120 150,90 C200,60 250,80 300,50 C350,20 400,40 400,40 L400,150 L0,150 Z" fill="url(#grad1)"></path>
+<path d="M0,100 C50,80 100,120 150,90 C200,60 250,80 300,50 C350,20 400,40 400,40" fill="none" stroke="#2b8c8a" stroke-width="2"></path>
+<!-- Primary (Amber) Line -->
+<path d="M0,130 C50,110 100,140 150,110 C200,80 250,100 300,70 C350,40 400,60 400,60 L400,150 L0,150 Z" fill="url(#grad2)"></path>
+<path d="M0,130 C50,110 100,140 150,110 C200,80 250,100 300,70 C350,40 400,60 400,60" fill="none" stroke="#ca6a2b" stroke-dasharray="4 2" stroke-width="1"></path>
+</svg>
+</div>
+<div class="flex justify-between mt-4">
+<span class="text-[10px] font-bold text-slate-400">MON</span>
+<span class="text-[10px] font-bold text-slate-400">TUE</span>
+<span class="text-[10px] font-bold text-slate-400">WED</span>
+<span class="text-[10px] font-bold text-slate-400">THU</span>
+<span class="text-[10px] font-bold text-secondary">FRI</span>
+<span class="text-[10px] font-bold text-slate-400">SAT</span>
+<span class="text-[10px] font-bold text-slate-400">SUN</span>
+</div>
+</div>
+</section>
+<!-- Recent Logs -->
+<section class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold">Recent Logs</h3>
+<button class="text-sm font-bold text-primary">View All</button>
+</div>
+<div class="space-y-3">
+<!-- Log Entry: Food -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-slate-50 flex items-center justify-between group">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined font-light">restaurant</span>
+</div>
+<div>
+<p class="font-bold text-slate-800">Mediterranean Salad</p>
+<p class="text-xs text-slate-500">12:30 PM • Lunch</p>
+</div>
+</div>
+<div class="flex items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-lg fill-current">star</span>
+<span class="material-symbols-outlined text-lg fill-current">star</span>
+<span class="material-symbols-outlined text-lg">star</span>
+</div>
+</div>
+<!-- Log Entry: Symptom -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-slate-50 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-secondary/5 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined font-light">personal_injury</span>
+</div>
+<div>
+<p class="font-bold text-slate-800">Mild Heartburn</p>
+<p class="text-xs text-slate-500">2:15 PM • Symptom</p>
+</div>
+</div>
+<span class="text-[10px] font-bold text-secondary bg-secondary/5 px-2 py-1 rounded border border-secondary/10 uppercase">Low Intensity</span>
+</div>
+<!-- Log Entry: Drink -->
+<div class="bg-white rounded-xl p-4 shadow-sm border border-slate-50 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-12 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined font-light">coffee</span>
+</div>
+<div>
+<p class="font-bold text-slate-800">Chamomile Tea</p>
+<p class="text-xs text-slate-500">4:00 PM • Drink</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-slate-300">more_vert</span>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white border-t border-slate-100 flex items-center justify-around px-4 py-3 pb-8 z-20">
+<a class="flex flex-col items-center gap-1 relative" href="#">
+<span class="material-symbols-outlined text-secondary fill-current">home</span>
+<span class="text-[10px] font-bold text-secondary">Home</span>
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-secondary rounded-full"></div>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Insights</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Log</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-slate-400" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Profile</span>
+</a>
+</nav>
+</div>
+</body></html>

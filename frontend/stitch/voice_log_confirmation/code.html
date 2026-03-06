@@ -1,0 +1,166 @@
+<html><head><meta charset="utf-8"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          "primary": "#ca6a2b",
+          "background-light": "#f8f7f6",
+          "background-dark": "#201812",
+        },
+        fontFamily: {
+          "display": ["Inter"]
+        },
+        borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+      },
+    },
+  }
+</script>
+</head><body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/10 px-6 py-4 lg:px-40 bg-background-light dark:bg-background-dark sticky top-0 z-50">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary/10 rounded-lg">
+<span class="material-symbols-outlined text-primary text-2xl">waves</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">GutIQ</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Logs</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Insights</a>
+<a class="text-slate-600 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="#">Trends</a>
+</nav>
+<div class="flex gap-2">
+<button class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="bg-primary/20 rounded-full size-10 overflow-hidden ring-2 ring-primary/10" data-alt="User profile avatar placeholder" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCcMnTfku4y-d8bAz67AaA9idbRy3hIYHkmV_X4dNqRWA7CKHmOZlmj48VE3eVRLw1jt1ZUI9YeLNXyJKWR8Bms2t5Tx7L_9EngIio8JJy5IyfeR4POM0igrXoYusY4xGkYCMlOuLTU01DQlAwKF7p42VmO2NQw4vBKPq2QWE52ZErJ7c5BR8QXBfBACG7usOjBh7PUHeo404BUNAIGua8hNtiH1LFRBIzYsCq9Ck_ZTFZCrI6D5Xbjmi9-B6lhuGGz-6U0P3ErhHUy');"></div>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center py-12 px-4 max-w-4xl mx-auto w-full">
+<!-- Success Header -->
+<div class="text-center mb-10">
+<div class="inline-flex items-center justify-center size-20 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 mb-6 ring-8 ring-green-50 dark:ring-green-900/10">
+<span class="material-symbols-outlined text-4xl font-bold">check</span>
+</div>
+<h1 class="text-slate-900 dark:text-slate-100 text-4xl font-bold tracking-tight mb-2">Voice Log Confirmed!</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg">Our AI has successfully analyzed your voice note.</p>
+</div>
+<!-- Summary Card -->
+<div class="w-full bg-white dark:bg-slate-800/50 rounded-xl shadow-xl shadow-primary/5 border border-primary/5 overflow-hidden">
+<div class="p-6 md:p-8">
+<div class="flex items-center justify-between mb-8 pb-4 border-b border-primary/5">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">description</span>
+<h3 class="text-xl font-bold text-slate-800 dark:text-slate-200">Extracted Summary</h3>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 text-primary font-medium hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+<span>Edit fields</span>
+</button>
+</div>
+<!-- Data Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+<!-- Left Column: Foods & Symptoms -->
+<div class="space-y-6">
+<div>
+<div class="flex items-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">restaurant</span>
+<span class="text-xs font-bold uppercase tracking-wider">Foods consumed</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">Spicy Food</span>
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium">Coffee</span>
+</div>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-2 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">monitor_heart</span>
+<span class="text-xs font-bold uppercase tracking-wider">Symptoms</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-sm font-medium">Heartburn</span>
+<span class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full text-sm font-medium">Bloating</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Scores -->
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">priority_high</span>
+<span class="text-xs font-bold uppercase tracking-wider">Severity level</span>
+</div>
+<span class="text-sm font-bold text-primary">7/10</span>
+</div>
+<div class="h-3 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 70%;"></div>
+</div>
+<p class="text-[10px] text-slate-400 uppercase tracking-widest text-right">High intensity</p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-background-light dark:bg-slate-700/50 rounded-lg border border-primary/5">
+<div class="flex items-center gap-2 mb-1 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">psychology</span>
+<span class="text-xs font-bold uppercase tracking-wider">Stress</span>
+</div>
+<div class="text-xl font-bold text-slate-800 dark:text-slate-200">6/10</div>
+</div>
+<div class="p-4 bg-background-light dark:bg-slate-700/50 rounded-lg border border-primary/5">
+<div class="flex items-center gap-2 mb-1 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-sm">bedtime</span>
+<span class="text-xs font-bold uppercase tracking-wider">Sleep</span>
+</div>
+<div class="text-xl font-bold text-slate-800 dark:text-slate-200">7 hours</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Actions -->
+<div class="bg-primary/5 p-6 md:px-8 md:py-6 flex flex-col sm:flex-row gap-4 justify-between items-center border-t border-primary/10">
+<p class="text-sm text-slate-500 dark:text-slate-400 text-center sm:text-left">
+              This log will be added to your weekly insights report.
+            </p>
+<div class="flex gap-4 w-full sm:w-auto">
+<button class="flex-1 sm:flex-none px-8 py-3 bg-primary text-white font-bold rounded-full shadow-lg shadow-primary/30 hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
+<span>Save &amp; Go Home</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Feedback section -->
+<div class="mt-12 flex flex-col items-center gap-4">
+<p class="text-slate-500 text-sm">Was this transcription accurate?</p>
+<div class="flex gap-4">
+<button class="size-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-400">thumb_up</span>
+</button>
+<button class="size-12 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-slate-400">thumb_down</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Footer Info -->
+<footer class="mt-auto py-8 text-center px-6">
+<p class="text-slate-400 text-xs">GutIQ uses secure, HIPAA-compliant encryption for your voice recordings and health data.</p>
+</footer>
+</div>
+</div>
+</body></html>
