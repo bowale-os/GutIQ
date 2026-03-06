@@ -21,6 +21,17 @@
 - **2026‑03‑04 – v0.1**
   - I completed the onboarding route
   - Made schemas for onboarding requests and responses.
+
+ **2026‑03‑04 – v0.1**
+  - modeled great looking ui and frontend with claude
+  - developed user info retrieval and updating route
+  - Made schemas for user info requests and response.
+  - finished claude plan..
   
 
+
+ **2026‑03‑06 – v0.1**
+  - added logging flow to frontend
+  - added log_type as enum table, and updated model
+  
 

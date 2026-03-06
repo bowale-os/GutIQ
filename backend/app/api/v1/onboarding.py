@@ -32,6 +32,7 @@ async def complete_onboarding(
     current_user: User = Depends(get_current_user),
     session: Session = Depends(get_session)
 ):
+
     """Complete user onboarding with condition, goal, and age range"""
     user_db = await session.get(User, current_user.id)
     
