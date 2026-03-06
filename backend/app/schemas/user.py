@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
+from datetime import datetime
 
 class UserCreateRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=50)
@@ -16,13 +17,15 @@ class TokenResponse(BaseModel):
 
 
 class UserUpdateRequest(BaseModel):
-    digestive_condition: Optional[str] = Field(..., min_length=2, max_length=50)
+    email: Optional[EmailStr] = None
+    digestive_condition: Optional[str] = None
     goal: Optional[str] = None
+    age_range: Optional[str] = None
 
 class UserUpdateResponse(BaseModel):
-    id: str
-    name: str
     email: EmailStr
     digestive_condition: Optional[str] = None
-    onboarding_goal: Optional[str] = None
+    goal: Optional[str] = None
+    age_range: Optional[str] = None
+    updated_at: datetime
 
