@@ -1,14 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import timedelta, datetime
+from sqlalchemy.exc import SQLAlchemyError
+from datetime import datetime
 from uuid import UUID
 
 
 from app.db import get_session
 from app.models import User
 from app.schemas import UserUpdateRequest, UserUpdateResponse
-from app.core.config import settings
 from app.api.deps import get_current_user
 
 router = APIRouter()
@@ -33,10 +33,10 @@ async def update_user_profile(
 ):
     # If email is being changed, check it isn't taken
     if data.email and data.email != current_user.email:
-        existing = await session.exec(
+        existing_result = await session.execute(
             select(User).where(User.email == data.email)
         )
-        if existing.first():
+        if existing_result.scalar_one_or_none():
             raise HTTPException(status_code=409, detail="Email already in use")
 
     update_data = data.model_dump(exclude_unset=True)
@@ -45,7 +45,12 @@ async def update_user_profile(
 
     current_user.updated_at = datetime.now()
     session.add(current_user)
-    await session.commit()
+    try:
+        await session.commit()
+    except SQLAlchemyError:
+        await session.rollback()
+        raise HTTPException(status_code=500, detail="Could not update user profile")
+
     await session.refresh(current_user)
 
     return UserUpdateResponse(

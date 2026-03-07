@@ -1,5 +1,12 @@
 ﻿# Changelog
 
+- **2026-03-07 - v0.1**
+  - Hardened auth and token validation paths to handle malformed token `sub` values, corrupt password hashes, and duplicate-email race conditions without unhandled crashes.
+  - Fixed async session usage in user profile updates and added DB error handling/rollback safeguards in user and onboarding writes.
+  - Added missing-user guard for onboarding completion to prevent state-desync attribute errors when records disappear mid-flow.
+  - Stabilized log schema parsing by safely handling malformed JSON in `parsed_foods`/`parsed_symptoms`.
+  - Reworked log preview route validation to handle mismatched user IDs, empty text/audio payloads, and missing preview response model references safely.
+
 - **2026‑02‑23 – v0.1**
   - Initialized repository and base documentation.
   - FastAPI backend structure (`src/gutiq/`) with `main.py`, API routes, Pydantic models

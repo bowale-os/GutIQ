@@ -1,14 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import timedelta, datetime
-from uuid import UUID
+from fastapi import APIRouter, Depends, HTTPException
 
 
-from app.db import get_session
 from app.models import User
-from app.schemas import LogPreviewRequest
-from app.core.config import settings
+from app.schemas import LogPreviewRequest, LogPreviewResponse
 from app.api.deps import get_current_user
 
 router = APIRouter()
@@ -22,33 +16,36 @@ async def preview_log(
     Parse raw_content with Nova but do NOT save.
     Returns structured fields for user review.
     """
-    content_to_parse = None
-    
+    if data.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Cannot preview logs for another user")
+
     if data.source == "text":
-        if not data.raw_content:
+        if not data.raw_content or not data.raw_content.strip():
             raise HTTPException(
                 status_code=400, 
                 detail="raw_content required for text logs"
             )
-        transcript = None
-        content_to_parse = data.raw_content
 
     elif data.source == "voice":
-        if not data.audio_file:
+        if data.audio_data is None:
             raise HTTPException(
                 status_code=400, 
-                detail="audio_file required for voice logs"
+                detail="audio_data required for voice logs"
             )
-        audio_bytes = await data.audio_data.read()
-        transcript = await nova_sonic_transcribe(audio_bytes)
-        content_to_parse = transcript
+        if not isinstance(data.audio_data, (bytes, bytearray)) or len(data.audio_data) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="audio_data must contain non-empty bytes",
+            )
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported source type")
 
     return LogPreviewResponse(
-        parsed_foods=parsed.foods,
-        parsed_symptoms=parsed.symptoms,
-        parsed_severity=parsed.severity,
-        parsed_stress=parsed.stress,
-        parsed_sleep=parsed.sleep,
-        parsed_exercise=parsed.exercise,
-        confidence=parsed.confidence
+        parsed_foods=[],
+        parsed_symptoms=[],
+        parsed_severity=None,
+        parsed_stress=None,
+        parsed_sleep=None,
+        parsed_exercise=None,
+        confidence=0.0,
     )

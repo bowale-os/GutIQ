@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.deps import get_current_user
 from app.db import get_session
@@ -11,7 +12,7 @@ router = APIRouter()
 @router.get("/status", response_model=OnboardingStatusResponse)
 async def get_onboarding_status(
     current_user: User = Depends(get_current_user),
-    session: Session = Depends(get_session)
+    session: AsyncSession = Depends(get_session)
 ):
     """Check if user needs onboarding (missing fields)"""
 
@@ -30,18 +31,25 @@ async def get_onboarding_status(
 async def complete_onboarding(
     data:OnboardingCompleteRequest ,  # in this format {"digestive_condition": "GERD", "goal": "triggers", "age_range": "30-40"}
     current_user: User = Depends(get_current_user),
-    session: Session = Depends(get_session)
+    session: AsyncSession = Depends(get_session)
 ):
 
     """Complete user onboarding with condition, goal, and age range"""
     user_db = await session.get(User, current_user.id)
+    if user_db is None:
+        raise HTTPException(status_code=404, detail="User no longer exists")
     
     # Safe direct assignment (validated by Pydantic)
     user_db.digestive_condition = data.digestive_condition
     user_db.goal = data.goal
     user_db.age_range = data.age_range
     
-    await session.commit()
+    try:
+        await session.commit()
+    except SQLAlchemyError:
+        await session.rollback()
+        raise HTTPException(status_code=500, detail="Could not complete onboarding")
+
     await session.refresh(user_db)
     
     return OnboardingCompleteResponse(

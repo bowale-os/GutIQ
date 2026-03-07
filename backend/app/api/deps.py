@@ -33,7 +33,7 @@ async def get_current_user(
             raise credentials_exception
         # Convert str to UUID
         user_id_uuid = uuid.UUID(user_id)
-    except (JWTError, ValueError):
+    except (JWTError, ValueError, TypeError):
         raise credentials_exception
     
     user = await session.get(User, user_id_uuid)
