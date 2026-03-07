@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from datetime import timedelta
 
 
@@ -17,18 +18,26 @@ router = APIRouter()
 async def signup(payload:UserCreateRequest, db: AsyncSession = Depends(get_session)):
     
     # Check if user exists
-    stmt = select(User).where(User.email == payload.email)
-    result = await db.execute(stmt)
-    existing = result.scalar_one_or_none()
-    if existing:
+    try:
+        stmt = select(User).where(User.email == payload.email)
+        result = await db.execute(stmt)
+        existing = result.scalar_one_or_none()
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        user = User(
+            email=payload.email,
+            hashed_password=hash_password(payload.password),
+        )
+        db.add(user)
+        await db.commit()
+    except IntegrityError:
+        await db.rollback()
         raise HTTPException(status_code=400, detail="Email already registered")
-    
-    user = User(
-        email=payload.email,
-        hashed_password=hash_password(payload.password),
-    )
-    db.add(user)
-    await db.commit()
+    except SQLAlchemyError:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail="Could not create user")
+
     await db.refresh(user)
 
     token = create_access_token(subject=str(user.id), expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS))
@@ -50,9 +59,7 @@ async def login(payload: LogInRequest, db: AsyncSession = Depends(get_session)):
             )
         
         token = create_access_token(subject=str(user.id), expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS))
-        await db.commit()
         return TokenResponse(access_token=token)
-    
-    except Exception:
+    except SQLAlchemyError:
         await db.rollback()
-        raise
+        raise HTTPException(status_code=500, detail="Could not complete login")

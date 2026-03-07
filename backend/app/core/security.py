@@ -16,7 +16,12 @@ def hash_password(password: str) -> str:
 
 
 def verify_password(password: str, hashed: str) -> bool:
-    return pwd_context.verify(password, hashed)
+    if not password or not hashed:
+        return False
+    try:
+        return pwd_context.verify(password[:72], hashed)
+    except (ValueError, TypeError):
+        return False
 
 
 def create_access_token(subject: str, expires_delta: timedelta | None = None) -> str:
@@ -33,7 +38,7 @@ def create_access_token(subject: str, expires_delta: timedelta | None = None) ->
     return jwt.encode(
         payload,
         settings.JWT_SECRET,
-        algorithm="HS256",
+        algorithm=settings.JWT_ALGORITHM,
     )
 
 
@@ -41,5 +46,5 @@ def decode_token(token: str) -> dict[str, Any]:
     return jwt.decode(
         token,
         settings.JWT_SECRET,
-        algorithms=["HS256"],
+        algorithms=[settings.JWT_ALGORITHM],
     )
