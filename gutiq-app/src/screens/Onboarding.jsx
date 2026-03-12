@@ -4,6 +4,7 @@ import { FONTS, STYLES } from '../constants/styles';
 import StepIndicator from '../components/StepIndicator';
 import { complete } from '../api/onboarding';
 import { storeUser } from '../api/client';
+import { AGE_RANGES } from '../api/schemas';
 
 function SelectCard({ icon, label, desc, selected, onClick }) {
   return (
@@ -61,8 +62,6 @@ const REMINDER_TIMES = [
   { id: 'none',    label: 'No reminders', time: '' },
 ];
 
-const AGE_RANGES = ['20-30', '30-40', '40-50', '50+'];
-
 export default function Onboarding({ step, setStep, navigate }) {
   const [condition,     setCondition]    = useState(null);
   const [logPref,       setLogPref]      = useState(null);
@@ -70,6 +69,7 @@ export default function Onboarding({ step, setStep, navigate }) {
   const [weeklySummary, setWeeklySummary] = useState(true);
   const [ageRange,      setAgeRange]     = useState(null);
   const [saving,        setSaving]       = useState(false);
+  const [saveError,     setSaveError]    = useState(null);
 
   const canProceed = () =>
     step === 1 ? !!condition :
@@ -80,15 +80,16 @@ export default function Onboarding({ step, setStep, navigate }) {
     if (step < 3) { setStep(step + 1); return; }
     // Step 3 finish — save to backend
     setSaving(true);
+    setSaveError(null);
     try {
       const goal = `Identify and manage ${condition} triggers`;
       await complete(condition, goal, ageRange);
-      storeUser(localStorage.getItem('gutiq_email') || '', condition);
-    } catch {
-      // Proceed even if backend call fails
+      storeUser(localStorage.getItem('gutiq_email') || '', localStorage.getItem('gutiq_user_id') || '', condition);
+      navigate('dashboard');
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save. Please try again.');
     } finally {
       setSaving(false);
-      navigate('dashboard');
     }
   };
 
@@ -198,6 +199,12 @@ export default function Onboarding({ step, setStep, navigate }) {
               </button>
             </div>
           </div>
+        )}
+
+        {saveError && (
+          <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: '#e53e3e', marginTop: 16, textAlign: 'center' }}>
+            {saveError}
+          </p>
         )}
 
         <button

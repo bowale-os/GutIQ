@@ -3,10 +3,9 @@ import { COLORS } from '../constants/colors';
 import { STYLES, FONTS } from '../constants/styles';
 import { clearStoredUser } from '../api/client';
 import { update, getUserData } from '../api/user';
+import { DIGESTIVE_CONDITIONS as CONDITIONS, AGE_RANGES } from '../api/schemas';
 
-const CONDITIONS = ['IBS', "Crohn's Disease", 'Ulcerative Colitis', 'GERD', 'Celiac Disease', 'Other'];
-const GOALS      = ['Track symptoms', 'Identify triggers', 'Improve diet', 'Prepare for doctor visit', 'General wellness'];
-const AGE_RANGES = ['Under 20', '20–30', '30–40', '40–50', '50+'];
+const GOALS = ['Track symptoms', 'Identify triggers', 'Improve diet', 'Prepare for doctor visit', 'General wellness'];
 
 function SelectPill({ options, value, onChange }) {
   return (
@@ -71,8 +70,8 @@ export default function Profile({ user, navigate, onUpdate }) {
     age_range:           liveUser?.age_range           ?? '',
   });
 
-  const initials = (liveUser?.name ?? liveUser?.email ?? 'U')
-    .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const initials = (liveUser?.name || liveUser?.email || 'U')
+    .split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0, 2) || 'U';
 
   const handleCancel = () => {
     setDraft({

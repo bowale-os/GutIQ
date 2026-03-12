@@ -1,4 +1,4 @@
-import { BASE, authHeaders, authJsonHeaders, isLoggedIn, throwIfNotOk } from './client';
+import { BASE, authHeaders, authJsonHeaders, isLoggedIn, clearStoredUser, throwIfNotOk } from './client';
 import {
   makeLogCreateRequest,
   parseLogPreviewResponse,
@@ -72,7 +72,10 @@ export async function fetchRealLogs() {
   try {
     const { logs } = await list();
     return logs;
-  } catch {
+  } catch (err) {
+    if (err.status === 401) {
+      clearStoredUser();
+    }
     return [];
   }
 }

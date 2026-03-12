@@ -7,14 +7,19 @@ const stressEmoji = { high: '😰', medium: '😐', low: '😌' };
 
 function computeStats(logs) {
   if (!logs.length) return { avg: null, highDays: 0, avgSleep: null, topTrigger: '—' };
-  const avg      = (logs.reduce((s, l) => s + (l.parsed_severity ?? 0), 0) / logs.length).toFixed(1);
-  const highDays = logs.filter(l => l.parsed_severity >= 6).length;
+  const severityLogs = logs.filter(l => l.parsed_severity != null);
+  const avg = severityLogs.length
+    ? (severityLogs.reduce((s, l) => s + l.parsed_severity, 0) / severityLogs.length).toFixed(1)
+    : null;
+  const highDays = severityLogs.filter(l => l.parsed_severity >= 6).length;
   const sleepLogs = logs.filter(l => l.parsed_sleep != null);
   const avgSleep  = sleepLogs.length
     ? (sleepLogs.reduce((s, l) => s + l.parsed_sleep, 0) / sleepLogs.length).toFixed(1)
     : null;
   const foodCounts = {};
-  logs.forEach(l => (l.parsed_foods ?? []).forEach(f => { foodCounts[f] = (foodCounts[f] || 0) + 1; }));
+  logs.forEach(l => {
+    (l.parsed_foods ?? []).forEach(f => { foodCounts[f] = (foodCounts[f] || 0) + 1; });
+  });
   const topTrigger = Object.entries(foodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
   return { avg, highDays, avgSleep, topTrigger };
 }

@@ -37,22 +37,16 @@ async def signup(payload:UserCreateRequest, db: AsyncSession = Depends(get_sessi
 
 @router.post("/login", response_model=TokenResponse)
 async def login(payload: LogInRequest, db: AsyncSession = Depends(get_session)):
-    try:
-        stmt = select(User).where(User.email == payload.email)
-        result = await db.execute(stmt)
-        user: User | None = result.scalar_one_or_none()
+    stmt = select(User).where(User.email == payload.email)
+    result = await db.execute(stmt)
+    user: User | None = result.scalar_one_or_none()
 
-        if not user or not verify_password(payload.password, user.hashed_password):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect email or password",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
-        
-        token = create_access_token(subject=str(user.id), expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS))
-        await db.commit()
-        return TokenResponse(access_token=token, user_id=str(user.id))
-    
-    except Exception:
-        await db.rollback()
-        raise
+    if not user or not verify_password(payload.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = create_access_token(subject=str(user.id), expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS))
+    return TokenResponse(access_token=token, user_id=str(user.id))

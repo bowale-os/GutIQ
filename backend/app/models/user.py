@@ -12,7 +12,7 @@ class User(SQLModel, table=True):
     hashed_password: str
     digestive_condition: Optional[str] = Field(default=None, index=True)
     goal: Optional[str] = Field(default=None)
-    age_range: Optional[str] = Field(default=None)  # e.g., "20-30", "30-40", "40-50", "50+"
+    age_range: Optional[str] = Field(default=None)  # e.g., "Under 20", "20-30", "30-40", "40-50", "50+"
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None),
         sa_column_kwargs={

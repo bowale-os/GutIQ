@@ -46,13 +46,13 @@ export const parseTokenResponse = (raw = {}) => ({
 export const DIGESTIVE_CONDITIONS = /** @type {const} */ (['GERD', 'IBS', 'Ulcer', 'Other']);
 
 /** @type {readonly string[]} */
-export const AGE_RANGES = /** @type {const} */ (['20-30', '30-40', '40-50', '50+']);
+export const AGE_RANGES = /** @type {const} */ (['Under 20', '20-30', '30-40', '40-50', '50+']);
 
 /**
  * @typedef {Object} OnboardingCompleteRequest
  * @property {'GERD'|'IBS'|'Ulcer'|'Other'} digestive_condition
  * @property {string} goal        - max 150 chars
- * @property {'20-30'|'30-40'|'40-50'|'50+'} age_range
+ * @property {'Under 20'|'20-30'|'30-40'|'40-50'|'50+'} age_range
  */
 export const makeOnboardingCompleteRequest = (
   digestive_condition = 'GERD',

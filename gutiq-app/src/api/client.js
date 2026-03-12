@@ -44,10 +44,12 @@ export async function throwIfNotOk(res) {
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
     const detail = body.detail;
-    if (Array.isArray(detail)) {
-      throw new Error(detail.map(e => e.msg).join(', '));
-    }
-    throw new Error(typeof detail === 'string' ? detail : `HTTP ${res.status}`);
+    const message = Array.isArray(detail)
+      ? detail.map(e => e.msg).join(', ')
+      : typeof detail === 'string' ? detail : `HTTP ${res.status}`;
+    const err = new Error(message);
+    err.status = res.status;
+    throw err;
   }
   return res;
 }

@@ -37,7 +37,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
     <div style={{ ...STYLES.page, paddingBottom: 90 }}>
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '32px 20px 0' }}>
         <h1 style={{ fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 8 }}>
-          Hi, {user.name.split(' ')[0]}
+          Hi, {user.name?.split(' ')[0] ?? 'there'}
         </h1>
         <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted, marginBottom: 32 }}>
           Your dashboard will fill in as you log.
@@ -68,7 +68,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
           <div>
             <h1 style={{ fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 4 }}>
-              Hi, {user.name.split(' ')[0]}
+              Hi, {user.name?.split(' ')[0] ?? 'there'}
             </h1>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, backgroundColor: COLORS.amberDim, border: `1px solid ${COLORS.amberBorder}`, borderRadius: 999, padding: '3px 10px', fontFamily: FONTS.mono, fontSize: 11, color: COLORS.amber }}>
               🔥 {user.streak}-day streak

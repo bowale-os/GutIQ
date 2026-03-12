@@ -206,6 +206,7 @@ export default function Lifestyles() {
     setChallenges(prev => prev.map(c =>
       c.id === id ? { ...c, active: false, day_current: 0 } : c
     ));
+    setConflictId(null);
   };
 
   const filtered = [...lifestyles]

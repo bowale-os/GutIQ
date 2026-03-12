@@ -1,6 +1,6 @@
 # app/schemas/log.py
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 from typing import Optional, List, Literal
 from datetime import datetime
 import uuid
@@ -26,6 +26,9 @@ class LogPreviewResponse(BaseModel):
 
 
 # ── Save (after user confirms) ─────────────────────────────────────────────────
+# Users may edit preview fields before confirming, so parsed_* values come from
+# the client. Strict validation here ensures edited values stay within expected
+# bounds rather than relying on whatever the client sends.
 
 class LogCreateRequest(BaseModel):
     source: Literal["text", "voice"]
@@ -33,10 +36,10 @@ class LogCreateRequest(BaseModel):
     log_categories: Optional[List[str]] = None
     parsed_foods: Optional[List[str]] = None
     parsed_symptoms: Optional[List[str]] = None
-    parsed_severity: Optional[int] = None
-    parsed_stress: Optional[str] = None
-    parsed_sleep: Optional[float] = None
-    parsed_exercise: Optional[str] = None
+    parsed_severity: Optional[int] = Field(None, ge=1, le=10)
+    parsed_stress: Optional[Literal["low", "medium", "high"]] = None
+    parsed_sleep: Optional[float] = Field(None, ge=0, le=24)
+    parsed_exercise: Optional[Literal["none", "light", "moderate", "intense"]] = None
 
 
 # ── Response ───────────────────────────────────────────────────────────────────

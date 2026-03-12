@@ -45,6 +45,8 @@ Rules:
         messages=[{"role": "user", "content": prompt}]
     )
 
+    if not message.content:
+        raise ValueError("LLM returned an empty response (no content blocks)")
     text = message.content[0].text
     
     # Strip markdown fences if model adds them

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { COLORS } from './constants/colors';
 import { currentUser, mockLogs } from './constants/mockData';
 import { isLoggedIn, getStoredUser } from './api/client';
-import { fetchRealLogs } from './api/logs';
+import { fetchRealLogs, apiLogToFrontend } from './api/logs';
+import { getStatus } from './api/onboarding';
 
 import NavBar     from './components/NavBar';
 import Login      from './screens/Login';
@@ -73,6 +74,24 @@ export default function App() {
   const [demoMode, setDemoMode] = useState(false);
   const [logs, setLogs] = useState([]);
 
+  // On refresh: re-check onboarding completion so a token-only isLoggedIn()
+  // doesn't skip the onboarding gate when the user hasn't finished it yet.
+  useEffect(() => {
+    if (!isLoggedIn()) return;
+    getStatus()
+      .then(status => { if (!status.is_complete) navigate('onboarding'); })
+      .catch(() => {}); // stay on dashboard if the check fails
+  }, []);
+
+  // Sync user state whenever we navigate, so storeUser() calls in Login/Signup/
+  // Onboarding are reflected without a reload.
+  useEffect(() => {
+    if (isLoggedIn()) {
+      const stored = getStoredUser();
+      if (stored.email) setUser(u => ({ ...u, ...stored }));
+    }
+  }, [currentScreen]);
+
   useEffect(() => {
     if (demoMode) { setLogs(mockLogs); return; }
     if (isLoggedIn()) fetchRealLogs().then(setLogs);
@@ -118,7 +137,12 @@ export default function App() {
       </div>
 
       {logModalOpen && (
-        <LogEntry onClose={closeLog} userStreak={user.streak} demoMode={demoMode} />
+        <LogEntry
+          onClose={closeLog}
+          onSave={newLog => setLogs(prev => [apiLogToFrontend(newLog), ...prev])}
+          userStreak={user.streak}
+          demoMode={demoMode}
+        />
       )}
     </div>
   );
