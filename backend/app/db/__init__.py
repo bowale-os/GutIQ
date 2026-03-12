@@ -1,23 +1,50 @@
-from sqlmodel import SQLModel, create_engine, Session
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+# app/db/__init__.py
+
+from sqlmodel import SQLModel
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.models import User, Log
 from app.core.config import settings
 
-async_engine = create_async_engine(settings.DATABASE_URL)  # ← NO .replace()
+async_engine = None
+AsyncSessionLocal = None
 
-engine = create_engine(settings.DATABASE_URL_SYNC, echo=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global async_engine, AsyncSessionLocal
+
+    async_engine = create_async_engine(
+        settings.DATABASE_URL,
+        pool_pre_ping=True,
+        pool_recycle=300,
+        echo=False,
+    )
+
+    AsyncSessionLocal = async_sessionmaker(
+        bind=async_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False,
+        autocommit=False,
+    )
+
     async with async_engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
-    yield
-    await async_engine.dispose()
 
-# Dependency
+    print("✓ Database connected")
+    yield
+
+    await async_engine.dispose()
+    print("✓ Database disconnected")
+
+
 async def get_session() -> AsyncSession:
-    async with AsyncSession(async_engine) as session:
-        yield session
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        except Exception:
+            await session.rollback()
+            raise

@@ -5,7 +5,8 @@ const TABS = [
   { id: 'dashboard', icon: '⌂',  label: 'Home'     },
   { id: 'gutcheck',  icon: '✦',  label: 'Gut Check' },
   { id: 'export',    icon: '↗',  label: 'Export'   },
-  { id: 'profile',   icon: '○',  label: 'Profile'  },
+  { id: 'profile',    icon: '○',  label: 'Profile'   },
+  { id: 'lifestyles', icon: '◈',  label: 'Lifestyle' },
 ];
 
 export default function NavBar({ currentScreen, navigate, onLogClick }) {

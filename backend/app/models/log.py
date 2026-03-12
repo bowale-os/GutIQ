@@ -29,4 +29,3 @@ class Log(SQLModel, table=True):
     parsed_stress: Optional[str] = None         # "low" | "medium" | "high"
     parsed_sleep: Optional[float] = None        # hours e.g. 6.5
     parsed_exercise: Optional[str] = None       # "none" | "light" | "moderate" | "intense"
-    is_ai_processed: bool = Field(default=False)

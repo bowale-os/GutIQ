@@ -172,7 +172,7 @@ class TestOnboardingComplete:
 
     # ── age_range enum ───────────────────────────────────────────────────────
 
-    @pytest.mark.parametrize("age_range", ["20-30", "30-40", "40-50", "50+"])
+    @pytest.mark.parametrize("age_range", ["Under 20", "20-30", "30-40", "40-50", "50+"])
     async def test_accepts_all_valid_age_ranges(self, client: AsyncClient, age_range: str):
         headers = await signup_and_get_headers(client)
         resp = await client.post("/onboarding/complete", json={

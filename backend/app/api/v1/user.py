@@ -13,16 +13,29 @@ from app.api.deps import get_current_user
 
 router = APIRouter()
 
-@router.get("/{user_id}", response_model=User, status_code=200)
-async def get_user(user_id: UUID, 
-                    db: AsyncSession = Depends(get_session), 
-                    current_user: User = Depends(get_current_user)):
+# @router.get("/{user_id}", response_model=User, status_code=200)
+# async def get_user(user_id: UUID, 
+#                     db: AsyncSession = Depends(get_session), 
+#                     current_user: User = Depends(get_current_user)):
     
-    # Check if user_id is equal to current_user.id
-    if user_id != current_user.id:
-        raise HTTPException(status_code=403, detail="you're messing around")
+#     # Check if user_id is equal to current_user.id
+#     if user_id != current_user.id:
+#         raise HTTPException(status_code=403, detail="you're messing around")
 
-    return current_user
+#     return current_user
+
+
+@router.get("/me", response_model=UserUpdateResponse)
+async def get_me(
+    current_user: User = Depends(get_current_user),
+):
+    return UserUpdateResponse(
+        email=current_user.email,
+        digestive_condition=current_user.digestive_condition,
+        goal=current_user.goal,
+        age_range=current_user.age_range,
+        updated_at=current_user.updated_at,
+    )
 
 
 @router.patch("/me", response_model=UserUpdateResponse)

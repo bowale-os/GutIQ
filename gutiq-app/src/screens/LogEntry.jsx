@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
-
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { preview, create } from '../api/logs';
 
 const TRANSCRIPT_LINES = [
   'Had coffee this morning...',
@@ -79,7 +78,7 @@ function EditRow({ label, children }) {
   );
 }
 
-export default function LogEntry({ onClose, userStreak = 4 }) {
+export default function LogEntry({ onClose, onSave, userStreak = 4, demoMode = false }) {
   const [phase, setPhase] = useState('idle');
   const [source, setSource] = useState('voice');
   const [rawContent, setRawContent] = useState('');
@@ -90,6 +89,8 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
   const [addFoodInput, setAddFoodInput] = useState('');
   const [showAddFood, setShowAddFood] = useState(false);
   const [missingInput, setMissingInput] = useState('');
+  const [previewError, setPreviewError] = useState(null);
+  const [saveError,    setSaveError]    = useState(null);
 
   const lineRef = useRef(0);
   const discardTimer = useRef(null);
@@ -120,52 +121,49 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
   const callPreview = async (content) => {
     const rc = content ?? rawContent;
     logTime.current = new Date();
+    setPreviewError(null);
     setPhase('previewing');
-    try {
-      const token = localStorage.getItem('gutiq_token');
-      const res = await fetch(`${BASE_URL}/logs/preview`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ source, raw_content: rc }),
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setConfirmed({ ...data });
-    } catch {
+    if (demoMode) {
+      await new Promise(r => setTimeout(r, 900));
       setConfirmed({ ...MOCK_PREVIEW });
+      setPhase('reviewing');
+    } else {
+      try {
+        const data = await preview(rc);
+        setConfirmed({ ...data });
+        setPhase('reviewing');
+      } catch (err) {
+        setPreviewError(err.message || 'Parsing failed. Please try again.');
+        setPhase('capturing');
+      }
     }
-    setPhase('reviewing');
   };
 
   const callSave = async (extra = {}) => {
     const final = { ...confirmed, ...extra };
+    setSaveError(null);
     setPhase('saving');
     try {
-      const token = localStorage.getItem('gutiq_token');
-      await fetch(`${BASE_URL}/logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
+      if (!demoMode) {
+        const result = await create({
           source,
-          raw_content: rawContent,
-          log_categories: final.log_categories,
-          parsed_foods: final.parsed_foods,
+          raw_content:     rawContent,
+          log_categories:  final.log_categories,
+          parsed_foods:    final.parsed_foods,
           parsed_symptoms: final.parsed_symptoms,
           parsed_severity: final.parsed_severity,
-          parsed_stress: final.parsed_stress,
-          parsed_sleep: final.parsed_sleep,
+          parsed_stress:   final.parsed_stress,
+          parsed_sleep:    final.parsed_sleep,
           parsed_exercise: final.parsed_exercise,
-        }),
-      });
-    } catch { /* proceed while backend isn't ready */ }
-    setPhase('saved');
-    setTimeout(() => onClose(), 1500);
+        });
+        onSave?.(result.log);
+      }
+      setPhase('saved');
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setSaveError(err.message || 'Save failed. Please try again.');
+      setPhase('reviewing');
+    }
   };
 
   const handleClose = () => {
@@ -321,6 +319,11 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
               {transcript}
               {transcript && <span style={{ animation: 'pulse 0.8s ease infinite', color: COLORS.orange }}>|</span>}
             </div>
+            {previewError && (
+              <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.danger, textAlign: 'center', marginTop: 10, flexShrink: 0 }}>
+                {previewError}
+              </p>
+            )}
             <button
               onClick={() => { setRawContent(transcript); callPreview(transcript); }}
               style={{ marginTop: 14, fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, paddingBottom: 8 }}
@@ -346,6 +349,11 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
                 color: COLORS.darkText, flex: 1, resize: 'none', lineHeight: 1.6, marginBottom: 14,
               }}
             />
+            {previewError && (
+              <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.danger, marginBottom: 8 }}>
+                {previewError}
+              </p>
+            )}
             <button
               onClick={() => callPreview()}
               disabled={!rawContent.trim()}
@@ -436,6 +444,13 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
             {discardGuard && (
               <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.amber, textAlign: 'center', marginBottom: 8, animation: 'fadeIn 0.2s ease' }}>
                 Tap × again to discard
+              </p>
+            )}
+
+            {/* Save error */}
+            {saveError && (
+              <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.danger, textAlign: 'center', marginBottom: 8, flexShrink: 0 }}>
+                {saveError}
               </p>
             )}
 

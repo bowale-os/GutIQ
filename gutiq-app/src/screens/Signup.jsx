@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
+import { signup } from '../api/auth';
+import { setToken, storeUser } from '../api/client';
 
 export default function Signup({ navigate }) {
   const [form,    setForm]    = useState({ name: '', email: '', password: '', confirm: '' });
   const [errors,  setErrors]  = useState({});
   const [focused, setFocused] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const update = (field, val) => setForm(f => ({ ...f, [field]: val }));
 
@@ -18,11 +21,21 @@ export default function Signup({ navigate }) {
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    navigate('onboarding');
+    setLoading(true);
+    try {
+      const data = await signup(form.email, form.password, form.name);
+      setToken(data.access_token);
+      storeUser(form.email, data.user_id);
+      navigate('onboarding');
+    } catch (err) {
+      setErrors({ general: err.message || 'Signup failed. Try a different email.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const fields = [
@@ -69,7 +82,20 @@ export default function Signup({ navigate }) {
               )}
             </div>
           ))}
-          <button type="submit" style={{ ...STYLES.btnPrimary, marginTop: 4 }}>Create account</button>
+
+          {errors.general && (
+            <p style={{
+              fontSize: 13, color: COLORS.danger,
+              backgroundColor: COLORS.dangerDim, border: `1px solid ${COLORS.dangerBorder}`,
+              borderRadius: 8, padding: '8px 12px', animation: 'fadeSlideUp 0.2s ease',
+            }}>
+              {errors.general}
+            </p>
+          )}
+
+          <button type="submit" disabled={loading} style={{ ...STYLES.btnPrimary, marginTop: 4, opacity: loading ? 0.6 : 1 }}>
+            {loading ? 'Creating account...' : 'Create account'}
+          </button>
         </form>
       </div>
 
