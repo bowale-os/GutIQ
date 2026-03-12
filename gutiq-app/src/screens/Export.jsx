@@ -6,11 +6,15 @@ const getSeverityColor = (v) => v <= 3 ? COLORS.teal : v <= 6 ? COLORS.amber : C
 const stressEmoji = { high: '😰', medium: '😐', low: '😌' };
 
 function computeStats(logs) {
-  const avg      = (logs.reduce((s, l) => s + l.parsed_severity, 0) / logs.length).toFixed(1);
+  if (!logs.length) return { avg: null, highDays: 0, avgSleep: null, topTrigger: '—' };
+  const avg      = (logs.reduce((s, l) => s + (l.parsed_severity ?? 0), 0) / logs.length).toFixed(1);
   const highDays = logs.filter(l => l.parsed_severity >= 6).length;
-  const avgSleep = (logs.reduce((s, l) => s + l.parsed_sleep, 0) / logs.length).toFixed(1);
+  const sleepLogs = logs.filter(l => l.parsed_sleep != null);
+  const avgSleep  = sleepLogs.length
+    ? (sleepLogs.reduce((s, l) => s + l.parsed_sleep, 0) / sleepLogs.length).toFixed(1)
+    : null;
   const foodCounts = {};
-  logs.forEach(l => l.parsed_foods.forEach(f => { foodCounts[f] = (foodCounts[f] || 0) + 1; }));
+  logs.forEach(l => (l.parsed_foods ?? []).forEach(f => { foodCounts[f] = (foodCounts[f] || 0) + 1; }));
   const topTrigger = Object.entries(foodCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—';
   return { avg, highDays, avgSleep, topTrigger };
 }
@@ -27,6 +31,13 @@ function StatPill({ label, value, orange }) {
     </div>
   );
 }
+
+const formatNum = (n) =>
+  Number.isNaN(n) || n == null ? "-" : n;
+
+const formatHours = (n) =>
+  Number.isNaN(n) || n == null ? "-" : `${n}h`;
+
 
 export default function Export({ user, logs, navigate }) {
   const [downloading, setDownloading] = useState(false);
@@ -52,10 +63,10 @@ export default function Export({ user, logs, navigate }) {
 
         {/* Stats */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-          <StatPill label="Avg severity" value={`${avg}/10`} orange />
+          <StatPill label="Avg severity" value={`${formatNum(avg)}/10`} orange />
           <StatPill label="High days"    value={`${highDays}`} />
           <StatPill label="Top trigger"  value={topTrigger} />
-          <StatPill label="Avg sleep"    value={`${avgSleep}h`} />
+          <StatPill label="Avg sleep"    value={`${formatHours(avgSleep)}`} />
         </div>
 
         {/* Table */}
@@ -71,7 +82,16 @@ export default function Export({ user, logs, navigate }) {
               </tr>
             </thead>
             <tbody>
-              {logs.map((log, i) => (
+              {logs.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ padding: '36px 14px', textAlign: 'center' }}>
+                    <p style={{ fontFamily: FONTS.serif, fontSize: 18, color: COLORS.text, margin: '0 0 6px' }}>No logs yet</p>
+                    <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.muted, margin: 0 }}>
+                      Start logging to generate your 14-day summary.
+                    </p>
+                  </td>
+                </tr>
+              ) : logs.map((log, i) => (
                 <tr key={log.date} style={{
                   borderBottom: `1px solid ${COLORS.border}`,
                   borderLeft: log.parsed_severity >= 6 ? `3px solid ${COLORS.danger}` : '3px solid transparent',
@@ -83,9 +103,9 @@ export default function Export({ user, logs, navigate }) {
                   <td style={{ padding: '10px 14px' }}>
                     <span style={{ fontFamily: FONTS.mono, fontSize: 13, fontWeight: 500, color: getSeverityColor(log.parsed_severity) }}>{log.parsed_severity}</span>
                   </td>
-                  <td style={{ padding: '10px 14px', fontSize: 12, color: COLORS.muted, maxWidth: 140 }}>{log.parsed_foods.join(', ')}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 12, color: COLORS.muted, maxWidth: 140 }}>{(log.parsed_foods ?? []).join(', ')}</td>
                   <td style={{ padding: '10px 14px', fontSize: 16 }}>{stressEmoji[log.parsed_stress]}</td>
-                  <td style={{ padding: '10px 14px', fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted, whiteSpace: 'nowrap' }}>{log.parsed_sleep}h</td>
+                  <td style={{ padding: '10px 14px', fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted, whiteSpace: 'nowrap' }}>{log.parsed_sleep != null ? `${log.parsed_sleep}h` : '—'}</td>
                 </tr>
               ))}
             </tbody>

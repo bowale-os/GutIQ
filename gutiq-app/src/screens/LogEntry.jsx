@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
-
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { preview, create } from '../api/logs';
 
 const TRANSCRIPT_LINES = [
   'Had coffee this morning...',
@@ -79,7 +78,7 @@ function EditRow({ label, children }) {
   );
 }
 
-export default function LogEntry({ onClose, userStreak = 4 }) {
+export default function LogEntry({ onClose, userStreak = 4, demoMode = false }) {
   const [phase, setPhase] = useState('idle');
   const [source, setSource] = useState('voice');
   const [rawContent, setRawContent] = useState('');
@@ -121,21 +120,16 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
     const rc = content ?? rawContent;
     logTime.current = new Date();
     setPhase('previewing');
-    try {
-      const token = localStorage.getItem('gutiq_token');
-      const res = await fetch(`${BASE_URL}/logs/preview`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({ source, raw_content: rc }),
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setConfirmed({ ...data });
-    } catch {
+    if (demoMode) {
+      await new Promise(r => setTimeout(r, 900));
       setConfirmed({ ...MOCK_PREVIEW });
+    } else {
+      try {
+        const data = await preview(rc);
+        setConfirmed({ ...data });
+      } catch {
+        setConfirmed({ ...MOCK_PREVIEW });
+      }
     }
     setPhase('reviewing');
   };
@@ -143,27 +137,19 @@ export default function LogEntry({ onClose, userStreak = 4 }) {
   const callSave = async (extra = {}) => {
     const final = { ...confirmed, ...extra };
     setPhase('saving');
-    try {
-      const token = localStorage.getItem('gutiq_token');
-      await fetch(`${BASE_URL}/logs`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          source,
-          raw_content: rawContent,
-          log_categories: final.log_categories,
-          parsed_foods: final.parsed_foods,
-          parsed_symptoms: final.parsed_symptoms,
-          parsed_severity: final.parsed_severity,
-          parsed_stress: final.parsed_stress,
-          parsed_sleep: final.parsed_sleep,
-          parsed_exercise: final.parsed_exercise,
-        }),
+    if (!demoMode) {
+      await create({
+        source,
+        raw_content:     rawContent,
+        log_categories:  final.log_categories,
+        parsed_foods:    final.parsed_foods,
+        parsed_symptoms: final.parsed_symptoms,
+        parsed_severity: final.parsed_severity,
+        parsed_stress:   final.parsed_stress,
+        parsed_sleep:    final.parsed_sleep,
+        parsed_exercise: final.parsed_exercise,
       });
-    } catch { /* proceed while backend isn't ready */ }
+    }
     setPhase('saved');
     setTimeout(() => onClose(), 1500);
   };

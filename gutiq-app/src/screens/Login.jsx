@@ -1,21 +1,40 @@
 import { useState } from 'react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
+import { login }     from '../api/auth';
+import { getStatus } from '../api/onboarding';
+import { setToken, storeUser } from '../api/client';
 
-export default function Login({ navigate }) {
+export default function Login({ navigate, onDemo }) {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
+  const [loading,  setLoading]  = useState(false);
   const [focused,  setFocused]  = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     if (!email.includes('@') || password.length < 6) {
       setError('Invalid email or password (min 6 characters).');
       return;
     }
-    navigate('dashboard');
+    setLoading(true);
+    try {
+      const data = await login(email, password);
+      setToken(data.access_token);
+      storeUser(email, data.user_id);
+      try {
+        const status = await getStatus();
+        navigate(status.is_complete ? 'dashboard' : 'onboarding');
+      } catch {
+        navigate('dashboard');
+      }
+    } catch (err) {
+      setError(err.message || 'Login failed. Check your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,7 +91,9 @@ export default function Login({ navigate }) {
             </p>
           )}
 
-          <button type="submit" style={{ ...STYLES.btnPrimary, marginTop: 4 }}>Sign in</button>
+          <button type="submit" disabled={loading} style={{ ...STYLES.btnPrimary, marginTop: 4, opacity: loading ? 0.6 : 1 }}>
+            {loading ? 'Signing in...' : 'Sign in'}
+          </button>
         </form>
       </div>
 
@@ -83,7 +104,7 @@ export default function Login({ navigate }) {
         </button>
       </p>
       <p style={{ textAlign: 'center', marginTop: 14 }}>
-        <button onClick={() => navigate('dashboard')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: COLORS.mutedLight, fontSize: 12, fontFamily: FONTS.mono, letterSpacing: '0.04em', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+        <button onClick={onDemo} style={{ background: 'none', border: 'none', cursor: 'pointer', color: COLORS.mutedLight, fontSize: 12, fontFamily: FONTS.mono, letterSpacing: '0.04em', textDecoration: 'underline', textUnderlineOffset: 3 }}>
           skip to demo →
         </button>
       </p>

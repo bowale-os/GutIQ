@@ -9,7 +9,9 @@ app = FastAPI(title="GutIQ API v1", lifespan=lifespan)
 
 # CORS configuration
 origins = [
-    "http://localhost:3000",  # Add localhost for local dev too
+    "http://localhost:3000",
+    "http://localhost:5173",  # Vite default dev port
+    "http://localhost:4173",  # Vite preview port
 ]
 app.add_middleware(
     CORSMiddleware,

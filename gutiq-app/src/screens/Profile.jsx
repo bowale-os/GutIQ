@@ -1,19 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { COLORS } from '../constants/colors';
 import { STYLES, FONTS } from '../constants/styles';
+import { clearStoredUser } from '../api/client';
+import { update, getUserData } from '../api/user';
 
 const CONDITIONS = ['IBS', "Crohn's Disease", 'Ulcerative Colitis', 'GERD', 'Celiac Disease', 'Other'];
-const GOALS = ['Track symptoms', 'Identify triggers', 'Improve diet', 'Prepare for doctor visit', 'General wellness'];
+const GOALS      = ['Track symptoms', 'Identify triggers', 'Improve diet', 'Prepare for doctor visit', 'General wellness'];
 const AGE_RANGES = ['Under 20', '20–30', '30–40', '40–50', '50+'];
-
-function Section({ title, children }) {
-  return (
-    <div style={{ marginBottom: 16 }}>
-      <p style={{ ...STYLES.label, marginBottom: 10 }}>{title}</p>
-      {children}
-    </div>
-  );
-}
 
 function SelectPill({ options, value, onChange }) {
   return (
@@ -41,32 +34,52 @@ function SelectPill({ options, value, onChange }) {
   );
 }
 
+function Field({ label, children }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <p style={{ ...STYLES.label, marginBottom: 8 }}>{label}</p>
+      {children}
+    </div>
+  );
+}
+
 export default function Profile({ user, navigate, onUpdate }) {
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
+  const [editing,   setEditing]   = useState(false);
+  const [saving,    setSaving]    = useState(false);
   const [saveError, setSaveError] = useState(null);
-  const [saved, setSaved] = useState(false);
+  const [saved,     setSaved]     = useState(false);
+  const [liveUser,  setLiveUser]  = useState(user);
+
+  useEffect(() => {
+    getUserData()
+      .then(data => {
+        setLiveUser(prev => ({ ...prev, ...data }));
+        setDraft(d => ({
+          email:               data.email               ?? d.email,
+          digestive_condition: data.digestive_condition ?? d.digestive_condition,
+          goal:                data.goal                ?? d.goal,
+          age_range:           data.age_range           ?? d.age_range,
+        }));
+      })
+      .catch(() => {}); // silently fall back to prop data
+  }, []);
 
   const [draft, setDraft] = useState({
-    email: user?.email ?? '',
-    digestive_condition: user?.digestive_condition ?? '',
-    goal: user?.goal ?? '',
-    age_range: user?.age_range ?? '',
+    email:               liveUser?.email               ?? '',
+    digestive_condition: liveUser?.digestive_condition ?? '',
+    goal:                liveUser?.goal                ?? '',
+    age_range:           liveUser?.age_range           ?? '',
   });
 
-  const initials = (user?.name ?? user?.email ?? 'U')
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = (liveUser?.name ?? liveUser?.email ?? 'U')
+    .split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
 
   const handleCancel = () => {
     setDraft({
-      email: user?.email ?? '',
-      digestive_condition: user?.digestive_condition ?? '',
-      goal: user?.goal ?? '',
-      age_range: user?.age_range ?? '',
+      email:               liveUser?.email               ?? '',
+      digestive_condition: liveUser?.digestive_condition ?? '',
+      goal:                liveUser?.goal                ?? '',
+      age_range:           liveUser?.age_range           ?? '',
     });
     setSaveError(null);
     setEditing(false);
@@ -76,28 +89,8 @@ export default function Profile({ user, navigate, onUpdate }) {
     setSaving(true);
     setSaveError(null);
     try {
-      // PATCH /api/v1/users/me
-      const token = localStorage.getItem('token');
-      const res = await fetch('/api/v1/users/me', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
-          email: draft.email || undefined,
-          digestive_condition: draft.digestive_condition || undefined,
-          goal: draft.goal || undefined,
-          age_range: draft.age_range || undefined,
-        }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.detail ?? `Error ${res.status}`);
-      }
-
-      const updated = await res.json();
+      const updated = await update(draft);
+      setLiveUser(prev => ({ ...prev, ...updated }));
       onUpdate?.(updated);
       setSaved(true);
       setEditing(false);
@@ -111,57 +104,50 @@ export default function Profile({ user, navigate, onUpdate }) {
 
   return (
     <div style={{ ...STYLES.page, paddingBottom: 96 }}>
-      {/* Header */}
-      <div style={{
-        padding: '56px 24px 24px',
-        borderBottom: `1px solid ${COLORS.border}`,
-        backgroundColor: COLORS.surface,
-      }}>
-        <div style={{ maxWidth: 480, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 16 }}>
-          {/* Avatar */}
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '32px 20px 0' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 28 }}>
           <div style={{
-            width: 60, height: 60, borderRadius: '50%', flexShrink: 0,
+            width: 52, height: 52, borderRadius: '50%', flexShrink: 0,
             backgroundColor: COLORS.orangeLight,
-            border: `2px solid ${COLORS.orangeBorder}`,
+            border: `1.5px solid ${COLORS.orangeBorder}`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: FONTS.serif, fontSize: 22, color: COLORS.orange,
+            fontFamily: FONTS.serif, fontSize: 18, color: COLORS.orange,
           }}>
             {initials}
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <h2 style={{ ...STYLES.h2, fontSize: 22, margin: 0 }}>
-              {user?.name ?? 'Your Profile'}
-            </h2>
-            <p style={{ fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted, marginTop: 2 }}>
-              {user?.email}
+          <div>
+            <h1 style={{ fontFamily: FONTS.serif, fontSize: 26, color: COLORS.text, letterSpacing: '-0.01em', margin: '0 0 2px' }}>
+              {liveUser?.name ?? 'Your Profile'}
+            </h1>
+            <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted, margin: 0 }}>
+              {liveUser?.email}
             </p>
           </div>
-          <button
-            onClick={() => editing ? handleCancel() : setEditing(true)}
-            style={{
-              fontFamily: FONTS.sans, fontSize: 13, fontWeight: 500,
-              padding: '8px 16px', borderRadius: 10, cursor: 'pointer',
-              border: `1px solid ${COLORS.border}`,
-              backgroundColor: editing ? COLORS.surfaceAlt : COLORS.surface,
-              color: editing ? COLORS.muted : COLORS.text,
-              flexShrink: 0,
-            }}
-          >
-            {editing ? 'Cancel' : 'Edit'}
-          </button>
         </div>
-      </div>
 
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 24px 0' }}>
+        {/* Badges */}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+          {liveUser?.digestive_condition && (
+            <span style={{ ...STYLES.chip, ...STYLES.chipOrange }}>
+              {liveUser.digestive_condition}
+            </span>
+          )}
+          {liveUser?.age_range && (
+            <span style={{ ...STYLES.chip, ...STYLES.chipMuted }}>
+              {liveUser.age_range}
+            </span>
+          )}
+        </div>
 
         {/* Success banner */}
         {saved && (
           <div style={{
-            backgroundColor: COLORS.tealLight,
-            border: `1px solid ${COLORS.tealBorder}`,
-            borderRadius: 12, padding: '12px 16px',
+            backgroundColor: COLORS.tealLight, border: `1px solid ${COLORS.tealBorder}`,
+            borderRadius: 12, padding: '12px 16px', marginBottom: 16,
             fontFamily: FONTS.sans, fontSize: 14, color: COLORS.teal,
-            marginBottom: 20, animation: 'fadeIn 0.2s ease',
+            animation: 'fadeSlideUp 0.2s ease',
             display: 'flex', alignItems: 'center', gap: 8,
           }}>
             ✓ Profile updated
@@ -171,19 +157,34 @@ export default function Profile({ user, navigate, onUpdate }) {
         {/* Error banner */}
         {saveError && (
           <div style={{
-            backgroundColor: COLORS.dangerDim,
-            border: `1px solid ${COLORS.dangerBorder}`,
-            borderRadius: 12, padding: '12px 16px',
+            backgroundColor: COLORS.dangerDim, border: `1px solid ${COLORS.dangerBorder}`,
+            borderRadius: 12, padding: '12px 16px', marginBottom: 16,
             fontFamily: FONTS.sans, fontSize: 14, color: COLORS.danger,
-            marginBottom: 20,
+            animation: 'fadeSlideUp 0.2s ease',
           }}>
             {saveError}
           </div>
         )}
 
-        {/* Email */}
-        <div style={{ ...STYLES.card, marginBottom: 16 }}>
-          <Section title="Email">
+        {/* Health profile card */}
+        <div style={{ ...STYLES.card, marginBottom: 12 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+            <p style={{ fontFamily: FONTS.serif, fontSize: 18, color: COLORS.text, margin: 0 }}>Health Profile</p>
+            <button
+              onClick={() => editing ? handleCancel() : setEditing(true)}
+              style={{
+                fontFamily: FONTS.mono, fontSize: 10, letterSpacing: '0.07em',
+                padding: '5px 12px', borderRadius: 999, cursor: 'pointer',
+                border: editing ? `1px solid ${COLORS.dangerBorder}` : `1px solid ${COLORS.border}`,
+                backgroundColor: 'transparent',
+                color: editing ? COLORS.danger : COLORS.muted,
+              }}
+            >
+              {editing ? 'CANCEL' : 'EDIT'}
+            </button>
+          </div>
+
+          <Field label="Email">
             {editing ? (
               <input
                 type="email"
@@ -195,101 +196,76 @@ export default function Profile({ user, navigate, onUpdate }) {
               />
             ) : (
               <p style={{ fontFamily: FONTS.sans, fontSize: 15, color: COLORS.text, margin: 0 }}>
-                {user?.email ?? '—'}
+                {liveUser?.email ?? '—'}
               </p>
             )}
-          </Section>
-        </div>
+          </Field>
 
-        {/* Health profile */}
-        <div style={{ ...STYLES.card, marginBottom: 16 }}>
-          <p style={{ fontFamily: FONTS.serif, fontSize: 18, color: COLORS.text, margin: '0 0 20px' }}>
-            Health Profile
-          </p>
+          <div style={STYLES.divider} />
 
-          <Section title="Digestive condition">
+          <Field label="Digestive condition">
             {editing ? (
-              <SelectPill
-                options={CONDITIONS}
-                value={draft.digestive_condition}
-                onChange={v => setDraft(d => ({ ...d, digestive_condition: v }))}
-              />
+              <SelectPill options={CONDITIONS} value={draft.digestive_condition}
+                onChange={v => setDraft(d => ({ ...d, digestive_condition: v }))} />
             ) : (
               <span style={{ ...STYLES.chip, ...STYLES.chipOrange }}>
-                {user?.digestive_condition ?? '—'}
+                {liveUser?.digestive_condition ?? '—'}
               </span>
             )}
-          </Section>
+          </Field>
 
           <div style={STYLES.divider} />
 
-          <Section title="Goal">
+          <Field label="Goal">
             {editing ? (
-              <SelectPill
-                options={GOALS}
-                value={draft.goal}
-                onChange={v => setDraft(d => ({ ...d, goal: v }))}
-              />
+              <SelectPill options={GOALS} value={draft.goal}
+                onChange={v => setDraft(d => ({ ...d, goal: v }))} />
             ) : (
               <p style={{ fontFamily: FONTS.sans, fontSize: 15, color: COLORS.text, margin: 0 }}>
-                {user?.goal ?? '—'}
+                {liveUser?.goal ?? '—'}
               </p>
             )}
-          </Section>
+          </Field>
 
           <div style={STYLES.divider} />
 
-          <Section title="Age range">
+          <Field label="Age range">
             {editing ? (
-              <SelectPill
-                options={AGE_RANGES}
-                value={draft.age_range}
-                onChange={v => setDraft(d => ({ ...d, age_range: v }))}
-              />
+              <SelectPill options={AGE_RANGES} value={draft.age_range}
+                onChange={v => setDraft(d => ({ ...d, age_range: v }))} />
             ) : (
               <span style={{ ...STYLES.chip, ...STYLES.chipMuted }}>
-                {user?.age_range ?? '—'}
+                {liveUser?.age_range ?? '—'}
               </span>
             )}
-          </Section>
+          </Field>
+
+          {editing && (
+            <button onClick={handleSave} disabled={saving}
+              style={{ ...STYLES.btnPrimary, marginTop: 4, opacity: saving ? 0.6 : 1 }}>
+              {saving ? 'Saving…' : 'Save changes'}
+            </button>
+          )}
         </div>
 
-        {/* Save button */}
-        {editing && (
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            style={{
-              ...STYLES.btnPrimary,
-              opacity: saving ? 0.6 : 1,
-              marginBottom: 16,
-            }}
-          >
-            {saving ? 'Saving…' : 'Save changes'}
-          </button>
-        )}
-
-        {/* Danger zone */}
+        {/* Account */}
         {!editing && (
-          <div style={{ ...STYLES.card, marginBottom: 16 }}>
+          <div style={{ ...STYLES.card, marginBottom: 12 }}>
             <p style={{ ...STYLES.label, marginBottom: 14 }}>Account</p>
             <button
-              onClick={() => {
-                localStorage.removeItem('token');
-                navigate('login');
-              }}
+              onClick={() => { clearStoredUser(); navigate('login'); }}
               style={{
                 fontFamily: FONTS.sans, fontSize: 14, fontWeight: 500,
                 background: 'none', border: `1px solid ${COLORS.dangerBorder}`,
-                borderRadius: 10, padding: '10px 16px',
-                color: COLORS.danger, cursor: 'pointer',
-                width: '100%',
+                borderRadius: 10, padding: '11px 16px',
+                color: COLORS.danger, cursor: 'pointer', width: '100%',
               }}
             >
               Sign out
             </button>
           </div>
         )}
+
       </div>
     </div>
   );

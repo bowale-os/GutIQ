@@ -33,6 +33,29 @@ function Sparkline({ logs }) {
 }
 
 export default function Dashboard({ user, logs, navigate, openLog }) {
+  if (logs.length === 0) return (
+    <div style={{ ...STYLES.page, paddingBottom: 90 }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: '32px 20px 0' }}>
+        <h1 style={{ fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 8 }}>
+          Hi, {user.name.split(' ')[0]}
+        </h1>
+        <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted, marginBottom: 32 }}>
+          Your dashboard will fill in as you log.
+        </p>
+        <div style={{ ...STYLES.card, padding: '28px 24px', textAlign: 'center' }}>
+          <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.text, marginBottom: 8 }}>No logs yet</p>
+          <p style={{ fontSize: 13, color: COLORS.muted, marginBottom: 24 }}>
+            Log your first meal or symptom to start building your gut profile.
+          </p>
+          <button onClick={openLog} style={{ ...STYLES.btnPrimary, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%' }}>
+            <span style={{ animation: 'pulse 2s ease infinite', fontSize: 18 }}>🎙️</span>
+            Log now
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const lastLog    = logs[logs.length - 1];
   const recentLogs = logs.slice(-3).reverse();
   const avgSev     = (logs.reduce((s, l) => s + l.parsed_severity, 0) / logs.length).toFixed(1);

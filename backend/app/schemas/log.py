@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field, model_validator
+# app/schemas/log.py
+
+from pydantic import BaseModel, model_validator
 from typing import Optional, List, Literal
 from datetime import datetime
 import uuid
@@ -7,38 +9,50 @@ import json
 from app.models.log import LogType
 
 
-class LogCreateRequest(BaseModel):
-    raw_content: str
-    source: str
+# ── Preview ────────────────────────────────────────────────────────────────────
 
-class LogPreviewRequest(BaseModel):
-    user_id: uuid.UUID
-    source: Literal["voice", "text"]
-    raw_content: Optional[str] = None    # text only
-    audio_data: Optional[bytes] = None   # voice only
-
-    @model_validator(mode="after")
-    def validate_source(self):
-        if self.source == "voice" and not self.audio_data:
-            raise ValueError("Voice preview requires audio_data")
-        if self.source == "text" and not self.raw_content:
-            raise ValueError("Text preview requires raw_content")
-        return self
-
-
-class LogResponse(BaseModel):
-    id: uuid.UUID
-    user_id: uuid.UUID
-    raw_content: str
-    logged_at: datetime
-    log_type: Optional[LogType] = None
-    parsed_foods: Optional[List[str]] = None      # deserialized from JSON string
-    parsed_symptoms: Optional[List[str]] = None   # deserialized from JSON string
+class LogPreviewResponse(BaseModel):
+    transcript: Optional[str] = None          # populated for voice, None for text
+    log_categories: List[str] = []
+    parsed_foods: Optional[List[str]] = None
+    parsed_symptoms: Optional[List[str]] = None
     parsed_severity: Optional[int] = None
     parsed_stress: Optional[str] = None
     parsed_sleep: Optional[float] = None
     parsed_exercise: Optional[str] = None
-    is_ai_processed: bool
+    confidence: str = "high"
+    natural_summary: str = ""
+    missing_critical_field: Optional[str] = None
+
+
+# ── Save (after user confirms) ─────────────────────────────────────────────────
+
+class LogCreateRequest(BaseModel):
+    source: Literal["text", "voice"]
+    raw_content: Optional[str] = None
+    log_categories: Optional[List[str]] = None
+    parsed_foods: Optional[List[str]] = None
+    parsed_symptoms: Optional[List[str]] = None
+    parsed_severity: Optional[int] = None
+    parsed_stress: Optional[str] = None
+    parsed_sleep: Optional[float] = None
+    parsed_exercise: Optional[str] = None
+
+
+# ── Response ───────────────────────────────────────────────────────────────────
+
+class LogResponse(BaseModel):
+    id: uuid.UUID
+    user_id: uuid.UUID
+    raw_content: Optional[str]
+    logged_at: datetime
+    log_type: Optional[LogType] = None
+    parsed_foods: Optional[List[str]] = None
+    parsed_symptoms: Optional[List[str]] = None
+    parsed_severity: Optional[int] = None
+    parsed_stress: Optional[str] = None
+    parsed_sleep: Optional[float] = None
+    parsed_exercise: Optional[str] = None
 
     @classmethod
     def from_orm(cls, log) -> "LogResponse":
@@ -53,8 +67,7 @@ class LogResponse(BaseModel):
             parsed_severity=log.parsed_severity,
             parsed_stress=log.parsed_stress,
             parsed_sleep=log.parsed_sleep,
-            parsed_exercise=log.parsed_exercise,
-            is_ai_processed=log.is_ai_processed,
+            parsed_exercise=log.parsed_exercise
         )
 
 
@@ -65,5 +78,5 @@ class LogListResponse(BaseModel):
 
 class LogCreateResponse(BaseModel):
     success: bool = True
-    message: str = "Log saved. Processing with Nova..."
+    message: str = "Log saved."
     log: LogResponse

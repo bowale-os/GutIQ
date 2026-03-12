@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { COLORS } from './constants/colors';
 import { currentUser, mockLogs } from './constants/mockData';
+import { isLoggedIn, getStoredUser } from './api/client';
+import { fetchRealLogs } from './api/logs';
 
 import NavBar     from './components/NavBar';
 import Login      from './screens/Login';
@@ -11,6 +13,7 @@ import GutCheck  from './screens/GutCheck';
 import LogEntry   from './screens/LogEntry';
 import Export     from './screens/Export';
 import Profile    from './screens/Profile';
+import Lifestyles from './screens/Lifestyles';
 
 const GLOBAL_STYLES = `
   @keyframes fadeSlideUp {
@@ -54,13 +57,26 @@ const GLOBAL_STYLES = `
   ::placeholder { color: #A8A29E; }
 `;
 
-const AUTH_SCREENS = ['dashboard', 'gutcheck', 'export', 'profile'];
+const AUTH_SCREENS = ['dashboard', 'gutcheck', 'export', 'profile', 'lifestyles'];
 
 export default function App() {
-  const [currentScreen,  setCurrentScreen]  = useState('login');
+  const [currentScreen,  setCurrentScreen]  = useState(() => isLoggedIn() ? 'dashboard' : 'login');
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [logModalOpen,   setLogModalOpen]   = useState(false);
-  const [user,           setUser]           = useState(currentUser);
+  const [user,           setUser]           = useState(() => {
+    if (isLoggedIn()) {
+      const stored = getStoredUser();
+      return stored.email ? { ...currentUser, ...stored } : currentUser;
+    }
+    return currentUser;
+  });
+  const [demoMode, setDemoMode] = useState(false);
+  const [logs, setLogs] = useState([]);
+
+  useEffect(() => {
+    if (demoMode) { setLogs(mockLogs); return; }
+    if (isLoggedIn()) fetchRealLogs().then(setLogs);
+  }, [currentScreen === 'dashboard', demoMode]);
 
   const navigate = (screen) => {
     setCurrentScreen(screen);
@@ -77,13 +93,14 @@ export default function App() {
 
   const renderScreen = () => {
     switch (currentScreen) {
-      case 'login':      return <Login navigate={navigate} />;
+      case 'login':      return <Login navigate={navigate} onDemo={() => { setDemoMode(true); navigate('dashboard'); }} />;
       case 'signup':     return <Signup navigate={navigate} />;
       case 'onboarding': return <Onboarding step={onboardingStep} setStep={setOnboardingStep} navigate={navigate} />;
-      case 'dashboard':  return <Dashboard user={user} logs={mockLogs} navigate={navigate} openLog={openLog} />;
+      case 'dashboard':  return <Dashboard user={user} logs={logs} navigate={navigate} openLog={openLog} />;
       case 'gutcheck':   return <GutCheck />;
-      case 'export':     return <Export user={user} logs={mockLogs} navigate={navigate} />;
+      case 'export':     return <Export user={user} logs={logs} navigate={navigate} />;
       case 'profile':    return <Profile user={user} navigate={navigate} onUpdate={updated => setUser(u => ({ ...u, ...updated }))} />;
+      case 'lifestyles': return <Lifestyles navigate={navigate} />;
       default:           return <Login navigate={navigate} />;
     }
   };
@@ -101,7 +118,7 @@ export default function App() {
       </div>
 
       {logModalOpen && (
-        <LogEntry onClose={closeLog} userStreak={user.streak} />
+        <LogEntry onClose={closeLog} userStreak={user.streak} demoMode={demoMode} />
       )}
     </div>
   );

@@ -32,7 +32,7 @@ async def signup(payload:UserCreateRequest, db: AsyncSession = Depends(get_sessi
     await db.refresh(user)
 
     token = create_access_token(subject=str(user.id), expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS))
-    return TokenResponse(access_token=token)
+    return TokenResponse(access_token=token, user_id=str(user.id))
 
 
 @router.post("/login", response_model=TokenResponse)
@@ -51,7 +51,7 @@ async def login(payload: LogInRequest, db: AsyncSession = Depends(get_session)):
         
         token = create_access_token(subject=str(user.id), expires_delta=timedelta(hours=settings.ACCESS_TOKEN_EXPIRE_HOURS))
         await db.commit()
-        return TokenResponse(access_token=token)
+        return TokenResponse(access_token=token, user_id=str(user.id))
     
     except Exception:
         await db.rollback()

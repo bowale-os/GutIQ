@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import StepIndicator from '../components/StepIndicator';
+import { complete } from '../api/onboarding';
+import { storeUser } from '../api/client';
 
 function SelectCard({ icon, label, desc, selected, onClick }) {
   return (
@@ -59,15 +61,36 @@ const REMINDER_TIMES = [
   { id: 'none',    label: 'No reminders', time: '' },
 ];
 
+const AGE_RANGES = ['20-30', '30-40', '40-50', '50+'];
+
 export default function Onboarding({ step, setStep, navigate }) {
   const [condition,     setCondition]    = useState(null);
   const [logPref,       setLogPref]      = useState(null);
   const [reminderTime,  setReminderTime] = useState('evening');
   const [weeklySummary, setWeeklySummary] = useState(true);
+  const [ageRange,      setAgeRange]     = useState(null);
+  const [saving,        setSaving]       = useState(false);
 
-  const canProceed = () => step === 1 ? !!condition : step === 2 ? !!logPref : true;
+  const canProceed = () =>
+    step === 1 ? !!condition :
+    step === 2 ? !!logPref :
+    !!ageRange;
 
-  const handleNext = () => step < 3 ? setStep(step + 1) : navigate('dashboard');
+  const handleNext = async () => {
+    if (step < 3) { setStep(step + 1); return; }
+    // Step 3 finish — save to backend
+    setSaving(true);
+    try {
+      const goal = `Identify and manage ${condition} triggers`;
+      await complete(condition, goal, ageRange);
+      storeUser(localStorage.getItem('gutiq_email') || '', condition);
+    } catch {
+      // Proceed even if backend call fails
+    } finally {
+      setSaving(false);
+      navigate('dashboard');
+    }
+  };
 
   return (
     <div style={{ ...STYLES.page }}>
@@ -125,6 +148,31 @@ export default function Onboarding({ step, setStep, navigate }) {
               ))}
             </div>
 
+            {/* Age range */}
+            <div style={{ marginBottom: 24 }}>
+              <p style={{ ...STYLES.label, marginBottom: 10 }}>Your age range</p>
+              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                {AGE_RANGES.map(r => (
+                  <button
+                    key={r}
+                    onClick={() => setAgeRange(r)}
+                    style={{
+                      padding: '10px 18px', borderRadius: 10,
+                      border: `1.5px solid ${ageRange === r ? COLORS.orange : COLORS.border}`,
+                      backgroundColor: ageRange === r ? COLORS.orangeLight : COLORS.surface,
+                      color: ageRange === r ? COLORS.orange : COLORS.muted,
+                      fontFamily: FONTS.mono, fontWeight: ageRange === r ? 600 : 400,
+                      fontSize: 14, cursor: 'pointer',
+                      boxShadow: COLORS.shadow,
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Weekly summary toggle */}
             <div style={{ ...STYLES.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <div>
@@ -154,10 +202,10 @@ export default function Onboarding({ step, setStep, navigate }) {
 
         <button
           onClick={handleNext}
-          disabled={!canProceed()}
-          style={{ ...STYLES.btnPrimary, marginTop: 24, opacity: canProceed() ? 1 : 0.35 }}
+          disabled={!canProceed() || saving}
+          style={{ ...STYLES.btnPrimary, marginTop: 24, opacity: (canProceed() && !saving) ? 1 : 0.35 }}
         >
-          {step === 3 ? 'Start tracking →' : 'Continue'}
+          {saving ? 'Saving...' : step === 3 ? 'Start tracking →' : 'Continue'}
         </button>
 
         {step > 1 && (
