@@ -1,34 +1,94 @@
-import { useState, useEffect } from 'react';
-import { COLORS } from '../constants/colors';
+import { useState, useEffect, useMemo } from 'react';
+import { HeartPulse } from 'lucide-react';
+import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import LogCard from '../components/LogCard';
 
-const getSeverityColor = (v) => v <= 3 ? COLORS.teal : v <= 6 ? COLORS.amber : COLORS.danger;
-
 function Sparkline({ logs }) {
   const [visible, setVisible] = useState(false);
+  const [hovered, setHovered] = useState(null);
   useEffect(() => { const t = setTimeout(() => setVisible(true), 150); return () => clearTimeout(t); }, []);
-  const W = 440, H = 52;
-  const barW = (W / logs.length) * 0.55;
-  const gap  = W / logs.length;
+
+  const days = useMemo(() => {
+    const logsByDate = {};
+    for (const l of logs) {
+      if (!logsByDate[l.date]) logsByDate[l.date] = [];
+      logsByDate[l.date].push(l);
+    }
+    return Array.from({ length: 14 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (13 - i));
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dayLogs = logsByDate[label] || [];
+      if (dayLogs.length === 0) return { label, logs: [] };
+      const withSev = dayLogs.filter(l => l.parsed_severity != null);
+      if (withSev.length === 0) return { label, logs: dayLogs, avg: null };
+      const avg = withSev.reduce((s, l) => s + l.parsed_severity, 0) / withSev.length;
+      return { label, logs: dayLogs, avg };
+    });
+  }, [logs]);
+
+  const W = 440, H = 52, gap = W / 14, barW = gap * 0.55;
+  const hoveredDay = hovered !== null ? days[hovered] : null;
+  const tooltipLeft = hovered !== null ? `${((hovered * gap + gap / 2) / W) * 100}%` : '0%';
+
   return (
-    <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
-      {logs.map((log, i) => {
-        const x = i * gap + gap / 2 - barW / 2;
-        const barH = (log.parsed_severity / 10) * H;
-        const y = H - barH;
+    <div style={{ position: 'relative' }}>
+      <svg width="100%" viewBox={`0 0 ${W} ${H}`} style={{ display: 'block' }}>
+        {days.map((day, i) => {
+          const x = i * gap + gap / 2 - barW / 2;
+          if (!day.logs.length || day.avg == null) {
+            return (
+              <g key={i}>
+                <rect x={x} y={0} width={barW} height={H} rx={3} fill="#E7E5E4" fillOpacity={0.12} />
+                <rect x={x} y={H - 4} width={barW} height={4} rx={2} fill="#E7E5E4" fillOpacity={0.5} />
+              </g>
+            );
+          }
+          const barH = Math.max((day.avg / 10) * H, 4);
+          const y = H - barH;
+          return (
+            <rect
+              key={i} x={x} y={y} width={barW} height={barH} rx={3}
+              fill={getSeverityColor(day.avg)}
+              fillOpacity={hovered === i ? 1 : 0.8}
+              style={{
+                cursor: 'pointer',
+                transformOrigin: `${x + barW / 2}px ${H}px`,
+                animationName: visible ? 'barGrow' : 'none',
+                animationDuration: '0.45s',
+                animationTimingFunction: 'cubic-bezier(0.34,1.56,0.64,1)',
+                animationFillMode: 'both',
+                animationDelay: `${i * 25}ms`,
+              }}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+            />
+          );
+        })}
+      </svg>
+      {hoveredDay?.logs.length > 0 && (() => {
+        const barH = Math.max((hoveredDay.avg / 10) * H, 4);
+        const barTopPct = ((H - barH) / H) * 100;
         return (
-          <rect key={log.date} x={x} y={y} width={barW} height={barH} rx={3}
-            fill={getSeverityColor(log.parsed_severity)} fillOpacity={0.8}
-            style={{
-              transformOrigin: `${x + barW / 2}px ${H}px`,
-              animation: visible ? 'barGrow 0.45s cubic-bezier(0.34,1.56,0.64,1) both' : 'none',
-              animationDelay: `${i * 25}ms`,
-            }}
-          />
+        <div style={{
+          position: 'absolute',
+          top: `calc(${barTopPct}% - 32px)`,
+          left: tooltipLeft,
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(28, 25, 23, 0.75)', color: '#FAFAF9',
+          borderRadius: 8, padding: '5px 10px',
+          fontFamily: FONTS.mono, fontSize: 11,
+          whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 10,
+          backdropFilter: 'blur(4px)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        }}>
+          {hoveredDay.label} · avg {hoveredDay.avg.toFixed(1)}/10
+          {hoveredDay.logs.length > 1 && ` · ${hoveredDay.logs.length} logs`}
+        </div>
         );
-      })}
-    </svg>
+      })()}
+    </div>
   );
 }
 
@@ -52,13 +112,45 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             Log now
           </button>
         </div>
+        <button
+          onClick={() => navigate('pain_relief')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            width: '100%', textAlign: 'left',
+            backgroundColor: COLORS.surface,
+            border: `1px solid ${COLORS.tealBorder}`,
+            borderRadius: 16, padding: '16px 18px',
+            marginTop: 12, cursor: 'pointer',
+            boxShadow: COLORS.shadow,
+          }}
+        >
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+            backgroundColor: COLORS.tealLight,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <HeartPulse size={20} color={COLORS.teal} strokeWidth={1.75} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: FONTS.sans, fontWeight: 600, fontSize: 14, color: COLORS.text, marginBottom: 2 }}>
+              Let me help you through this
+            </p>
+            <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.muted }}>
+              Tiwa · guided relief steps for gut pain
+            </p>
+          </div>
+          <span style={{ fontFamily: FONTS.mono, fontSize: 13, color: COLORS.teal }}>→</span>
+        </button>
       </div>
     </div>
   );
 
-  const lastLog    = logs[logs.length - 1];
-  const recentLogs = logs.slice(-3).reverse();
-  const avgSev     = (logs.reduce((s, l) => s + l.parsed_severity, 0) / logs.length).toFixed(1);
+  const lastLog    = logs[0];
+  const recentLogs = logs.slice(0, 3);
+  const logsWithSev = logs.filter(l => l.parsed_severity != null);
+  const avgSev      = logsWithSev.length
+    ? (logsWithSev.reduce((s, l) => s + l.parsed_severity, 0) / logsWithSev.length).toFixed(1)
+    : '—';
 
   return (
     <div style={{ ...STYLES.page, paddingBottom: 90 }}>
@@ -70,9 +162,6 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             <h1 style={{ fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 4 }}>
               Hi, {user.name?.split(' ')[0] ?? 'there'}
             </h1>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, backgroundColor: COLORS.amberDim, border: `1px solid ${COLORS.amberBorder}`, borderRadius: 999, padding: '3px 10px', fontFamily: FONTS.mono, fontSize: 11, color: COLORS.amber }}>
-              🔥 {user.streak}-day streak
-            </span>
           </div>
           <div style={{
             width: 44, height: 44, borderRadius: '50%',
@@ -81,7 +170,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             fontFamily: FONTS.sans, fontWeight: 700, fontSize: 15, color: '#fff',
             flexShrink: 0,
           }}>
-            {user.initials}
+            {user.name?.charAt(0).toUpperCase() ?? '?'}
           </div>
         </div>
 
@@ -102,7 +191,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             How are you feeling today?
           </p>
           <p style={{ fontSize: 12, color: COLORS.darkMuted, marginBottom: 20 }}>
-            Yesterday: severity {lastLog.parsed_severity}/10 · {lastLog.parsed_foods[0]}
+            {lastLog.date}: {lastLog.parsed_severity != null ? `pain level ${lastLog.parsed_severity}/10` : 'no symptoms'} · {lastLog.parsed_foods[0] ?? 'no food logged'}
           </p>
           <button
             onClick={openLog}
@@ -120,17 +209,49 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
           </button>
         </div>
 
+        {/* Pain relief CTA */}
+        <button
+          onClick={() => navigate('pain_relief')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 14,
+            width: '100%', textAlign: 'left',
+            backgroundColor: COLORS.surface,
+            border: `1px solid ${COLORS.tealBorder}`,
+            borderRadius: 16, padding: '16px 18px',
+            marginBottom: 16, cursor: 'pointer',
+            boxShadow: COLORS.shadow,
+            transition: 'border-color 0.15s ease',
+          }}
+        >
+          <div style={{
+            width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+            backgroundColor: COLORS.tealLight,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <HeartPulse size={20} color={COLORS.teal} strokeWidth={1.75} />
+          </div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontFamily: FONTS.sans, fontWeight: 600, fontSize: 14, color: COLORS.text, marginBottom: 2 }}>
+              In pain right now?
+            </p>
+            <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.muted, lineHeight: 1.4 }}>
+              Get evidence-based relief steps for your gut symptoms
+            </p>
+          </div>
+          <span style={{ fontFamily: FONTS.mono, fontSize: 13, color: COLORS.teal }}>→</span>
+        </button>
+
         {/* Stats row */}
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
           <div style={{ ...STYLES.card, flex: 1, textAlign: 'center' }}>
-            <p style={{ ...STYLES.labelTeal, marginBottom: 6 }}>Avg severity</p>
+            <p style={{ ...STYLES.labelTeal, marginBottom: 6 }}>Avg pain level</p>
             <p style={{ fontFamily: FONTS.mono, fontSize: 26, fontWeight: 500, color: getSeverityColor(parseFloat(avgSev)) }}>{avgSev}</p>
             <p style={{ fontSize: 11, color: COLORS.muted, marginTop: 2 }}>/ 10</p>
           </div>
           <div style={{ ...STYLES.card, flex: 1, textAlign: 'center' }}>
             <p style={{ ...STYLES.labelTeal, marginBottom: 6 }}>Last log</p>
-            <p style={{ fontFamily: FONTS.mono, fontSize: 26, fontWeight: 500, color: COLORS.text }}>{lastLog.parsed_severity}</p>
-            <p style={{ fontSize: 11, color: COLORS.muted, marginTop: 2 }}>{lastLog.date.slice(-5)}</p>
+            <p style={{ fontFamily: FONTS.mono, fontSize: 26, fontWeight: 500, color: COLORS.text }}>{lastLog.parsed_severity ?? '—'}</p>
+            <p style={{ fontSize: 11, color: COLORS.muted, marginTop: 2 }}>{lastLog.date}</p>
           </div>
         </div>
 

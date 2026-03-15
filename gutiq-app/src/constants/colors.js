@@ -45,3 +45,6 @@ export const COLORS = {
   darkText:     '#FAFAF9',
   darkMuted:    '#A8A29E',
 };
+
+export const getSeverityColor = (v) =>
+  v <= 3 ? COLORS.teal : v <= 6 ? COLORS.amber : COLORS.danger;

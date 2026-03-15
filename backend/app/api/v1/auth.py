@@ -24,6 +24,7 @@ async def signup(payload:UserCreateRequest, db: AsyncSession = Depends(get_sessi
         raise HTTPException(status_code=400, detail="Email already registered")
     
     user = User(
+        name=payload.name,
         email=payload.email,
         hashed_password=hash_password(payload.password),
     )

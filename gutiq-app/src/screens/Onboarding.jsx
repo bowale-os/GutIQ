@@ -50,7 +50,7 @@ const CONDITIONS = [
 ];
 
 const LOG_PREFS = [
-  { id: 'voice', icon: '🎙️', label: 'Voice',  desc: 'Speak naturally after meals. Nova listens and parses.' },
+  { id: 'voice', icon: '🎙️', label: 'Voice',  desc: 'Speak naturally after meals. Tiwa listens and parses.' },
   { id: 'text',  icon: '⌨️', label: 'Text',   desc: 'Type a quick note. Fast and familiar.' },
   { id: 'both',  icon: '✨', label: 'Both',   desc: 'Voice when convenient, text when quiet.' },
 ];

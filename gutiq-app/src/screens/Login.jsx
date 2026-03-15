@@ -3,9 +3,10 @@ import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { login }     from '../api/auth';
 import { getStatus } from '../api/onboarding';
+import { getUserData } from '../api/user';
 import { setToken, storeUser } from '../api/client';
 
-export default function Login({ navigate, onDemo }) {
+export default function Login({ navigate, onDemo, onLogin }) {
   const [email,    setEmail]    = useState('');
   const [password, setPassword] = useState('');
   const [error,    setError]    = useState('');
@@ -24,6 +25,8 @@ export default function Login({ navigate, onDemo }) {
       const data = await login(email, password);
       setToken(data.access_token);
       storeUser(email, data.user_id);
+      try { const u = await getUserData(); if (u.name) storeUser(email, data.user_id, u.name); } catch {}
+      onLogin?.();
       try {
         const status = await getStatus();
         navigate(status.is_complete ? 'dashboard' : 'onboarding');

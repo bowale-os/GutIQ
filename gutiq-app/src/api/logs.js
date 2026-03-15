@@ -9,23 +9,27 @@ import {
 // ── Shape transformer ──────────────────────────────────────────────────────────
 
 export function apiLogToFrontend(log) {
+  const symptoms = log.parsed_symptoms || [];
+  const severities = symptoms.map(s => s.severity).filter(s => s != null);
+  const maxSeverity = severities.length > 0 ? severities.reduce((m, s) => s > m ? s : m) : null;
+
   return {
     date: new Date(log.logged_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
     log_categories: [
-      (log.parsed_foods?.length)    ? 'food'     : null,
-      (log.parsed_symptoms?.length) ? 'symptom'  : null,
-      log.parsed_stress             ? 'stress'   : null,
-      log.parsed_sleep              ? 'sleep'    : null,
-      log.parsed_exercise           ? 'exercise' : null,
+      log.parsed_foods?.length  ? 'food'     : null,
+      symptoms.length           ? 'symptom'  : null,
+      log.parsed_stress         ? 'stress'   : null,
+      log.parsed_sleep != null  ? 'sleep'    : null,
+      log.parsed_exercise && log.parsed_exercise !== 'none' ? 'exercise' : null,
     ].filter(Boolean),
-    parsed_foods:    log.parsed_foods    || [],
-    parsed_symptoms: log.parsed_symptoms || [],
-    parsed_severity: log.parsed_severity ?? 5,
-    parsed_stress:   log.parsed_stress   || null,
-    parsed_sleep:    log.parsed_sleep    || null,
+    parsed_foods:    log.parsed_foods  || [],
+    parsed_symptoms: symptoms,            // [{name, severity}]
+    parsed_severity: maxSeverity,        // derived max — used by Dashboard sparkline
+    parsed_stress:   log.parsed_stress  || null,
+    parsed_sleep:    log.parsed_sleep   ?? null,
     parsed_exercise: log.parsed_exercise || null,
-    natural_summary: log.raw_content     || '',
-    confidence:      'high',
+    natural_summary: log.natural_summary || log.raw_content || '',
+    confidence:      log.confidence     || 'high',
     _id:             log.id,
   };
 }

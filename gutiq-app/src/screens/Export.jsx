@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { COLORS } from '../constants/colors';
+import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
-
-const getSeverityColor = (v) => v <= 3 ? COLORS.teal : v <= 6 ? COLORS.amber : COLORS.danger;
-const stressEmoji = { high: '😰', medium: '😐', low: '😌' };
+import { STRESS_EMOJI } from '../constants/labels';
 
 function computeStats(logs) {
   if (!logs.length) return { avg: null, highDays: 0, avgSleep: null, topTrigger: '—' };
@@ -68,7 +66,7 @@ export default function Export({ user, logs, navigate }) {
 
         {/* Stats */}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 20 }}>
-          <StatPill label="Avg severity" value={`${formatNum(avg)}/10`} orange />
+          <StatPill label="Avg pain level" value={`${formatNum(avg)}/10`} orange />
           <StatPill label="High days"    value={`${highDays}`} />
           <StatPill label="Top trigger"  value={topTrigger} />
           <StatPill label="Avg sleep"    value={`${formatHours(avgSleep)}`} />
@@ -109,7 +107,7 @@ export default function Export({ user, logs, navigate }) {
                     <span style={{ fontFamily: FONTS.mono, fontSize: 13, fontWeight: 500, color: getSeverityColor(log.parsed_severity) }}>{log.parsed_severity}</span>
                   </td>
                   <td style={{ padding: '10px 14px', fontSize: 12, color: COLORS.muted, maxWidth: 140 }}>{(log.parsed_foods ?? []).join(', ')}</td>
-                  <td style={{ padding: '10px 14px', fontSize: 16 }}>{stressEmoji[log.parsed_stress]}</td>
+                  <td style={{ padding: '10px 14px', fontSize: 16 }}>{STRESS_EMOJI[log.parsed_stress]}</td>
                   <td style={{ padding: '10px 14px', fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted, whiteSpace: 'nowrap' }}>{log.parsed_sleep != null ? `${log.parsed_sleep}h` : '—'}</td>
                 </tr>
               ))}
@@ -122,7 +120,7 @@ export default function Export({ user, logs, navigate }) {
           <p style={{ ...STYLES.labelTeal, marginBottom: 10 }}>Summary for doctor</p>
           <p style={{ fontSize: 14, color: COLORS.textSoft, lineHeight: 1.7 }}>
             Over the last 14 days, <strong>{user.name}</strong> ({user.condition}) logged consistently.
-            Average symptom severity was <strong style={{ color: COLORS.amber }}>{avg}/10</strong>.
+            Average pain level was <strong style={{ color: COLORS.amber }}>{avg}/10</strong>.
             High-symptom days (≥6) occurred on <strong style={{ color: COLORS.danger }}>{highDays} of 14 days</strong>.
             Top dietary trigger: <strong style={{ color: COLORS.orange }}>{topTrigger}</strong>.
             Average sleep was <strong>{avgSleep} hours</strong> per night.
