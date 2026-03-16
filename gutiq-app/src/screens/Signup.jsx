@@ -29,7 +29,7 @@ export default function Signup({ navigate }) {
     try {
       const data = await signup(form.email, form.password, form.name);
       setToken(data.access_token);
-      storeUser(form.email, data.user_id);
+      storeUser(form.email, data.user_id, form.name);
       navigate('onboarding');
     } catch (err) {
       setErrors({ general: err.message || 'Signup failed. Try a different email.' });

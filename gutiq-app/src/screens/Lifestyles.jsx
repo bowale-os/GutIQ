@@ -150,7 +150,7 @@ const INITIAL_CHALLENGES = [
     duration_days: 7,
     people_count: 445,
     avg_improvement: 1.8,
-    description: 'Finish all eating by 7pm for a week. Nova will ask about your symptoms each morning.',
+    description: 'Finish all eating by 7pm for a week. Tiwa will ask about your symptoms each morning.',
     difficulty: 'medium',
     active: true,
     completed: false,
@@ -293,7 +293,7 @@ export default function Lifestyles() {
 
             {/* Summary */}
             <p style={{ fontFamily: FONTS.serif, fontSize: 15, color: COLORS.muted, textAlign: 'center', marginTop: 28 }}>
-              Your average severity: <span style={{ color: COLORS.text, fontWeight: 600 }}>{MOCK_PROFILE.avg_severity}/10</span>
+              Your average pain level: <span style={{ color: COLORS.text, fontWeight: 600 }}>{MOCK_PROFILE.avg_severity}/10</span>
             </p>
           </div>
         )}
@@ -349,7 +349,7 @@ export default function Lifestyles() {
 
                     {/* Stats */}
                     <p style={{ fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted, margin: '0 0 14px' }}>
-                      {item.people_count} people · avg −{item.avg_improvement} severity pts
+                      {item.people_count} people · avg −{item.avg_improvement} pain pts
                     </p>
 
                     {/* Footer row */}

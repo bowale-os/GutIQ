@@ -30,6 +30,7 @@ async def get_me(
     current_user: User = Depends(get_current_user),
 ):
     return UserUpdateResponse(
+        name=current_user.name,
         email=current_user.email,
         digestive_condition=current_user.digestive_condition,
         goal=current_user.goal,
@@ -62,7 +63,8 @@ async def update_user_profile(
     await session.refresh(current_user)
 
     return UserUpdateResponse(
-        email= current_user.email,
+        name=current_user.name,
+        email=current_user.email,
         digestive_condition=current_user.digestive_condition,
         goal=current_user.goal,
         age_range=current_user.age_range,

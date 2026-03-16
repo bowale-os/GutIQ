@@ -1,0 +1,20 @@
+
+ARTICLE: FUNCTIONAL GI DISORDERS
+Peppermint Oil Treatment for Irritable Bowel Syndrome: A Randomized Placebo-Controlled Trial
+Nee, Judy MD1; Ballou, Sarah PhD1; Kelley, John M. PhD2,3; Kaptchuk, Ted J.2; Hirsch, William BS1; Katon, Jesse BS1; Cheng, Vivian MS, MPH1; Rangan, Vikram MD1; Lembo, Anthony MD1; Iturrino, Johanna MD1
+Author Information
+The American Journal of Gastroenterology 116(11):p 2279-2285, November 2021. | DOI: 10.14309/ajg.0000000000001395
+Buy
+SDC
+Abstract
+INTRODUCTION: 
+Peppermint oil is often used to treat irritable bowel syndrome (IBS); however, the overall quality of previous studies is low, and findings have been heterogeneous. This study aimed to compare the effects of peppermint oil vs placebo in relieving IBS symptoms.
+
+METHODS: 
+In a 6-week, randomized, double-blind, placebo-controlled trial at a single academic center in the United States, individuals diagnosed with IBS (Rome IV criteria), with moderate to severe symptoms based on the IBS Severity Scoring System (IBS-SSS score ≥175), were randomized to enteric-coated peppermint oil 180 mg 3 times daily vs placebo in a 1:2 ratio. The primary outcome was mean change in IBS-SSS scores from baseline to 6-week endpoint.
+
+RESULTS: 
+A modified intent-to-treat analysis revealed that there were substantial mean improvements from baseline to 6-week endpoint in the main outcome measure (IBS-SSS) for both peppermint oil (90.8, SD = 75.3) and placebo (100.3, SD = 99.6). Although the peppermint oil group reported numerically lower improvement than the placebo group, the effect size was small (d = −0.11), and the difference between the groups was not statistically significant (P = 0.97). Similarly, both groups reported substantial improvements on the secondary endpoints; but again, there were no statistically significant differences between the groups on any of the secondary measures. Sensitivity analyses using multiple imputation to replace missing data produced similar results and revealed no significant differences between peppermint oil and placebo on any outcome measure.
+
+DISCUSSION: 
+Peppermint oil and placebo both showed clinically meaningful improvement in IBS symptoms. However, there were no significant differences between the groups. Further large, rigorous trials are needed to evaluate the role of peppermint oil for the treatment of IBS.

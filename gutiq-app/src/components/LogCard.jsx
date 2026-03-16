@@ -1,9 +1,7 @@
 import { useState } from 'react';
-import { COLORS } from '../constants/colors';
+import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
-
-const stressEmoji = { high: '😰', medium: '😐', low: '😌' };
-const getSeverityColor = (v) => v <= 3 ? COLORS.teal : v <= 6 ? COLORS.amber : COLORS.danger;
+import { STRESS_EMOJI } from '../constants/labels';
 
 export default function LogCard({ log, delay = 0 }) {
   const [expanded, setExpanded] = useState(false);
@@ -25,7 +23,7 @@ export default function LogCard({ log, delay = 0 }) {
         <span style={{ fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted }}>{log.date}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontFamily: FONTS.mono, fontSize: 13, fontWeight: 600, color: sevColor }}>{log.parsed_severity}/10</span>
-          <span style={{ fontSize: 16 }}>{stressEmoji[log.parsed_stress]}</span>
+          <span style={{ fontSize: 16 }}>{STRESS_EMOJI[log.parsed_stress]}</span>
         </div>
       </div>
 

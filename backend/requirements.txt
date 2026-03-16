@@ -1,14 +1,48 @@
-﻿fastapi[standard]>=0.115.0
+# ── Python version ─────────────────────────────────────────────────────────────
+# Requires Python >=3.10, <3.14  (fastembed wheels not yet built for 3.14+)
+# Install into a 3.12 venv:  python3.12 -m venv .venv && .venv/Scripts/pip install -r requirements.txt
+
+# ── Web framework ──────────────────────────────────────────────────────────────
+fastapi[standard]>=0.115.0
 uvicorn[standard]>=0.30.0
 pydantic>=2.9.0
+
+# ── Database ───────────────────────────────────────────────────────────────────
 sqlmodel>=0.0.20
-python-dotenv
-psycopg2-binary
 asyncpg>=0.28.0
+psycopg2-binary
 alembic
+
+# ── Auth ───────────────────────────────────────────────────────────────────────
 python-jose[cryptography]
 passlib[bcrypt]==1.7.4
 bcrypt>=3.2.0,<4.0.0
-pytest-env
+
+# ── AI / LLM ──────────────────────────────────────────────────────────────────
 anthropic>=0.40.0
 
+# ── RAG pipeline ──────────────────────────────────────────────────────────────
+langchain>=0.3.0
+langchain-community>=0.3.0
+langchain-text-splitters>=0.3.0
+langchain-qdrant>=0.2.0
+qdrant-client>=1.9.0
+# FastEmbed: local embeddings via ONNX — no PyTorch/GPU needed
+# Requires Python <3.14 (pre-built ONNX wheels)
+fastembed>=0.3.0,<0.8.0
+
+# ── Document ingestion ────────────────────────────────────────────────────────
+xmltodict>=0.13.0        # PubMed XML parsing
+beautifulsoup4>=4.12.0   # NHS web scraping
+lxml>=5.0.0              # HTML parser for BeautifulSoup
+pymupdf>=1.24.0          # PDF text extraction
+
+# ── Data / cache ──────────────────────────────────────────────────────────────
+pandas>=2.2.0
+pyarrow>=16.0.0          # Parquet read/write
+
+# ── Config ────────────────────────────────────────────────────────────────────
+python-dotenv
+
+# ── Testing ───────────────────────────────────────────────────────────────────
+pytest-env

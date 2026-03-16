@@ -85,87 +85,101 @@ export const parseOnboardingCompleteResponse = (raw = {}) => ({
 // ══════════════════════════════════════════════════════════════════════════════
 
 /**
+ * @typedef {Object} SymptomItem
+ * @property {string}      name
+ * @property {number|null} severity   - 1–10 per symptom, or null
+ */
+const parseSymptomItem = (raw = {}) => ({
+  name:     raw.name     ?? '',
+  severity: raw.severity ?? null,
+});
+
+/**
  * @typedef {Object} LogPreviewResponse
- * @property {string|null}   transcript
- * @property {string[]}      log_categories
- * @property {string[]|null} parsed_foods
- * @property {string[]|null} parsed_symptoms
- * @property {number|null}   parsed_severity   - 1–10
- * @property {string|null}   parsed_stress
- * @property {number|null}   parsed_sleep      - hours
- * @property {string|null}   parsed_exercise
- * @property {string}        confidence        - "high"|"medium"|"low"
- * @property {string}        natural_summary
- * @property {string|null}   missing_critical_field
+ * @property {string|null}    transcript
+ * @property {string[]}       log_categories
+ * @property {string[]}       parsed_foods
+ * @property {SymptomItem[]}  parsed_symptoms      - one object per symptom
+ * @property {number|null}    overall_severity     - fallback when no per-symptom scores
+ * @property {string|null}    parsed_stress        - "low"|"medium"|"high"
+ * @property {number|null}    parsed_sleep         - hours
+ * @property {string|null}    parsed_exercise      - "none"|"light"|"moderate"|"intense"
+ * @property {string}         confidence           - "high"|"medium"|"low"
+ * @property {string}         natural_summary
+ * @property {string|null}    missing_critical_field
  */
 export const parseLogPreviewResponse = (raw = {}) => ({
-  transcript:             raw.transcript              ?? null,
-  log_categories:         raw.log_categories          ?? [],
-  parsed_foods:           raw.parsed_foods            ?? null,
-  parsed_symptoms:        raw.parsed_symptoms         ?? null,
-  parsed_severity:        raw.parsed_severity         ?? null,
-  parsed_stress:          raw.parsed_stress           ?? null,
-  parsed_sleep:           raw.parsed_sleep            ?? null,
-  parsed_exercise:        raw.parsed_exercise         ?? null,
-  confidence:             raw.confidence              ?? 'high',
-  natural_summary:        raw.natural_summary         ?? '',
-  missing_critical_field: raw.missing_critical_field  ?? null,
+  transcript:             raw.transcript                                    ?? null,
+  log_categories:         raw.log_categories                               ?? [],
+  parsed_foods:           raw.parsed_foods                                 ?? [],
+  parsed_symptoms:        (raw.parsed_symptoms ?? []).map(parseSymptomItem),
+  overall_severity:       raw.overall_severity                             ?? null,
+  parsed_stress:          raw.parsed_stress                                ?? null,
+  parsed_sleep:           raw.parsed_sleep                                 ?? null,
+  parsed_exercise:        raw.parsed_exercise                              ?? null,
+  confidence:             raw.confidence                                   ?? 'high',
+  natural_summary:        raw.natural_summary                              ?? '',
+  missing_critical_field: raw.missing_critical_field                       ?? null,
 });
 
 /**
  * @typedef {Object} LogCreateRequest
  * @property {'text'|'voice'}  source
  * @property {string|null}     raw_content
- * @property {string[]|null}   log_categories
+ * @property {string|null}     transcript
+ * @property {string|null}     natural_summary
+ * @property {string|null}     confidence
  * @property {string[]|null}   parsed_foods
- * @property {string[]|null}   parsed_symptoms
- * @property {number|null}     parsed_severity
+ * @property {SymptomItem[]|null} parsed_symptoms
+ * @property {number|null}     overall_severity   - fallback severity applied to symptoms with null severity
  * @property {string|null}     parsed_stress
  * @property {number|null}     parsed_sleep
  * @property {string|null}     parsed_exercise
  */
 export const makeLogCreateRequest = ({
-  source          = 'text',
-  raw_content     = null,
-  log_categories  = null,
-  parsed_foods    = null,
-  parsed_symptoms = null,
-  parsed_severity = null,
-  parsed_stress   = null,
-  parsed_sleep    = null,
-  parsed_exercise = null,
+  source           = 'text',
+  raw_content      = null,
+  transcript       = null,
+  natural_summary  = null,
+  confidence       = null,
+  parsed_foods     = null,
+  parsed_symptoms  = null,
+  overall_severity = null,
+  parsed_stress    = null,
+  parsed_sleep     = null,
+  parsed_exercise  = null,
 } = {}) => ({
-  source, raw_content, log_categories,
-  parsed_foods, parsed_symptoms, parsed_severity,
+  source, raw_content, transcript, natural_summary, confidence,
+  parsed_foods, parsed_symptoms, overall_severity,
   parsed_stress, parsed_sleep, parsed_exercise,
 });
 
 /**
  * @typedef {Object} LogResponse
- * @property {string}        id
- * @property {string}        user_id
- * @property {string|null}   raw_content
- * @property {string}        logged_at     - ISO datetime
- * @property {string|null}   log_type
- * @property {string[]|null} parsed_foods
- * @property {string[]|null} parsed_symptoms
- * @property {number|null}   parsed_severity
- * @property {string|null}   parsed_stress
- * @property {number|null}   parsed_sleep
- * @property {string|null}   parsed_exercise
+ * @property {string}         id
+ * @property {string}         user_id
+ * @property {string|null}    raw_content
+ * @property {string}         logged_at        - ISO datetime
+ * @property {string|null}    natural_summary
+ * @property {string|null}    confidence
+ * @property {string[]}       parsed_foods
+ * @property {SymptomItem[]}  parsed_symptoms
+ * @property {string|null}    parsed_stress
+ * @property {number|null}    parsed_sleep
+ * @property {string|null}    parsed_exercise
  */
 export const parseLogResponse = (raw = {}) => ({
-  id:              raw.id              ?? '',
-  user_id:         raw.user_id         ?? '',
-  raw_content:     raw.raw_content     ?? null,
-  logged_at:       raw.logged_at       ?? '',
-  log_type:        raw.log_type        ?? null,
-  parsed_foods:    raw.parsed_foods    ?? null,
-  parsed_symptoms: raw.parsed_symptoms ?? null,
-  parsed_severity: raw.parsed_severity ?? null,
-  parsed_stress:   raw.parsed_stress   ?? null,
-  parsed_sleep:    raw.parsed_sleep    ?? null,
-  parsed_exercise: raw.parsed_exercise ?? null,
+  id:              raw.id                                      ?? '',
+  user_id:         raw.user_id                                 ?? '',
+  raw_content:     raw.raw_content                             ?? null,
+  logged_at:       raw.logged_at                               ?? '',
+  natural_summary: raw.natural_summary                         ?? null,
+  confidence:      raw.confidence                              ?? null,
+  parsed_foods:    raw.parsed_foods                            ?? [],
+  parsed_symptoms: (raw.parsed_symptoms ?? []).map(parseSymptomItem),
+  parsed_stress:   raw.parsed_stress                           ?? null,
+  parsed_sleep:    raw.parsed_sleep                            ?? null,
+  parsed_exercise: raw.parsed_exercise                         ?? null,
 });
 
 /**
@@ -222,6 +236,7 @@ export const makeUserUpdateRequest = ({
  * @property {string}      updated_at   - ISO datetime
  */
 export const parseUserUpdateResponse = (raw = {}) => ({
+  name:                raw.name                ?? '',
   email:               raw.email               ?? '',
   digestive_condition: raw.digestive_condition  ?? null,
   goal:                raw.goal                ?? null,

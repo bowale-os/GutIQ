@@ -24,6 +24,7 @@ class UserUpdateRequest(BaseModel):
     age_range: Optional[str] = None
 
 class UserUpdateResponse(BaseModel):
+    name: Optional[str] = None
     email: EmailStr
     digestive_condition: Optional[str] = None
     goal: Optional[str] = None

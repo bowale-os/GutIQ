@@ -1,0 +1,199 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.flow { display: flex; gap: 0; padding: 1.5rem 1rem; overflow-x: auto; align-items: flex-start; }
+.screen-wrap { display: flex; flex-direction: column; align-items: center; min-width: 200px; }
+.arrow { display: flex; align-items: center; padding: 0 4px; margin-top: 120px; color: var(--color-text-tertiary); font-size: 18px; flex-shrink: 0; }
+.screen { width: 192px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: 16px; padding: 14px 12px; min-height: 340px; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: border-color 0.15s; flex-shrink: 0; }
+.screen:hover { border-color: var(--color-border-secondary); }
+.screen-num { font-size: 10px; color: var(--color-text-tertiary); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+.screen-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 2px; }
+.phone { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; padding: 10px 8px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.greeting { font-size: 11px; font-weight: 500; color: var(--color-text-primary); line-height: 1.4; }
+.sub { font-size: 10px; color: var(--color-text-secondary); line-height: 1.4; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip { font-size: 9px; padding: 3px 7px; border-radius: 20px; border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); background: var(--color-background-secondary); }
+.chip.sel { background: #E1F5EE; border-color: #1D9E75; color: #085041; }
+.slider-row { display: flex; align-items: center; gap: 6px; }
+.slider-track { flex: 1; height: 4px; background: var(--color-border-tertiary); border-radius: 2px; position: relative; }
+.slider-fill { height: 4px; width: 65%; background: #1D9E75; border-radius: 2px; }
+.slider-dot { width: 10px; height: 10px; background: #1D9E75; border-radius: 50%; position: absolute; top: -3px; left: 63%; }
+.slider-label { font-size: 9px; color: var(--color-text-secondary); }
+.btn-primary { background: #1D9E75; color: #E1F5EE; border-radius: 8px; padding: 7px 0; text-align: center; font-size: 10px; font-weight: 500; }
+.btn-secondary { border: 0.5px solid var(--color-border-secondary); color: var(--color-text-secondary); border-radius: 8px; padding: 6px 0; text-align: center; font-size: 10px; }
+.divider { height: 0.5px; background: var(--color-border-tertiary); margin: 2px 0; }
+.loading-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; }
+.pulse-ring { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #1D9E75; opacity: 0.6; }
+.step-num { font-size: 9px; color: #1D9E75; font-weight: 500; }
+.step-action { font-size: 12px; font-weight: 500; color: var(--color-text-primary); line-height: 1.35; }
+.step-detail { font-size: 9px; color: var(--color-text-secondary); line-height: 1.5; }
+.timer-ring { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #1D9E75; display: flex; align-items: center; justify-content: center; align-self: center; }
+.timer-text { font-size: 11px; font-weight: 500; color: #0F6E56; }
+.dots { display: flex; gap: 4px; justify-content: center; padding: 2px 0; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); }
+.dot.active { background: #1D9E75; }
+.history-pill { background: #E1F5EE; border-radius: 6px; padding: 5px 7px; }
+.history-text { font-size: 9px; color: #085041; line-height: 1.4; }
+.done-icon { font-size: 24px; text-align: center; }
+.stars { display: flex; gap: 3px; justify-content: center; }
+.star { width: 14px; height: 14px; background: #EF9F27; border-radius: 2px; opacity: 0.3; }
+.star.lit { opacity: 1; }
+.tag { font-size: 9px; color: var(--color-text-tertiary); padding: 2px 0; }
+.change-tag { font-size: 9px; color: #993C1D; background: #FAECE7; padding: 2px 6px; border-radius: 4px; }
+.note { font-size: 10px; color: var(--color-text-tertiary); text-align: center; margin-top: 6px; line-height: 1.4; max-width: 192px; }
+.critique { background: #FAECE7; border: 0.5px solid #F5C4B3; border-radius: 8px; padding: 6px 8px; margin-top: 6px; }
+.critique-label { font-size: 9px; font-weight: 500; color: #712B13; margin-bottom: 2px; }
+.critique-text { font-size: 9px; color: #993C1D; line-height: 1.4; }
+.good { background: #E1F5EE; border: 0.5px solid #9FE1CB; border-radius: 8px; padding: 6px 8px; margin-top: 6px; }
+.good-label { font-size: 9px; font-weight: 500; color: #085041; margin-bottom: 2px; }
+.good-text { font-size: 9px; color: #0F6E56; line-height: 1.4; }
+</style>
+
+<div class="flow">
+
+  <!-- Screen 1 -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-num">Screen 1 — Intake</div>
+      <div class="screen-title">Grounding first</div>
+      <div class="phone">
+        <div class="greeting">You're okay. Let's help you through this.</div>
+        <div class="sub" style="margin-bottom:2px">What's happening right now?</div>
+        <div class="chip-row">
+          <div class="chip sel">Burning / heartburn</div>
+          <div class="chip">Chest pain</div>
+          <div class="chip">Bloating</div>
+          <div class="chip">Stomach pain</div>
+          <div class="chip">Nausea</div>
+          <div class="chip">Acid rising</div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub">How bad is it?</div>
+        <div class="slider-row">
+          <div class="slider-label">Mild</div>
+          <div class="slider-track"><div class="slider-fill"></div><div class="slider-dot"></div></div>
+          <div class="slider-label">7/10</div>
+        </div>
+        <div class="history-pill">
+          <div class="history-text">You've had this 3 times this week — usually after coffee.</div>
+        </div>
+        <div class="btn-primary">Get relief steps</div>
+        <div class="btn-secondary">Describe it instead</div>
+      </div>
+    </div>
+    <div class="good" style="width:192px">
+      <div class="good-label">Changes from original</div>
+      <div class="good-text">Grounding opener. No body map — chips cover 90% of cases faster. History pill personalises immediately. Two entry paths: tap chips or describe freely.</div>
+    </div>
+  </div>
+
+  <div class="arrow">›</div>
+
+  <!-- Screen 2 -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-num">Screen 2 — Loading</div>
+      <div class="screen-title">Calm hold</div>
+      <div class="phone">
+        <div class="loading-center">
+          <div class="pulse-ring"></div>
+          <div class="greeting" style="text-align:center;font-size:11px">Finding your steps...</div>
+          <div class="sub" style="text-align:center">Based on your history and what you're feeling now</div>
+        </div>
+      </div>
+    </div>
+    <div class="good" style="width:192px">
+      <div class="good-label">Keep as-is, one addition</div>
+      <div class="good-text">The personalisation line — "based on your history" — sets expectation that the steps are specific to them, not generic advice.</div>
+    </div>
+  </div>
+
+  <div class="arrow">›</div>
+
+  <!-- Screen 3 -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-num">Screen 3 — Step</div>
+      <div class="screen-title">One thing, right now</div>
+      <div class="phone">
+        <div class="dots">
+          <div class="dot active"></div><div class="dot active"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="step-num">Step 2 of 5</div>
+        <div class="timer-ring"><div class="timer-text">1:30</div></div>
+        <div class="step-action">Lie on your left side</div>
+        <div class="step-detail">Left side down, knees slightly bent. Head on 2 pillows. This position reduces acid reaching your esophagus.</div>
+        <div class="divider"></div>
+        <div class="sub" style="font-size:9px;color:#1D9E75">Why this helps →</div>
+        <div class="btn-primary">Done, next step</div>
+        <div style="display:flex;gap:6px">
+          <div class="btn-secondary" style="flex:1;font-size:9px">Skip</div>
+          <div class="btn-secondary" style="flex:1;font-size:9px">All steps</div>
+        </div>
+      </div>
+    </div>
+    <div class="good" style="width:192px">
+      <div class="good-label">One addition to original</div>
+      <div class="good-text">"Why this helps" — one-line rationale. Research shows understanding the reason improves compliance and reduces anxiety about following instructions.</div>
+    </div>
+  </div>
+
+  <div class="arrow">›</div>
+
+  <!-- Screen 4 -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-num">Screen 4 — Done</div>
+      <div class="screen-title">Softer close</div>
+      <div class="phone">
+        <div class="greeting" style="text-align:center">You got through it.</div>
+        <div class="sub" style="text-align:center">Did the steps help?</div>
+        <div class="stars">
+          <div class="star lit"></div><div class="star lit"></div>
+          <div class="star lit"></div><div class="star"></div><div class="star"></div>
+        </div>
+        <div class="divider"></div>
+        <div class="sub" style="font-size:9px">Want to log this episode?</div>
+        <div class="history-pill">
+          <div class="history-text">Heartburn · pain level 7 · tonight</div>
+          <div class="history-text" style="color:#1D9E75;margin-top:2px">Pre-filled from your description →</div>
+        </div>
+        <div class="btn-primary">Save log</div>
+        <div class="btn-secondary">Skip for now</div>
+        <div class="divider"></div>
+        <div class="sub" style="font-size:9px">If pain continues or worsens —</div>
+        <div class="change-tag">When to seek care →</div>
+      </div>
+    </div>
+    <div class="critique" style="width:192px">
+      <div class="critique-label">Replaces original done screen</div>
+      <div class="critique-text">Remove "how many steps did you do?" — it feels like a test. Stars only. Pre-filled log closes the loop without friction. "When to seek care" is always present but not alarming.</div>
+    </div>
+  </div>
+
+  <div class="arrow">›</div>
+
+  <!-- Screen 5 — edge case -->
+  <div class="screen-wrap">
+    <div class="screen">
+      <div class="screen-num">Screen 1b — Red flag</div>
+      <div class="screen-title">Hard exit</div>
+      <div class="phone">
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:8px">
+          <div class="greeting">Some symptoms need a doctor, not an app.</div>
+          <div class="sub">What you described — chest pain with no prior history — should be checked today.</div>
+          <div class="divider"></div>
+          <div class="sub" style="font-size:9px">This isn't an emergency, but don't wait.</div>
+          <div class="btn-primary" style="background:#D85A30;color:#FAECE7">Call your doctor now</div>
+          <div class="btn-secondary">This is my usual reflux</div>
+        </div>
+      </div>
+    </div>
+    <div class="critique" style="width:192px">
+      <div class="critique-label">New screen — missing from original</div>
+      <div class="critique-text">The original has no red flag exit. Two tiers: emergency (go to A&E now) and "see doctor today." The escape hatch "this is my usual reflux" lets known users bypass if they recognise the pattern.</div>
+    </div>
+  </div>
+
+</div>

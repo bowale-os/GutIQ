@@ -51,7 +51,7 @@ function detectKeyword(q) {
   return 'default';
 }
 
-export default function GutCheck() {
+export default function GutCheck({ user }) {
   const [phase, setPhase] = useState('idle');
   const [inputText, setInputText] = useState('');
   const [transcript, setTranscript] = useState('');
@@ -64,8 +64,18 @@ export default function GutCheck() {
   const busyRef = useRef(false);
 
   useEffect(() => {
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  }, [conversation.length, streamedAnswer.length, toolCallStates.length, phase]);
+    const t = setTimeout(() => {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }, 80);
+    return () => clearTimeout(t);
+  }, [conversation.length, toolCallStates.length, phase]);
+
+  useEffect(() => {
+    const t = requestAnimationFrame(() =>
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' })
+    );
+    return () => cancelAnimationFrame(t);
+  }, [streamedAnswer]);
 
   async function runConversation(question) {
     if (busyRef.current) return;
@@ -162,7 +172,7 @@ export default function GutCheck() {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <p style={{ ...STYLES.label, margin: 0 }}>Nova</p>
+            <p style={{ ...STYLES.label, margin: 0 }}>Tiwa</p>
             <h1 style={{ fontFamily: FONTS.serif, fontSize: 22, fontWeight: 400, margin: '2px 0 0', color: COLORS.text }}>
               Gut Check
             </h1>
@@ -173,14 +183,14 @@ export default function GutCheck() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontFamily: FONTS.mono, fontSize: 11, fontWeight: 700, color: '#fff',
             letterSpacing: '0.05em',
-          }}>AR</div>
+          }}>{user?.name?.charAt(0).toUpperCase() ?? '?'}</div>
         </div>
       </div>
 
       {/* Scrollable body */}
       <div style={{ padding: '16px 20px', paddingBottom: 200 }}>
 
-        {/* Nova intro card */}
+        {/* Tiwa intro card */}
         <div style={{
           backgroundColor: COLORS.darkBg,
           borderRadius: 16, padding: '18px 20px',
@@ -196,7 +206,7 @@ export default function GutCheck() {
             <span style={{
               fontFamily: FONTS.mono, fontSize: 10, fontWeight: 600,
               color: COLORS.orange, letterSpacing: '0.09em', textTransform: 'uppercase',
-            }}>Nova · Ready</span>
+            }}>Tiwa · Ready</span>
           </div>
           <p style={{ margin: 0, color: COLORS.darkText, fontSize: 15, lineHeight: 1.5 }}>
             Ask me anything about your gut health. I've analysed your last 14 days of logs.
@@ -280,7 +290,7 @@ export default function GutCheck() {
             onKeyDown={e => e.key === 'Enter' && handleTextSubmit()}
             placeholder={
               phase === 'listening' ? 'Listening...' :
-              phase === 'thinking' || phase === 'responding' ? 'Nova is thinking...' :
+              phase === 'thinking' || phase === 'responding' ? 'Tiwa is thinking...' :
               'Ask about your gut health...'
             }
             disabled={phase !== 'idle'}
@@ -361,7 +371,7 @@ function ConversationItem({ item }) {
         </div>
       </div>
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        <NovaAvatar />
+        <TiwaAvatar />
         <div style={{ flex: 1 }}>
           <div style={{
             backgroundColor: COLORS.surface,
@@ -407,7 +417,7 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        <NovaAvatar />
+        <TiwaAvatar />
         <div style={{ flex: 1 }}>
           {phase === 'thinking' && (
             <div style={{
@@ -421,7 +431,7 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
                 fontFamily: FONTS.mono, fontSize: 10, fontWeight: 600,
                 color: COLORS.orange, letterSpacing: '0.09em', textTransform: 'uppercase',
               }}>
-                Nova is checking your data...
+                Tiwa is checking your data...
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
                 {toolCallStates.map(tc => {
@@ -498,7 +508,7 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
   );
 }
 
-function NovaAvatar() {
+function TiwaAvatar() {
   return (
     <div style={{
       width: 26, height: 26, borderRadius: '50%',

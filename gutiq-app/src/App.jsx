@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { COLORS } from './constants/colors';
 import { currentUser, mockLogs } from './constants/mockData';
-import { isLoggedIn, getStoredUser } from './api/client';
+import { isLoggedIn, getStoredUser, storeUser } from './api/client';
 import { fetchRealLogs, apiLogToFrontend } from './api/logs';
 import { getStatus } from './api/onboarding';
+import { getUserData } from './api/user';
 
 import NavBar     from './components/NavBar';
 import Login      from './screens/Login';
@@ -14,7 +15,8 @@ import GutCheck  from './screens/GutCheck';
 import LogEntry   from './screens/LogEntry';
 import Export     from './screens/Export';
 import Profile    from './screens/Profile';
-import Lifestyles from './screens/Lifestyles';
+import Lifestyles  from './screens/Lifestyles';
+import PainRelief  from './screens/PainRelief';
 
 const GLOBAL_STYLES = `
   @keyframes fadeSlideUp {
@@ -50,6 +52,14 @@ const GLOBAL_STYLES = `
     from { transform: scaleY(0); }
     to   { transform: scaleY(1); }
   }
+  @keyframes breatheExpand {
+    0%, 100% { transform: scale(1);    opacity: 0.55; }
+    50%       { transform: scale(1.18); opacity: 0.9;  }
+  }
+  @keyframes breatheSlow {
+    0%, 100% { transform: scale(1);    opacity: 0.25; }
+    50%       { transform: scale(1.28); opacity: 0.5;  }
+  }
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   body { margin: 0; }
   button { transition: opacity 0.15s ease, transform 0.1s ease; }
@@ -58,7 +68,7 @@ const GLOBAL_STYLES = `
   ::placeholder { color: #A8A29E; }
 `;
 
-const AUTH_SCREENS = ['dashboard', 'gutcheck', 'export', 'profile', 'lifestyles'];
+const AUTH_SCREENS = ['dashboard', 'gutcheck', 'export', 'profile', 'lifestyles', 'pain_relief'];
 
 export default function App() {
   const [currentScreen,  setCurrentScreen]  = useState(() => isLoggedIn() ? 'dashboard' : 'login');
@@ -73,6 +83,20 @@ export default function App() {
   });
   const [demoMode, setDemoMode] = useState(false);
   const [logs, setLogs] = useState([]);
+
+  // On mount: fetch real name from backend and update state + localStorage.
+  useEffect(() => {
+    if (!isLoggedIn()) return;
+    getUserData()
+      .then(u => {
+        if (u.name) {
+          const stored = getStoredUser();
+          storeUser(stored.email, stored.userId, u.name, stored.condition);
+          setUser(prev => ({ ...prev, name: u.name }));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // On refresh: re-check onboarding completion so a token-only isLoggedIn()
   // doesn't skip the onboarding gate when the user hasn't finished it yet.
@@ -112,15 +136,16 @@ export default function App() {
 
   const renderScreen = () => {
     switch (currentScreen) {
-      case 'login':      return <Login navigate={navigate} onDemo={() => { setDemoMode(true); navigate('dashboard'); }} />;
+      case 'login':      return <Login navigate={navigate} onDemo={() => { setDemoMode(true); navigate('dashboard'); }} onLogin={() => setDemoMode(false)} />;
       case 'signup':     return <Signup navigate={navigate} />;
       case 'onboarding': return <Onboarding step={onboardingStep} setStep={setOnboardingStep} navigate={navigate} />;
       case 'dashboard':  return <Dashboard user={user} logs={logs} navigate={navigate} openLog={openLog} />;
-      case 'gutcheck':   return <GutCheck />;
+      case 'gutcheck':   return <GutCheck user={user} />;
       case 'export':     return <Export user={user} logs={logs} navigate={navigate} />;
       case 'profile':    return <Profile user={user} navigate={navigate} onUpdate={updated => setUser(u => ({ ...u, ...updated }))} />;
-      case 'lifestyles': return <Lifestyles navigate={navigate} />;
-      default:           return <Login navigate={navigate} />;
+      case 'lifestyles':  return <Lifestyles navigate={navigate} />;
+      case 'pain_relief': return <PainRelief navigate={navigate} logs={logs} />;
+      default:            return <Login navigate={navigate} />;
     }
   };
 
@@ -140,7 +165,6 @@ export default function App() {
         <LogEntry
           onClose={closeLog}
           onSave={newLog => setLogs(prev => [apiLogToFrontend(newLog), ...prev])}
-          userStreak={user.streak}
           demoMode={demoMode}
         />
       )}

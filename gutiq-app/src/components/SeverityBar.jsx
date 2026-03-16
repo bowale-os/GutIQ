@@ -1,10 +1,8 @@
-import { COLORS } from '../constants/colors';
+import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS } from '../constants/styles';
 
-const getColor = (v) => v <= 3 ? COLORS.teal : v <= 6 ? COLORS.amber : COLORS.danger;
-
 export default function SeverityBar({ value, showLabel, compact }) {
-  const color = getColor(value);
+  const color = getSeverityColor(value);
   const pct   = (value / 10) * 100;
   const h     = compact ? 5 : 8;
 
@@ -12,7 +10,7 @@ export default function SeverityBar({ value, showLabel, compact }) {
     <div>
       {showLabel && (
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-          <span style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.muted, letterSpacing: '0.07em', textTransform: 'uppercase' }}>Severity</span>
+          <span style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.muted, letterSpacing: '0.07em', textTransform: 'uppercase' }}>Pain level</span>
           <span style={{ fontFamily: FONTS.mono, fontSize: 12, fontWeight: 600, color }}>{value}/10</span>
         </div>
       )}

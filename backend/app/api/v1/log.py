@@ -1,16 +1,16 @@
-# app/api/routes/logs.py
+# app/api/routes/log.py
 
-import json
 import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from app.db import get_session
 from app.models import User
-from app.models.log import Log
+from app.models.log import Log, FoodEntry, SymptomEntry, WellnessEntry
 from app.schemas.log import (
     LogPreviewResponse,
     LogCreateRequest,
@@ -24,6 +24,28 @@ from app.ai_llm.transcriber import llm_transcribe
 
 router = APIRouter()
 
+_LOG_RELATIONS = [
+    selectinload(Log.food_entries),
+    selectinload(Log.symptom_entries),
+    selectinload(Log.wellness_entry),
+]
+
+
+def _log_categories(parsed) -> list[str]:
+    cats = []
+    if parsed.foods:
+        cats.append("food")
+    if parsed.symptoms:
+        cats.append("symptom")
+    w = parsed.wellness
+    if w.stress:
+        cats.append("stress")
+    if w.sleep_hours is not None:
+        cats.append("sleep")
+    if w.exercise and w.exercise != "none":
+        cats.append("exercise")
+    return cats
+
 
 # ── Preview (parse but do NOT save) ───────────────────────────────────────────
 
@@ -35,15 +57,12 @@ async def preview_log(
     current_user: User = Depends(get_current_user),
 ):
     """Parse with Claude but do NOT save. Returns structured fields for user to review."""
-
-    # ── Text path ──────────────────────────────────────────
     if source == "text":
         if not raw_content:
             raise HTTPException(status_code=400, detail="raw_content required for text logs")
         transcript = None
         content_to_parse = raw_content
 
-    # ── Voice path ─────────────────────────────────────────
     elif source == "voice":
         if not audio_file:
             raise HTTPException(status_code=400, detail="audio_file required for voice logs")
@@ -54,18 +73,17 @@ async def preview_log(
     else:
         raise HTTPException(status_code=400, detail="source must be 'text' or 'voice'")
 
-    # ── Both paths converge here ───────────────────────────
     parsed = await parse_with_llm(content_to_parse)
 
     return LogPreviewResponse(
         transcript=transcript,
-        log_categories=parsed.log_categories,
-        parsed_foods=parsed.parsed_foods,
-        parsed_symptoms=parsed.parsed_symptoms,
-        parsed_severity=parsed.parsed_severity,
-        parsed_stress=parsed.parsed_stress,
-        parsed_sleep=parsed.parsed_sleep,
-        parsed_exercise=parsed.parsed_exercise,
+        log_categories=_log_categories(parsed),
+        parsed_foods=[f.name for f in parsed.foods],
+        parsed_symptoms=parsed.symptoms,
+        parsed_stress=parsed.wellness.stress,
+        parsed_sleep=parsed.wellness.sleep_hours,
+        parsed_exercise=parsed.wellness.exercise,
+        overall_severity=parsed.overall_severity,
         confidence=parsed.confidence,
         natural_summary=parsed.natural_summary,
         missing_critical_field=parsed.missing_critical_field,
@@ -88,16 +106,42 @@ async def create_log(
         user_id=current_user.id,
         source=body.source,
         raw_content=body.raw_content,
-        parsed_foods=json.dumps(body.parsed_foods) if body.parsed_foods else None,
-        parsed_symptoms=json.dumps(body.parsed_symptoms) if body.parsed_symptoms else None,
-        parsed_severity=body.parsed_severity,
-        parsed_stress=body.parsed_stress,
-        parsed_sleep=body.parsed_sleep,
-        parsed_exercise=body.parsed_exercise
+        transcript=body.transcript,
+        natural_summary=body.natural_summary,
+        confidence=body.confidence,
     )
     session.add(log)
+    await session.flush()  # get log.id before inserting children
+
+    ts = log.logged_at
+
+    food_objs = [
+        FoodEntry(log_id=log.id, user_id=current_user.id, logged_at=ts, name=name)
+        for name in (body.parsed_foods or [])
+    ]
+    symptom_objs = [
+        SymptomEntry(
+            log_id=log.id, user_id=current_user.id, logged_at=ts,
+            name=item.name,
+            # Fall back to overall_severity when per-symptom severity is absent
+            severity=item.severity if item.severity is not None else body.overall_severity,
+        )
+        for item in (body.parsed_symptoms or [])
+    ]
+    session.add_all(food_objs)
+    session.add_all(symptom_objs)
+
+    if any((body.parsed_stress is not None, body.parsed_sleep is not None, body.parsed_exercise is not None)):
+        session.add(WellnessEntry(
+            log_id=log.id, user_id=current_user.id,
+            logged_at=ts,
+            stress=body.parsed_stress,
+            sleep_hours=body.parsed_sleep,
+            exercise=body.parsed_exercise,
+        ))
+
     await session.commit()
-    await session.refresh(log)
+    await session.refresh(log, attribute_names=['food_entries', 'symptom_entries', 'wellness_entry'])
 
     return LogCreateResponse(log=LogResponse.from_orm(log))
 
@@ -113,6 +157,7 @@ async def list_logs(
     result = await session.execute(
         select(Log)
         .where(Log.user_id == current_user.id)
+        .options(*_LOG_RELATIONS)
         .order_by(Log.logged_at.desc())
     )
     logs = result.scalars().all()
@@ -133,7 +178,9 @@ async def get_log(
 ):
     """Return a single log by ID (must belong to the current user)."""
     result = await session.execute(
-        select(Log).where(Log.id == log_id, Log.user_id == current_user.id)
+        select(Log)
+        .where(Log.id == log_id, Log.user_id == current_user.id)
+        .options(*_LOG_RELATIONS)
     )
     log = result.scalar_one_or_none()
     if not log:

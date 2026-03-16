@@ -11,7 +11,7 @@ export default function Insights({ insights, navigate }) {
 
         {/* Header */}
         <div style={{ marginBottom: 24 }}>
-          <p style={{ ...STYLES.labelTeal, marginBottom: 8 }}>Nova AI</p>
+          <p style={{ ...STYLES.labelTeal, marginBottom: 8 }}>Tiwa AI</p>
           <h1 style={{ ...STYLES.h1, fontSize: 30, marginBottom: 8 }}>Your Patterns</h1>
           <p style={{ ...STYLES.muted }}>
             14 days of data. Grounded in clinical research.
