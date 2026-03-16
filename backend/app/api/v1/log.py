@@ -3,7 +3,7 @@
 import uuid
 from typing import Optional
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
@@ -21,6 +21,7 @@ from app.schemas.log import (
 from app.api.deps import get_current_user
 from app.ai_llm.parser import parse_with_llm
 from app.ai_llm.transcriber import llm_transcribe
+from app.ai_llm.gut_check_profile import regenerate_profile, should_regenerate
 
 router = APIRouter()
 
@@ -95,6 +96,7 @@ async def preview_log(
 @router.post("/create-log", response_model=LogCreateResponse, status_code=201)
 async def create_log(
     body: LogCreateRequest,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     session: AsyncSession = Depends(get_session),
 ):
@@ -142,6 +144,12 @@ async def create_log(
 
     await session.commit()
     await session.refresh(log, attribute_names=['food_entries', 'symptom_entries', 'wellness_entry'])
+
+    # Increment profile counter — trigger background rebuild every 5 logs
+    current_user.logs_since_last_profile_change += 1
+    if should_regenerate(current_user):
+        background_tasks.add_task(regenerate_profile, current_user.id, session)
+    await session.commit()
 
     return LogCreateResponse(log=LogResponse.from_orm(log))
 

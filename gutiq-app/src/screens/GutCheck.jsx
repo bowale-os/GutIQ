@@ -1,40 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
-import { mockConversationHistory } from '../constants/mockData';
+import { mockConversationHistory } from '../constants/mockData'; // used in demo mode only
+import { askGutCheck } from '../api/gutCheck';
 
-const delay = ms => new Promise(r => setTimeout(r, ms));
-
+// ── Tool display labels ────────────────────────────────────────────────────────
 const TOOL_DISPLAY = {
-  query_logs:          'Searching your logs',
-  get_preceding_foods: 'Checking what you ate before symptoms',
-  correlate:           'Finding correlations in your data',
-  fetch_research:      'Looking up clinical research',
+  query_logs:     'Searching your full history',
+  fetch_research: 'Looking up clinical research',
 };
 
-const MOCK_RESPONSES = {
-  default: {
-    tools: ['query_logs', 'correlate', 'fetch_research'],
-    answer: "Looking at your last 14 days, your worst episodes share three things: coffee in the morning, under 6 hours of sleep the night before, and high stress. On your cleanest days — Feb 20, Feb 22, Feb 26, Mar 2 — you had none of those three together. Coffee alone lifts your average severity from 2.1 to 5.8.",
-  },
-  stress: {
-    tools: ['correlate', 'fetch_research'],
-    answer: "Stress is your strongest single trigger. On high-stress days your average severity is 7.2 versus 2.8 on low-stress days — a bigger gap than coffee alone. The gut-brain axis research is direct on this: psychological stress increases visceral sensitivity and esophageal acid exposure time.",
-  },
-  coffee: {
-    tools: ['get_preceding_foods', 'correlate', 'fetch_research'],
-    answer: "Coffee shows up on 10 of your 14 logged days, and on every day where severity hit 6 or above. On the 4 days without it, your average dropped to 2.1. Caffeine relaxes the lower esophageal sphincter — the valve that keeps acid down — which maps directly to your GERD pattern.",
-  },
-  sleep: {
-    tools: ['query_logs', 'correlate', 'fetch_research'],
-    answer: "Your 5 worst days all followed nights with 5 hours or less of sleep. When you got 7 or more, your next-day average was 2.8. Poor sleep slows mucosal recovery in your esophagus, so acid damage compounds faster. It's less dramatic than coffee but the pattern in your logs is consistent.",
-  },
-  food: {
-    tools: ['get_preceding_foods', 'correlate', 'fetch_research'],
-    answer: "The foods that reliably precede your symptoms: coffee, spicy food, pizza, wine, and beer — all appearing within 3 hours before 9 of your 10 high-severity episodes. Your best days had herbal tea, vegetables, and grilled proteins. The contrast in your data is stark.",
-  },
-};
-
+// ── Demo mode mock (used when demoMode=true, no real API call) ─────────────────
 const DEMO_QUESTIONS = [
   "Why was last week so bad?",
   "Is coffee actually causing this?",
@@ -42,16 +19,39 @@ const DEMO_QUESTIONS = [
   "What foods should I avoid?",
 ];
 
-function detectKeyword(q) {
+const DEMO_RESPONSES = {
+  default: {
+    tools: [],
+    answer: "Looking at your last 14 days, your worst episodes share three things: coffee in the morning, under 6 hours of sleep the night before, and high stress. On your cleanest days — Feb 20, Feb 22, Feb 26, Mar 2 — you had none of those three together. Coffee alone lifts your average pain level from 2.1 to 5.8.",
+  },
+  stress: {
+    tools: [],
+    answer: "Stress is your strongest single trigger. On high-stress days your average pain level is 7.2 versus 2.8 on low-stress days, which is a bigger gap than coffee alone. The gut-brain axis research is direct on this: psychological stress increases visceral sensitivity and esophageal acid exposure time.",
+  },
+  coffee: {
+    tools: ['fetch_research'],
+    answer: "Coffee shows up on 10 of your 14 logged days, and on every day where your pain level hit 6 or above. On the 4 days without it, your average dropped to 2.1. Caffeine relaxes the lower oesophageal sphincter, which is the valve that keeps acid down, and this maps directly to your GERD pattern.",
+  },
+  sleep: {
+    tools: [],
+    answer: "Your 5 worst days all followed nights with 5 hours or less of sleep. When you got 7 or more, your next-day average was 2.8. Poor sleep slows mucosal recovery in your oesophagus, so acid damage compounds faster. The pattern in your logs is consistent.",
+  },
+  food: {
+    tools: ['query_logs'],
+    answer: "The foods that reliably precede your symptoms: coffee, spicy food, pizza, wine, and beer, all appearing within 3 hours before 9 of your 10 high-pain episodes. Your best days had herbal tea, vegetables, and grilled proteins.",
+  },
+};
+
+function detectDemoKeyword(q) {
   const lq = q.toLowerCase();
-  if (lq.includes('stress') || lq.includes('anxiety') || lq.includes('work')) return 'stress';
+  if (lq.includes('stress') || lq.includes('anxiety')) return 'stress';
   if (lq.includes('coffee') || lq.includes('caffeine')) return 'coffee';
-  if (lq.includes('sleep') || lq.includes('tired')) return 'sleep';
-  if (lq.includes('food') || lq.includes('eat') || lq.includes('avoid') || lq.includes('trigger')) return 'food';
+  if (lq.includes('sleep') || lq.includes('tired'))    return 'sleep';
+  if (lq.includes('food') || lq.includes('eat') || lq.includes('avoid')) return 'food';
   return 'default';
 }
 
-export default function GutCheck({ user }) {
+export default function GutCheck({ user, demoMode = false }) {
   const [phase, setPhase] = useState('idle');
   const [inputText, setInputText] = useState('');
   const [transcript, setTranscript] = useState('');
@@ -59,6 +59,8 @@ export default function GutCheck({ user }) {
   const [currentQuestion, setCurrentQuestion] = useState('');
   const [streamedAnswer, setStreamedAnswer] = useState('');
   const [toolCallStates, setToolCallStates] = useState([]);
+  const [sessionId, setSessionId] = useState(null);   // persists across turns
+  const [error, setError] = useState(null);
 
   const inputRef = useRef(null);
   const busyRef = useRef(false);
@@ -81,39 +83,91 @@ export default function GutCheck({ user }) {
     if (busyRef.current) return;
     busyRef.current = true;
 
-    const key = detectKeyword(question);
-    const { tools, answer } = MOCK_RESPONSES[key];
+    // If previous exchange is done, archive it before starting the new one
+    if (phase === 'done' && currentQuestion && streamedAnswer) {
+      const ts = new Date().toLocaleString('en-US', {
+        month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true,
+      });
+      setConversation(prev => [...prev, {
+        id: Date.now(),
+        question: currentQuestion,
+        answer: streamedAnswer,
+        timestamp: ts,
+        tools_used: toolCallStates.map(t => t.name),
+      }]);
+    }
 
     setCurrentQuestion(question);
-    setPhase('thinking');
-    setToolCallStates(tools.map(t => ({ name: t, state: 'pending' })));
-
-    for (let i = 0; i < tools.length; i++) {
-      await delay(350);
-      setToolCallStates(prev => prev.map((t, idx) => idx === i ? { ...t, state: 'active' } : t));
-      await delay(i === 1 ? 900 : 700);
-      setToolCallStates(prev => prev.map((t, idx) => idx === i ? { ...t, state: 'done' } : t));
-    }
-
-    await delay(200);
-    setPhase('responding');
     setStreamedAnswer('');
+    setError(null);
+    setPhase('thinking');
+    setToolCallStates([]);
 
-    const words = answer.split(' ');
-    let built = '';
-    for (const word of words) {
-      await delay(90);
-      built += (built ? ' ' : '') + word;
-      setStreamedAnswer(built);
+    if (demoMode) {
+      // ── Demo path: simulate with local mock data ─────────────────────────
+      const key = detectDemoKeyword(question);
+      const { tools, answer } = DEMO_RESPONSES[key];
+
+      setToolCallStates(tools.map(t => ({ name: t, state: 'pending' })));
+      for (let i = 0; i < tools.length; i++) {
+        await new Promise(r => setTimeout(r, 350));
+        setToolCallStates(prev => prev.map((t, idx) => idx === i ? { ...t, state: 'active' } : t));
+        await new Promise(r => setTimeout(r, 700));
+        setToolCallStates(prev => prev.map((t, idx) => idx === i ? { ...t, state: 'done' } : t));
+      }
+
+      await new Promise(r => setTimeout(r, 200));
+      setPhase('responding');
+      let built = '';
+      for (const word of answer.split(' ')) {
+        await new Promise(r => setTimeout(r, 80));
+        built += (built ? ' ' : '') + word;
+        setStreamedAnswer(built);
+      }
+      setPhase('done');
+      busyRef.current = false;
+      return;
     }
 
-    setPhase('done');
-    busyRef.current = false;
+    // ── Real path: SSE stream from backend ───────────────────────────────
+    await askGutCheck(question, sessionId, {
+      onSessionId: (id) => setSessionId(id),
+
+      onToolStart: (tool) => {
+        setToolCallStates(prev => {
+          // avoid duplicate entries if tool fires more than once
+          if (prev.some(t => t.name === tool && t.state !== 'done')) return prev;
+          return [...prev, { name: tool, state: 'active' }];
+        });
+      },
+
+      onToolDone: (tool) => {
+        setToolCallStates(prev =>
+          prev.map(t => t.name === tool && t.state === 'active' ? { ...t, state: 'done' } : t)
+        );
+      },
+
+      onChunk: (text) => {
+        setPhase('responding');
+        setStreamedAnswer(prev => prev + text);
+      },
+
+      onDone: () => {
+        setPhase('done');
+        busyRef.current = false;
+      },
+
+      onError: (msg) => {
+        setError(msg);
+        setPhase('idle');
+        busyRef.current = false;
+      },
+    });
   }
 
   function handleTextSubmit() {
     const q = inputText.trim();
-    if (!q || phase !== 'idle') return;
+    if (!q || (phase !== 'idle' && phase !== 'done')) return;
     setInputText('');
     runConversation(q);
   }
@@ -121,6 +175,8 @@ export default function GutCheck({ user }) {
   function handleMicTap() {
     if (phase !== 'idle') return;
     setPhase('listening');
+    // In demo mode: animate a random preset question into the transcript
+    // In real mode: TODO — wire Web Speech API (same pattern as PainRelief.jsx)
     const question = DEMO_QUESTIONS[Math.floor(Math.random() * DEMO_QUESTIONS.length)];
     const words = question.split(' ');
     let idx = 0, built = '';
@@ -232,32 +288,38 @@ export default function GutCheck({ user }) {
           />
         )}
 
-        {/* Previous checks */}
-        <div style={{ ...STYLES.divider, margin: '16px 0 12px' }} />
-        <p style={{ ...STYLES.label, margin: '0 0 8px' }}>Previous gut checks</p>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-          {mockConversationHistory.map(item => (
-            <div key={item.id} style={{
-              backgroundColor: COLORS.surface,
-              borderRadius: 10, padding: '11px 14px',
-              border: `1px solid ${COLORS.border}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
-            }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{
-                  margin: 0, fontSize: 13, fontWeight: 500, color: COLORS.text,
-                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+        {/* Previous checks — demo shows mock history, real shows current session */}
+        {(demoMode ? mockConversationHistory.length > 0 : conversation.length > 0) && (
+          <>
+            <div style={{ ...STYLES.divider, margin: '16px 0 12px' }} />
+            <p style={{ ...STYLES.label, margin: '0 0 8px' }}>
+              {demoMode ? 'Previous gut checks' : 'This session'}
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {(demoMode ? mockConversationHistory : conversation).map((item, i) => (
+                <div key={item.id ?? i} style={{
+                  backgroundColor: COLORS.surface,
+                  borderRadius: 10, padding: '11px 14px',
+                  border: `1px solid ${COLORS.border}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
                 }}>
-                  "{item.question}"
-                </p>
-                <p style={{ margin: '2px 0 0', fontSize: 10, color: COLORS.mutedLight, fontFamily: FONTS.mono }}>
-                  {item.timestamp}
-                </p>
-              </div>
-              <span style={{ color: COLORS.mutedLight, fontSize: 14, flexShrink: 0 }}>&#8594;</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{
+                      margin: 0, fontSize: 13, fontWeight: 500, color: COLORS.text,
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                      "{item.question}"
+                    </p>
+                    <p style={{ margin: '2px 0 0', fontSize: 10, color: COLORS.mutedLight, fontFamily: FONTS.mono }}>
+                      {item.timestamp}
+                    </p>
+                  </div>
+                  <span style={{ color: COLORS.mutedLight, fontSize: 14, flexShrink: 0 }}>&#8594;</span>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        )}
       </div>
 
       {/* Fixed input area */}
@@ -271,6 +333,16 @@ export default function GutCheck({ user }) {
         padding: '10px 16px 12px',
         zIndex: 10,
       }}>
+        {error && (
+          <div style={{
+            marginBottom: 8, padding: '7px 12px',
+            backgroundColor: '#FEF2F2', borderRadius: 8,
+            fontSize: 13, color: '#DC2626',
+            animation: 'fadeIn 0.2s ease',
+          }}>
+            {error}
+          </div>
+        )}
         {phase === 'listening' && transcript && (
           <div style={{
             marginBottom: 8, padding: '7px 12px',
@@ -286,24 +358,24 @@ export default function GutCheck({ user }) {
           <input
             ref={inputRef}
             value={phase === 'listening' ? '' : inputText}
-            onChange={e => { if (phase === 'idle') setInputText(e.target.value); }}
+            onChange={e => { if (phase === 'idle' || phase === 'done') setInputText(e.target.value); }}
             onKeyDown={e => e.key === 'Enter' && handleTextSubmit()}
             placeholder={
               phase === 'listening' ? 'Listening...' :
               phase === 'thinking' || phase === 'responding' ? 'Tiwa is thinking...' :
               'Ask about your gut health...'
             }
-            disabled={phase !== 'idle'}
+            disabled={phase !== 'idle' && phase !== 'done'}
             style={{
               ...STYLES.input,
               flex: 1, fontSize: 14, padding: '10px 14px',
-              backgroundColor: phase !== 'idle' ? COLORS.surfaceAlt : COLORS.surface,
-              opacity: phase !== 'idle' ? 0.6 : 1,
+              backgroundColor: (phase !== 'idle' && phase !== 'done') ? COLORS.surfaceAlt : COLORS.surface,
+              opacity: (phase !== 'idle' && phase !== 'done') ? 0.6 : 1,
               transition: 'all 0.2s ease',
             }}
           />
 
-          {inputText.trim() && phase === 'idle' ? (
+          {inputText.trim() && (phase === 'idle' || phase === 'done') ? (
             <button
               onClick={handleTextSubmit}
               style={{
@@ -379,9 +451,22 @@ function ConversationItem({ item }) {
             padding: '12px 14px',
             border: `1px solid ${COLORS.border}`,
           }}>
-            <p style={{ margin: '0 0 8px', fontSize: 14, lineHeight: 1.55, color: COLORS.text }}>
-              {item.answer}
-            </p>
+            <div style={{ fontSize: 14, lineHeight: 1.6, color: COLORS.text, marginBottom: 8 }}>
+              <ReactMarkdown
+                components={{
+                  p:      ({ children }) => <p style={{ margin: '0 0 10px' }}>{children}</p>,
+                  strong: ({ children }) => <strong style={{ fontWeight: 600 }}>{children}</strong>,
+                  ul:     ({ children }) => <ul style={{ margin: '4px 0 10px', paddingLeft: 18 }}>{children}</ul>,
+                  ol:     ({ children }) => <ol style={{ margin: '4px 0 10px', paddingLeft: 18 }}>{children}</ol>,
+                  li:     ({ children }) => <li style={{ marginBottom: 4 }}>{children}</li>,
+                  h1: ({ children }) => <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{children}</p>,
+                  h2: ({ children }) => <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{children}</p>,
+                  h3: ({ children }) => <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{children}</p>,
+                }}
+              >
+                {item.answer}
+              </ReactMarkdown>
+            </div>
             <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
               {item.tools_used.map(t => (
                 <span key={t} style={{
@@ -398,6 +483,109 @@ function ConversationItem({ item }) {
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+const THINKING_THOUGHTS = [
+  "Reading your recent logs...",
+  "Looking for patterns in your data...",
+  "Connecting the dots...",
+  "Reviewing your symptom history...",
+  "Thinking through what this means for you...",
+  "Cross-referencing your entries...",
+  "Pulling together what I know about you...",
+  "Almost there...",
+];
+
+function ThinkingBubble({ toolCallStates }) {
+  const [thoughtIdx, setThoughtIdx] = useState(0);
+  const [visible, setVisible]       = useState(true);
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setThoughtIdx(i => (i + 1) % THINKING_THOUGHTS.length);
+        setVisible(true);
+      }, 300);
+    }, 2000);
+    return () => clearInterval(iv);
+  }, []);
+
+  return (
+    <div style={{
+      backgroundColor: COLORS.darkBg,
+      borderRadius: '4px 16px 16px 16px',
+      padding: '16px 18px',
+      border: `1px solid ${COLORS.darkBorder}`,
+    }}>
+
+      {/* Pulsing header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <div style={{
+          width: 6, height: 6, borderRadius: '50%',
+          backgroundColor: COLORS.orange,
+          animation: 'pulse 1.4s ease-in-out infinite',
+          flexShrink: 0,
+        }} />
+        <span style={{
+          fontFamily: FONTS.mono, fontSize: 10, fontWeight: 600,
+          color: COLORS.orange, letterSpacing: '0.09em', textTransform: 'uppercase',
+        }}>
+          Tiwa · thinking
+        </span>
+      </div>
+
+      {/* Rotating thought */}
+      <p style={{
+        margin: '0 0 14px',
+        fontSize: 13, color: COLORS.darkText, lineHeight: 1.5,
+        opacity: visible ? 1 : 0,
+        transition: 'opacity 0.3s ease',
+        minHeight: 20,
+      }}>
+        {THINKING_THOUGHTS[thoughtIdx]}
+      </p>
+
+      {/* Tool call states — only shown when tools fire */}
+      {toolCallStates.length > 0 && (
+        <div style={{
+          borderTop: `1px solid ${COLORS.darkBorder}`,
+          paddingTop: 12,
+          display: 'flex', flexDirection: 'column', gap: 9,
+        }}>
+          {toolCallStates.map(tc => {
+            const isDone    = tc.state === 'done';
+            const isActive  = tc.state === 'active';
+            const isPending = tc.state === 'pending';
+            return (
+              <div key={tc.name} style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                opacity: isPending ? 0.35 : 1,
+                transition: 'opacity 0.3s ease',
+              }}>
+                <span style={{
+                  fontSize: 13, width: 16, textAlign: 'center', flexShrink: 0,
+                  color: isDone ? '#4ADE80' : isActive ? COLORS.orange : COLORS.darkMuted,
+                  display: 'inline-block',
+                  animation: isActive ? 'spin 1s linear infinite' : isDone ? 'greenPop 0.3s ease both' : 'none',
+                }}>
+                  {isDone ? '✓' : isActive ? '⟳' : '○'}
+                </span>
+                <span style={{
+                  fontSize: 12, fontFamily: FONTS.mono,
+                  color: isPending ? COLORS.darkMuted : COLORS.darkText,
+                  transition: 'color 0.3s ease',
+                  letterSpacing: '0.03em',
+                }}>
+                  {TOOL_DISPLAY[tc.name] ?? tc.name.replace(/_/g, ' ')}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -419,52 +607,7 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
       <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
         <TiwaAvatar />
         <div style={{ flex: 1 }}>
-          {phase === 'thinking' && (
-            <div style={{
-              backgroundColor: COLORS.darkBg,
-              borderRadius: '4px 16px 16px 16px',
-              padding: '14px 16px',
-              border: `1px solid ${COLORS.darkBorder}`,
-            }}>
-              <p style={{
-                margin: '0 0 12px',
-                fontFamily: FONTS.mono, fontSize: 10, fontWeight: 600,
-                color: COLORS.orange, letterSpacing: '0.09em', textTransform: 'uppercase',
-              }}>
-                Tiwa is checking your data...
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
-                {toolCallStates.map(tc => {
-                  const isDone    = tc.state === 'done';
-                  const isActive  = tc.state === 'active';
-                  const isPending = tc.state === 'pending';
-                  return (
-                    <div key={tc.name} style={{
-                      display: 'flex', alignItems: 'center', gap: 10,
-                      opacity: isPending ? 0.35 : 1,
-                      transition: 'opacity 0.3s ease',
-                    }}>
-                      <span style={{
-                        fontSize: 13, width: 16, textAlign: 'center', flexShrink: 0,
-                        color: isDone ? '#4ADE80' : isActive ? COLORS.orange : COLORS.darkMuted,
-                        display: 'inline-block',
-                        animation: isActive ? 'spin 1s linear infinite' : isDone ? 'greenPop 0.3s ease both' : 'none',
-                      }}>
-                        {isDone ? '✓' : isActive ? '⟳' : '○'}
-                      </span>
-                      <span style={{
-                        fontSize: 13, fontFamily: FONTS.sans,
-                        color: isPending ? COLORS.darkMuted : COLORS.darkText,
-                        transition: 'color 0.3s ease',
-                      }}>
-                        {TOOL_DISPLAY[tc.name]}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {phase === 'thinking' && <ThinkingBubble toolCallStates={toolCallStates} />}
 
           {(phase === 'responding' || phase === 'done') && (
             <div>
@@ -474,8 +617,21 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
                 padding: '12px 14px',
                 border: `1px solid ${COLORS.border}`,
               }}>
-                <p style={{ margin: 0, fontSize: 14, lineHeight: 1.55, color: COLORS.text }}>
-                  {streamedAnswer}
+                <div style={{ fontSize: 14, lineHeight: 1.6, color: COLORS.text }}>
+                  <ReactMarkdown
+                    components={{
+                      p:      ({ children }) => <p style={{ margin: '0 0 10px' }}>{children}</p>,
+                      strong: ({ children }) => <strong style={{ fontWeight: 600, color: COLORS.text }}>{children}</strong>,
+                      ul:     ({ children }) => <ul style={{ margin: '4px 0 10px', paddingLeft: 18 }}>{children}</ul>,
+                      ol:     ({ children }) => <ol style={{ margin: '4px 0 10px', paddingLeft: 18 }}>{children}</ol>,
+                      li:     ({ children }) => <li style={{ marginBottom: 4 }}>{children}</li>,
+                      h1: ({ children }) => <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{children}</p>,
+                      h2: ({ children }) => <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{children}</p>,
+                      h3: ({ children }) => <p style={{ fontWeight: 600, margin: '0 0 6px' }}>{children}</p>,
+                    }}
+                  >
+                    {streamedAnswer}
+                  </ReactMarkdown>
                   {phase === 'responding' && (
                     <span style={{
                       display: 'inline-block', width: 2, height: 13,
@@ -484,7 +640,7 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
                       animation: 'pulse 0.7s ease-in-out infinite',
                     }} />
                   )}
-                </p>
+                </div>
               </div>
               {phase === 'done' && (
                 <button
@@ -515,6 +671,6 @@ function TiwaAvatar() {
       backgroundColor: COLORS.darkBg, flexShrink: 0, marginTop: 2,
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontSize: 9, color: COLORS.orange, fontFamily: FONTS.mono, fontWeight: 700,
-    }}>N</div>
+    }}>T</div>
   );
 }
