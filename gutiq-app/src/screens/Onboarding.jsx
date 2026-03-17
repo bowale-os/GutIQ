@@ -6,7 +6,7 @@ import { complete } from '../api/onboarding';
 import { storeUser } from '../api/client';
 import { AGE_RANGES } from '../api/schemas';
 
-function SelectCard({ icon, label, desc, selected, onClick }) {
+function SelectCard({ color, label, desc, selected, onClick }) {
   return (
     <button
       onClick={onClick}
@@ -23,7 +23,7 @@ function SelectCard({ icon, label, desc, selected, onClick }) {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span style={{ fontSize: 24, flexShrink: 0, width: 36, textAlign: 'center' }}>{icon}</span>
+        <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
         <div style={{ flex: 1 }}>
           <p style={{ fontFamily: FONTS.sans, fontWeight: 600, fontSize: 15, color: COLORS.text, marginBottom: 2 }}>{label}</p>
           {desc && <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.muted, lineHeight: 1.4 }}>{desc}</p>}
@@ -43,10 +43,15 @@ function SelectCard({ icon, label, desc, selected, onClick }) {
 }
 
 const CONDITIONS = [
-  { id: 'GERD',  icon: '🔥', label: 'GERD / Acid Reflux',  desc: 'Frequent heartburn, regurgitation, chest discomfort' },
-  { id: 'IBS',   icon: '🌀', label: 'IBS',                  desc: 'Cramping, bloating, irregular bowel habits' },
-  { id: 'Ulcer', icon: '🩹', label: 'Peptic Ulcer',         desc: 'Burning stomach pain, nausea, sensitivity to food' },
-  { id: 'Other', icon: '💊', label: 'Other / General',      desc: 'General digestive discomfort or exploration' },
+  { id: 'GERD',        color: '#e07b39', label: 'GERD / Acid Reflux',      desc: 'Frequent heartburn, regurgitation, chest discomfort' },
+  { id: 'IBS',         color: '#2c7a7b', label: 'IBS',                      desc: 'Cramping, bloating, irregular bowel habits' },
+  { id: 'Ulcer',       color: '#b45309', label: 'Peptic Ulcer',             desc: 'Burning stomach pain, nausea, sensitivity to food' },
+  { id: 'Crohns',      color: '#7c3aed', label: "Crohn's Disease",          desc: 'Chronic inflammation anywhere along the digestive tract' },
+  { id: 'UC',          color: '#0369a1', label: 'Ulcerative Colitis',       desc: 'Inflammation and ulcers in the colon and rectum' },
+  { id: 'Celiac',      color: '#15803d', label: 'Celiac Disease',           desc: 'Gluten sensitivity causing intestinal damage' },
+  { id: 'Gastroparesis', color: '#9f1239', label: 'Gastroparesis',          desc: 'Delayed stomach emptying, nausea, early fullness' },
+  { id: 'Dyspepsia',   color: '#92400e', label: 'Functional Dyspepsia',     desc: 'Chronic indigestion, bloating, discomfort after eating' },
+  { id: 'Other',       color: '#6b7280', label: 'Other / General',          desc: 'General digestive discomfort or exploration' },
 ];
 
 const LOG_PREFS = [
