@@ -282,7 +282,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             </button>
           </div>
           {recentLogs.map((log, i) => (
-            <LogCard key={log.date} log={log} delay={i * 60} />
+            <LogCard key={log.id ?? `${log.date}-${i}`} log={log} delay={i * 60} />
           ))}
         </div>
 

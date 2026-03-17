@@ -89,8 +89,33 @@ function TimerRing({ seconds, total, dark = false }) {
   );
 }
 
+// ── Demo mock ─────────────────────────────────────────────────────────────────────
+const MOCK_RELIEF = {
+  primary: {
+    action: 'Sit upright, shoulders back',
+    instruction: 'Find a chair or sit on the edge of your bed. Keep your back straight and let gravity hold the acid down. Slouching makes it worse.',
+    duration_minutes: 10,
+  },
+  maintain: ['Sip room-temperature water slowly', 'Breathe through your nose'],
+  avoid: ['Lying down', 'Coffee or citrus', 'Tight clothing around your waist'],
+  alternatives: [
+    {
+      action: 'Chew sugar-free gum',
+      instruction: 'Chewing gum stimulates saliva production, which neutralises acid in your oesophagus. Keep going for at least 10 minutes.',
+      duration_minutes: 10,
+    },
+    {
+      action: 'Slow diaphragm breathing',
+      instruction: 'Place one hand on your belly. Breathe in for 4 counts so your belly rises, hold 2, breathe out for 6. Repeat 8 times. This relaxes the lower oesophageal sphincter muscle.',
+      duration_minutes: 8,
+    },
+  ],
+  session_duration_minutes: 20,
+  when_to_seek_care: 'Seek care if pain radiates to your arm or jaw, or if symptoms haven\'t eased after 20 minutes.',
+};
+
 // ── Main component ────────────────────────────────────────────────────────────────
-export default function PainRelief({ navigate, logs = [] }) {
+export default function PainRelief({ navigate, logs = [], demoMode = false }) {
   const [view, setView] = useState('intake');
 
   // Intake
@@ -181,6 +206,17 @@ export default function PainRelief({ navigate, logs = [] }) {
     setIsListening(false);
     setView('loading');
 
+    if (demoMode) {
+      await new Promise(r => setTimeout(r, 1800)); // simulate latency
+      const totalSecs = MOCK_RELIEF.session_duration_minutes * 60;
+      setStructured(MOCK_RELIEF);
+      setAltIdx(0);
+      setSessionTimeLeft(totalSecs);
+      setSessionTotalTime(totalSecs);
+      setView('relief');
+      return;
+    }
+
     try {
       const req = buildRequest(selectedChips, freeText, intensity);
       const res = await submitPainSession(req);
@@ -215,7 +251,7 @@ export default function PainRelief({ navigate, logs = [] }) {
   // ── Rating ──────────────────────────────────────────────────────────────────────
   const handleRating = async (r) => {
     setRating(r);
-    if (!sessionId) return;
+    if (!sessionId || demoMode) return;
     try {
       await submitPainFeedback({ session_id: sessionId, relief_rating: r, steps_completed: altIdx + 1 });
     } catch (_) {}
