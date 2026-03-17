@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { Mic, MicOff } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
@@ -64,6 +65,7 @@ export default function GutCheck({ user, demoMode = false }) {
 
   const inputRef = useRef(null);
   const busyRef = useRef(false);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -166,22 +168,71 @@ export default function GutCheck({ user, demoMode = false }) {
   }
 
   function handleMicTap() {
+    // Tap while listening → stop and submit
+    if (phase === 'listening') {
+      recognitionRef.current?.stop();
+      return;
+    }
     if (phase !== 'idle' && phase !== 'done') return;
-    setPhase('listening');
-    // In demo mode: animate a random preset question into the transcript
-    // In real mode: TODO — wire Web Speech API (same pattern as PainRelief.jsx)
-    const question = DEMO_QUESTIONS[Math.floor(Math.random() * DEMO_QUESTIONS.length)];
-    const words = question.split(' ');
-    let idx = 0, built = '';
-    const iv = setInterval(() => {
-      if (idx < words.length) {
-        built += (built ? ' ' : '') + words[idx++];
-        setTranscript(built);
-      } else {
-        clearInterval(iv);
-        setTimeout(() => { setTranscript(''); runConversation(question); }, 400);
+
+    if (demoMode) {
+      setPhase('listening');
+      const question = DEMO_QUESTIONS[Math.floor(Math.random() * DEMO_QUESTIONS.length)];
+      const words = question.split(' ');
+      let idx = 0, built = '';
+      const iv = setInterval(() => {
+        if (idx < words.length) {
+          built += (built ? ' ' : '') + words[idx++];
+          setTranscript(built);
+        } else {
+          clearInterval(iv);
+          setTimeout(() => { setTranscript(''); runConversation(question); }, 400);
+        }
+      }, 200);
+      return;
+    }
+
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { setError('Voice input is not supported in this browser.'); return; }
+
+    const recognition = new SR();
+    recognitionRef.current = recognition;
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    let finalText = '';
+    recognition.onresult = (event) => {
+      let interim = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) finalText += (finalText ? ' ' : '') + t;
+        else interim = t;
       }
-    }, 200);
+      setTranscript(finalText + (interim ? ' ' + interim : ''));
+    };
+
+    recognition.onerror = (event) => {
+      if (event.error === 'not-allowed') setError('Microphone access denied.');
+      setPhase('idle');
+      setTranscript('');
+      recognitionRef.current = null;
+    };
+
+    recognition.onend = () => {
+      recognitionRef.current = null;
+      const question = finalText.trim();
+      setTranscript('');
+      if (question) {
+        runConversation(question);
+      } else {
+        setPhase('idle');
+      }
+    };
+
+    recognition.start();
+    setPhase('listening');
+    setTranscript('');
   }
 
   function handleAskAnother() {
@@ -382,41 +433,35 @@ export default function GutCheck({ user, demoMode = false }) {
             </button>
           ) : (
             <div style={{ position: 'relative', flexShrink: 0 }}>
-              {phase === 'listening' && (
-                <div style={{
-                  position: 'absolute', inset: -5, borderRadius: '50%',
-                  border: `2px solid ${COLORS.orange}`,
-                  animation: 'sonarPulse 1.2s ease-out infinite',
-                  pointerEvents: 'none',
-                }} />
-              )}
               <button
                 onClick={handleMicTap}
                 disabled={phase === 'thinking' || phase === 'responding'}
+                title={phase === 'listening' ? 'Listening…' : undefined}
                 style={{
                   width: 42, height: 42, borderRadius: '50%',
                   backgroundColor: phase === 'listening' ? COLORS.orangeHover : COLORS.orange,
                   border: 'none',
                   cursor: (phase === 'thinking' || phase === 'responding') ? 'default' : 'pointer',
-                  fontSize: 18,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'background-color 0.2s ease',
                 }}
               >
-                &#127897;
+                {phase === 'listening'
+                  ? <MicOff size={18} color="#fff" strokeWidth={1.5} />
+                  : <Mic    size={18} color="#fff" strokeWidth={1.5} />
+                }
               </button>
             </div>
           )}
         </div>
 
-        {phase === 'idle' && (
-          <p style={{
-            margin: '5px 0 0', fontSize: 10, textAlign: 'center',
-            color: COLORS.mutedLight, fontFamily: FONTS.mono,
-          }}>
-            Type to ask · or tap mic for voice
-          </p>
-        )}
+        <p style={{
+          margin: '5px 0 0', fontSize: 10, textAlign: 'center',
+          color: COLORS.mutedLight, fontFamily: FONTS.mono,
+          opacity: phase === 'idle' ? 1 : 0,
+        }}>
+          Type to ask · or tap mic for voice
+        </p>
       </div>
     </div>
   );
