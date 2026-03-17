@@ -22,8 +22,8 @@ export default function LogCard({ log, delay = 0 }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
         <span style={{ fontFamily: FONTS.mono, fontSize: 12, color: COLORS.muted }}>{log.date}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontFamily: FONTS.mono, fontSize: 13, fontWeight: 600, color: sevColor }}>{log.parsed_severity}/10</span>
-          <span style={{ fontSize: 16 }}>{STRESS_EMOJI[log.parsed_stress]}</span>
+          <span style={{ fontFamily: FONTS.mono, fontSize: 13, fontWeight: 600, color: sevColor }}>{log.parsed_severity ?? '—'}/10</span>
+          <span style={{ fontSize: 16 }}>{STRESS_EMOJI[log.parsed_stress] ?? ''}</span>
         </div>
       </div>
 
@@ -34,13 +34,13 @@ export default function LogCard({ log, delay = 0 }) {
 
       {/* Food chips */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
-        {log.parsed_foods.map(f => (
+        {(log.parsed_foods ?? []).map(f => (
           <span key={f} style={{ ...STYLES.chip, ...STYLES.chipOrange }}>{f}</span>
         ))}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted }}>😴 {log.parsed_sleep}h</span>
+        <span style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted }}>😴 {log.parsed_sleep != null ? `${log.parsed_sleep}h` : '—'}</span>
         <span style={{ fontSize: 10, color: COLORS.mutedLight }}>{expanded ? '▲' : '▼'}</span>
       </div>
 

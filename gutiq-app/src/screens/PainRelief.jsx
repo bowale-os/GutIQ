@@ -4,6 +4,18 @@ import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { submitPainSession, submitPainFeedback } from '../api/painRelief';
 
+// ── Regional emergency numbers ────────────────────────────────────────────────────
+// Detect locale from browser; default to international fallback.
+const EMERGENCY_BY_REGION = {
+  GB: { emergency: '999', nonemergency: '111', erLabel: 'A&E' },
+  US: { emergency: '911', nonemergency: '811', erLabel: 'ER'  },
+  CA: { emergency: '911', nonemergency: '811', erLabel: 'ER'  },
+  AU: { emergency: '000', nonemergency: '1800 022 222', erLabel: 'ED' },
+  IE: { emergency: '112', nonemergency: '1850 24 1850', erLabel: 'ED' },
+};
+const _region = navigator.language?.split('-')[1]?.toUpperCase() ?? 'GB';
+const EMERGENCY = EMERGENCY_BY_REGION[_region] ?? EMERGENCY_BY_REGION.GB;
+
 // ── Symptom chips ────────────────────────────────────────────────────────────────
 const SYMPTOM_CHIPS = [
   { label: 'Burning / heartburn', region: 'throat_chest',  character: 'burning',  activeStyle: 'amber',
@@ -395,18 +407,24 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
   // LOADING
   // ─────────────────────────────────────────────────────────────────────────────
   if (view === 'loading') return wrap(
-    <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ position: 'relative', width: 72, height: 72, marginBottom: 48 }}>
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${COLORS.teal}`, animation: 'sonarPulse 1.6s ease-out infinite' }} />
-        <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${COLORS.teal}`, animation: 'sonarPulse 1.6s ease-out 0.6s infinite' }} />
-        <div style={{ position: 'absolute', inset: 16, borderRadius: '50%', backgroundColor: COLORS.tealLight, border: `2px solid ${COLORS.teal}` }} />
+    <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 8px' }}>
+      {/* Immediate first action — gives the user something to do while API responds */}
+      <div style={{ ...STYLES.card, width: '100%', padding: '28px 24px', textAlign: 'center', marginBottom: 24, animation: 'fadeSlideUp 0.4s ease both' }}>
+        <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
+          While we prepare your steps
+        </p>
+        <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.text, marginBottom: 12, lineHeight: 1.4 }}>
+          Sit upright and breathe slowly
+        </p>
+        <p style={{ fontSize: 13, color: COLORS.muted, lineHeight: 1.7 }}>
+          Sit up straight, let gravity hold the acid down. Take three slow breaths in through your nose, out through your mouth. This alone helps.
+        </p>
       </div>
-      <p style={{ fontFamily: FONTS.serif, fontSize: 24, color: COLORS.text, textAlign: 'center', marginBottom: 10 }}>
-        Finding your steps...
-      </p>
-      <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.muted, textAlign: 'center', lineHeight: 1.5 }}>
-        Based on your history and what you're feeling now
-      </p>
+      {/* Subtle spinner below — not the focus */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ width: 10, height: 10, borderRadius: '50%', border: `2px solid ${COLORS.teal}`, borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
+        <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.mutedLight }}>Preparing your relief plan...</p>
+      </div>
     </div>
   );
 
@@ -432,28 +450,27 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
           <TimerRing seconds={sessionTimeLeft} total={sessionTotalTime} />
         </div>
 
-        {/* Breathing circle — the visual anchor, something alive to focus on */}
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
-          <div style={{ position: 'relative', width: 140, height: 140 }}>
-            {/* Outer slow pulse */}
-            <div style={{
-              position: 'absolute', inset: 0, borderRadius: '50%',
-              border: `1.5px solid ${COLORS.tealBorder}`,
-              animation: 'breatheSlow 5s ease-in-out infinite',
-            }} />
-            {/* Inner breathe ring */}
-            <div style={{
-              position: 'absolute', inset: 16, borderRadius: '50%',
-              border: `2px solid ${COLORS.teal}`,
-              animation: 'breatheExpand 5s ease-in-out infinite',
-            }} />
-            {/* Solid centre */}
-            <div style={{
-              position: 'absolute', inset: 32, borderRadius: '50%',
-              backgroundColor: COLORS.tealLight,
-            }} />
+        {/* Breathing circle — only shown when the action is a breathing exercise */}
+        {/breath/i.test(current.action) && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
+            <div style={{ position: 'relative', width: 140, height: 140 }}>
+              <div style={{
+                position: 'absolute', inset: 0, borderRadius: '50%',
+                border: `1.5px solid ${COLORS.tealBorder}`,
+                animation: 'breatheSlow 5s ease-in-out infinite',
+              }} />
+              <div style={{
+                position: 'absolute', inset: 16, borderRadius: '50%',
+                border: `2px solid ${COLORS.teal}`,
+                animation: 'breatheExpand 5s ease-in-out infinite',
+              }} />
+              <div style={{
+                position: 'absolute', inset: 32, borderRadius: '50%',
+                backgroundColor: COLORS.tealLight,
+              }} />
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Right now label — frames this as a moment, not a list */}
         <p style={{
@@ -651,15 +668,15 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
         {!isSoftFlag ? (
           <>
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.danger, letterSpacing: '0.06em', marginBottom: 16 }}>THIS MAY BE AN EMERGENCY</p>
-            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.danger, marginBottom: 10 }} onClick={() => window.open('tel:999')}>
-              Call 999 / Go to A&E now
+            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.danger, marginBottom: 10 }} onClick={() => window.open(`tel:${EMERGENCY.emergency}`)}>
+              Call {EMERGENCY.emergency} / Go to {EMERGENCY.erLabel} now
             </button>
           </>
         ) : (
           <>
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.amber, letterSpacing: '0.06em', marginBottom: 16 }}>DON'T WAIT ON THIS</p>
-            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.amber, marginBottom: 10 }} onClick={() => window.open('tel:111')}>
-              Call 111 or see your doctor today
+            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.amber, marginBottom: 10 }} onClick={() => window.open(`tel:${EMERGENCY.nonemergency}`)}>
+              Call {EMERGENCY.nonemergency} or see your doctor today
             </button>
           </>
         )}

@@ -44,11 +44,13 @@ export function detectPatterns(logs) {
     if (highRate >= 0.9 && onHigh >= 2 && lowRate <= 0.25) {
       patterns.push({
         strength: 'Strong',
+        _food: food,
         text: `${cap(food)} logged on all ${onHigh} high pain days (≥6). Absent on ${lowDays.length - onLow} of ${lowDays.length} low pain days.`,
       });
     } else if (highRate >= 0.6 && onHigh >= 2) {
       patterns.push({
         strength: 'Moderate',
+        _food: food,
         text: `${cap(food)} appeared on ${onHigh} of ${highDays.length} high pain days.`,
       });
     }
@@ -62,8 +64,24 @@ export function detectPatterns(logs) {
     });
   }
 
+  // Use foods already identified as correlated triggers (Strong/Moderate patterns).
+  // Falling back to frequency-ranked foods if no trigger patterns exist yet.
+  // Never use iteration-order slice — that would produce clinically meaningless output.
+  const triggerFoods = patterns
+    .filter(p => p.strength === 'Strong' || p.strength === 'Moderate')
+    .map(p => p._food)
+    .filter(Boolean);
+
+  const referenceFoods = triggerFoods.length > 0
+    ? triggerFoods
+    : [...allFoods].sort(
+        (a, b) =>
+          last14.filter(l => (l.parsed_foods ?? []).includes(b)).length -
+          last14.filter(l => (l.parsed_foods ?? []).includes(a)).length
+      ).slice(0, 3);
+
   const cleanDays = withSev.filter(
-    l => l.parsed_severity <= 2 && !allFoods.slice(0, 3).some(f => (l.parsed_foods ?? []).includes(f))
+    l => l.parsed_severity <= 2 && !referenceFoods.some(f => (l.parsed_foods ?? []).includes(f))
   );
   if (cleanDays.length >= 2) {
     patterns.push({
@@ -72,18 +90,19 @@ export function detectPatterns(logs) {
     });
   }
 
-  return patterns.slice(0, 4);
+  // Strip internal bookkeeping field before returning to callers.
+  return patterns.slice(0, 4).map(({ _food: _, ...p }) => p);
 }
 
 export function computeTrend(logs) {
   const today = new Date();
   const fmt   = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-  return [[0, 3], [4, 7], [8, 11], [12, 14]].map(([start, end]) => {
+  return [[0, 3], [4, 7], [8, 11], [12, 13]].map(([start, end]) => {
     const from = new Date(today); from.setDate(today.getDate() - end);
     const to   = new Date(today); to.setDate(today.getDate() - start);
     const days = [];
-    for (let d = start; d < end; d++) {
+    for (let d = start; d <= end; d++) {
       const day = new Date(today); day.setDate(today.getDate() - d);
       const label = day.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const match = logs.find(l => l.date === label);

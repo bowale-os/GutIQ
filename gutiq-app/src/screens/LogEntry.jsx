@@ -342,11 +342,11 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               value={missingInput} onChange={e => setMissingInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && missingInput.trim()) fillMissing('parsed_foods', missingInput.trim().split(',').map(s => s.trim())); }}
+              onKeyDown={e => { if (e.key === 'Enter' && missingInput.trim()) fillMissing('parsed_foods', missingInput.trim().split(',').map(s => s.trim()).filter(Boolean)); }}
               placeholder="coffee, pizza..."
               style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.darkBorder}`, color: COLORS.darkText, flex: 1 }}
             />
-            <button onClick={() => { if (missingInput.trim()) fillMissing('parsed_foods', missingInput.trim().split(',').map(s => s.trim())); }} disabled={!missingInput.trim()}
+            <button onClick={() => { if (missingInput.trim()) fillMissing('parsed_foods', missingInput.trim().split(',').map(s => s.trim()).filter(Boolean)); }} disabled={!missingInput.trim()}
               style={{ ...STYLES.btnPrimary, width: 'auto', padding: '12px 20px', opacity: missingInput.trim() ? 1 : 0.4 }}>Done</button>
           </div>
           {backBtn}

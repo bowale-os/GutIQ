@@ -191,7 +191,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             How are you feeling today?
           </p>
           <p style={{ fontSize: 12, color: COLORS.darkMuted, marginBottom: 20 }}>
-            {lastLog.date}: {lastLog.parsed_severity != null ? `pain level ${lastLog.parsed_severity}/10` : 'no symptoms'} · {lastLog.parsed_foods[0] ?? 'no food logged'}
+            {lastLog.date}: {lastLog.parsed_severity != null ? `pain level ${lastLog.parsed_severity}/10` : 'no symptoms'} · {lastLog.parsed_foods?.[0] ?? 'no food logged'}
           </p>
           <button
             onClick={openLog}
@@ -282,7 +282,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             </button>
           </div>
           {recentLogs.map((log, i) => (
-            <LogCard key={log.id ?? `${log.date}-${i}`} log={log} delay={i * 60} />
+            <LogCard key={log._id ?? `${log.date}-${i}`} log={log} delay={i * 60} />
           ))}
         </div>
 

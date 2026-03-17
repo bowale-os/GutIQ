@@ -15,7 +15,6 @@ import GutCheck    from './screens/GutCheck';
 import LogEntry    from './screens/LogEntry';
 import Export      from './screens/Export';
 import Profile     from './screens/Profile';
-import Lifestyles  from './screens/Lifestyles';
 import PainRelief  from './screens/PainRelief';
 
 const GLOBAL_STYLES = `
@@ -119,7 +118,7 @@ export default function App() {
   useEffect(() => {
     if (demoMode) { setLogs(mockLogs); return; }
     if (isLoggedIn()) fetchRealLogs().then(setLogs);
-  }, [currentScreen === 'dashboard', demoMode]);
+  }, [currentScreen, demoMode]);
 
   const navigate = (screen) => {
     setCurrentScreen(screen);
@@ -143,7 +142,6 @@ export default function App() {
       case 'gutcheck':   return <GutCheck user={user} demoMode={demoMode} />;
       case 'export':     return <Export user={user} logs={logs} navigate={navigate} />;
       case 'profile':    return <Profile user={user} navigate={navigate} onUpdate={updated => setUser(u => ({ ...u, ...updated }))} />;
-      case 'lifestyles':  return <Lifestyles navigate={navigate} />;
       case 'pain_relief': return <PainRelief navigate={navigate} logs={logs} demoMode={demoMode} />;
       default:            return <Login navigate={navigate} />;
     }
