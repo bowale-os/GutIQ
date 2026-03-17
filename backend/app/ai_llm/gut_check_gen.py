@@ -40,6 +40,7 @@ from sqlmodel import select
 
 from app.core.config import settings
 from app.core.utils import utcnow
+from app.db import AsyncSessionLocal
 from app.models.gut_check import GutCheckMessage, GutCheckSession
 from app.models.log import Log
 from app.models.user import User
@@ -88,6 +89,24 @@ async def run_gutcheck(
     # ── 1. Resolve or create session ──────────────────────────────────────────
     if session_id is None:
         session_id = await _create_session(user.id, db_session)
+    else:
+        # Verify the session exists AND belongs to this user before trusting it.
+        # A caller replaying another user's UUID must not be able to read or
+        # append to that conversation.
+        result = await db_session.execute(
+            select(GutCheckSession).where(
+                GutCheckSession.id == session_id,
+                GutCheckSession.user_id == user.id,
+            )
+        )
+        if result.scalar_one_or_none() is None:
+            # Unknown or foreign session — start a fresh one rather than erroring,
+            # so the frontend recovers gracefully without a visible crash.
+            logger.warning(
+                "session_id %s not found for user %s — creating new session",
+                session_id, user.id,
+            )
+            session_id = await _create_session(user.id, db_session)
 
     yield _sse("session_id", id=str(session_id))
 
@@ -156,9 +175,11 @@ async def run_gutcheck(
         if final.stop_reason == "tool_use":
             tool_blocks = [b for b in final.content if b.type == "tool_use"]
 
-            # Run all tool calls in parallel (they're always independent)
+            # Run all tool calls in parallel.
+            # Each call gets its own session — sharing one AsyncSession across
+            # concurrent tasks violates SQLAlchemy's concurrency model.
             tool_results = await asyncio.gather(*[
-                _execute_tool(block.name, block.input, user.id, db_session)
+                _execute_tool(block.name, block.input, user.id)
                 for block in tool_blocks
             ])
 
@@ -180,10 +201,11 @@ async def run_gutcheck(
                 ],
             })
 
-    # ── 5. Persist both turns ──────────────────────────────────────────────────
+    # ── 5. Persist both turns in one transaction ───────────────────────────────
+    # Both rows must land together. A partial write (user saved, assistant not)
+    # breaks the paired-turn assumption that _trim_history() relies on.
     answer_text = "".join(full_answer)
-    await _save_message(session_id, user.id, "user",      question,    None,       db_session)
-    await _save_message(session_id, user.id, "assistant", answer_text, tools_used, db_session)
+    await _save_exchange(session_id, user.id, question, answer_text, tools_used, db_session)
 
     yield _sse("done")
 
@@ -237,38 +259,47 @@ def _trim_history(history: list[dict], max_pairs: int = MAX_HISTORY_PAIRS) -> li
     return history[-(max_pairs * 2):]
 
 
-async def _save_message(
+async def _save_exchange(
     session_id: uuid.UUID,
     user_id,
-    role: str,
-    content: str,
+    question: str,
+    answer: str,
     tools_used: Optional[list[str]],
     db_session: AsyncSession,
 ) -> None:
-    msg = GutCheckMessage(
+    """Stage both turns and commit once — keeps history in matched pairs."""
+    db_session.add(GutCheckMessage(
         session_id=session_id,
         user_id=user_id,
-        role=role,
-        content=content,
+        role="user",
+        content=question,
+        tools_used=None,
+    ))
+    db_session.add(GutCheckMessage(
+        session_id=session_id,
+        user_id=user_id,
+        role="assistant",
+        content=answer,
         tools_used=json.dumps(tools_used) if tools_used else None,
-    )
-    db_session.add(msg)
+    ))
     await db_session.commit()
 
 
 # ── Tool dispatcher ────────────────────────────────────────────────────────────
 
-async def _execute_tool(
-    name: str,
-    inputs: dict,
-    user_id,
-    db_session: AsyncSession,
-) -> dict:
-    """Route a tool call to the correct implementation."""
+async def _execute_tool(name: str, inputs: dict, user_id) -> dict:
+    """
+    Route a tool call to the correct implementation.
+
+    DB-backed tools (query_logs) open their own AsyncSession so that
+    multiple tool calls gathered in parallel never share a session —
+    SQLAlchemy's AsyncSession is not safe for concurrent use.
+    """
     logger.info("Executing tool: %s | inputs=%s", name, inputs)
 
     if name == "query_logs":
-        return await execute_query_logs(inputs, user_id, db_session)
+        async with AsyncSessionLocal() as tool_session:
+            return await execute_query_logs(inputs, user_id, tool_session)
 
     if name == "fetch_research":
         return await execute_fetch_research(inputs)

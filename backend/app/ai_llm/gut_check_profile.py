@@ -81,16 +81,20 @@ async def regenerate_profile(user_id, db_session: AsyncSession) -> None:
             logger.info("regenerate_profile: no logs for user %s, skipping", user_id)
             return
 
-        formatted = [format_log(l) for l in logs]
-        existing  = user.health_profile_summary or "No existing profile."
+        formatted        = [format_log(l) for l in logs]
+        is_full_rebuild  = not user.health_profile_summary
+        existing         = user.health_profile_summary or "No existing profile."
 
-        # Only send the last 20 logs as "new data" to keep the prompt small.
-        # Claude updates the existing profile rather than rebuilding from scratch.
-        recent_formatted = formatted[-20:]
+        # Full rebuild: send all logs so no long-term pattern is missed.
+        # Incremental update: send only the 20 newest to keep the prompt small
+        # and let Claude merge them into the existing profile.
+        recent_formatted = formatted if is_full_rebuild else formatted[-20:]
+
+        label = "All logs for full profile build" if is_full_rebuild else "New or updated logs to incorporate"
 
         user_message = (
             f"Existing profile:\n{existing}\n\n"
-            f"New or updated logs to incorporate ({len(recent_formatted)} entries):\n"
+            f"{label} ({len(recent_formatted)} entries):\n"
             f"{json.dumps(recent_formatted, indent=2)}\n\n"
             f"Total log history: {len(formatted)} entries "
             f"from {formatted[0]['date']} to {formatted[-1]['date']}.\n\n"
@@ -100,8 +104,11 @@ async def regenerate_profile(user_id, db_session: AsyncSession) -> None:
         )
 
         logger.info(
-            "regenerate_profile | user=%s total_logs=%d",
-            user_id, len(formatted),
+            "regenerate_profile | user=%s mode=%s total_logs=%d logs_sent=%d",
+            user_id,
+            "full_rebuild" if is_full_rebuild else "incremental",
+            len(formatted),
+            len(recent_formatted),
         )
 
         response = await _client.messages.create(
@@ -125,6 +132,7 @@ async def regenerate_profile(user_id, db_session: AsyncSession) -> None:
         )
 
     except Exception:
+        await db_session.rollback()
         logger.exception("regenerate_profile failed for user %s", user_id)
 
 

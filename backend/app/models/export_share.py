@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 
 from sqlmodel import SQLModel, Field
-from sqlalchemy import Text
+from sqlalchemy import Column, Text
 
 from app.core.utils import utcnow
 
@@ -24,10 +24,10 @@ class ExportShare(SQLModel, table=True):
     # The URL-safe token — sent to the doctor, used to look up this row
     token: str = Field(index=True, unique=True)
 
-    user_id: uuid.UUID = Field(index=True)
+    user_id: uuid.UUID = Field(foreign_key="users.id", index=True)
 
     # Full report JSON snapshot (logs + stats) serialised as a string
-    report_json: str = Field(sa_column=Field(sa_type=Text))
+    report_json: str = Field(sa_column=Column(Text, nullable=False))
 
     created_at: datetime = Field(default_factory=utcnow)
     expires_at: datetime = Field(

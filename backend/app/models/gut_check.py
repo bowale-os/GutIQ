@@ -31,7 +31,7 @@ class GutCheckMessage(SQLModel, table=True):
     __tablename__ = "gut_check_messages"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    session_id: uuid.UUID = Field(index=True)          # FK not enforced — keep it loose
+    session_id: uuid.UUID = Field(foreign_key="gut_check_sessions.id", index=True)
     user_id: uuid.UUID = Field(foreign_key="users.id", index=True)
     role: str                                           # "user" | "assistant"
     content: str
