@@ -3,7 +3,7 @@ import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import StepIndicator from '../components/StepIndicator';
 import { complete } from '../api/onboarding';
-import { storeUser } from '../api/client';
+import { storeUser, getStoredUser } from '../api/client';
 import { AGE_RANGES } from '../api/schemas';
 
 const CONDITIONS = [
@@ -60,8 +60,7 @@ const inputStyle = (focused) => ({
 });
 
 export default function Onboarding({ step, setStep, navigate }) {
-  const [name,            setName]            = useState('');
-  const [nameFocused,     setNameFocused]     = useState(false);
+  const { name, email, userId } = getStoredUser();
   const [condition,       setCondition]       = useState(null);
   const [customCondition, setCustomCondition] = useState('');
   const [customFocused,   setCustomFocused]   = useState(false);
@@ -73,7 +72,7 @@ export default function Onboarding({ step, setStep, navigate }) {
 
   const canProceed = () =>
     step === 1
-      ? name.trim().length >= 2 && (condition === 'Other' ? customCondition.trim().length > 0 : !!condition)
+      ? (condition === 'Other' ? customCondition.trim().length > 0 : !!condition)
       : !!ageRange;
 
   const handleNext = async () => {
@@ -82,13 +81,8 @@ export default function Onboarding({ step, setStep, navigate }) {
     setSaveError(null);
     try {
       const goal = `Identify and manage ${finalCondition} triggers`;
-      await complete(name.trim(), finalCondition, goal, ageRange);
-      storeUser(
-        localStorage.getItem('gutiq_email') || '',
-        localStorage.getItem('gutiq_user_id') || '',
-        name.trim(),
-        finalCondition,
-      );
+      await complete(finalCondition, goal, ageRange);
+      storeUser(email, userId, name, finalCondition);
       navigate('gutcheck');
     } catch (err) {
       setSaveError(err.message || 'Failed to save. Please try again.');
@@ -106,21 +100,8 @@ export default function Onboarding({ step, setStep, navigate }) {
         {/* ── Step 1 — Who you are ── */}
         {step === 1 && (
           <div key="step1" style={{ animation: 'fadeSlideUp 0.3s ease' }}>
-            <p style={{ ...STYLES.label, marginBottom: 6 }}>Hi, I'm Tiwa.</p>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 24 }}>Let's get to know each other.</h1>
-
-            <p style={{ ...STYLES.label, marginBottom: 8 }}>Your name</p>
-            <input
-              autoFocus
-              value={name}
-              onChange={e => setName(e.target.value)}
-              onFocus={() => setNameFocused(true)}
-              onBlur={() => setNameFocused(false)}
-              placeholder="e.g. Daniel"
-              style={{ ...inputStyle(nameFocused), marginBottom: 24 }}
-            />
-
-            <p style={{ ...STYLES.label, marginBottom: 8 }}>What are you managing?</p>
+            <p style={{ ...STYLES.label, marginBottom: 6 }}>Hi{name ? `, ${name}` : ''}. I'm Tiwa.</p>
+            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 24 }}>What are you managing?</h1>
             {CONDITIONS.map(c => (
               <ConditionCard
                 key={c.id} {...c}

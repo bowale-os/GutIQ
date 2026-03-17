@@ -13,11 +13,11 @@ export const getStatus = async () => {
 };
 
 // POST /onboarding/complete
-export const complete = async (name, digestive_condition, goal, age_range) => {
+export const complete = async (digestive_condition, goal, age_range) => {
   const res = await fetch(`${BASE}/onboarding/complete`, {
     method: 'POST',
     headers: authJsonHeaders(),
-    body: JSON.stringify(makeOnboardingCompleteRequest(name, digestive_condition, goal, age_range)),
+    body: JSON.stringify(makeOnboardingCompleteRequest(digestive_condition, goal, age_range)),
   });
   await throwIfNotOk(res);
   return parseOnboardingCompleteResponse(await res.json());

@@ -3,6 +3,7 @@ import { Mic, MicOff } from 'lucide-react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { submitPainSession, submitPainFeedback } from '../api/painRelief';
+import { create as createLog } from '../api/logs';
 
 // ── Regional emergency numbers ────────────────────────────────────────────────────
 // Detect locale from browser; default to international fallback.
@@ -152,7 +153,9 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
   const [sessionId,         setSessionId]        = useState(null);
 
   // Done
-  const [rating, setRating] = useState(0);
+  const [rating,     setRating]     = useState(0);
+  const [savingLog,  setSavingLog]  = useState(false);
+  const [logSaved,   setLogSaved]   = useState(false);
   const [seekcareFrom, setSeekCareFrom] = useState('relief');
 
   // Red flag
@@ -265,13 +268,39 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
     }
   };
 
-  // ── Rating ──────────────────────────────────────────────────────────────────────
-  const handleRating = async (r) => {
-    setRating(r);
-    if (!sessionId || demoMode) return;
+  // ── Rating — UI only, submitted at commit time ──────────────────────────────────
+  const handleRating = (r) => setRating(r);
+
+  const submitFeedbackIfRated = async () => {
+    if (!rating || !sessionId || demoMode) return;
     try {
-      await submitPainFeedback({ session_id: sessionId, relief_rating: r, steps_completed: altIdx + 1 });
+      await submitPainFeedback({ session_id: sessionId, relief_rating: rating, steps_completed: altIdx + 1 });
     } catch (_) {}
+  };
+
+  // ── Save log ────────────────────────────────────────────────────────────────────
+  const handleSaveLog = async () => {
+    setSavingLog(true);
+    try {
+      await submitFeedbackIfRated();
+      const symptoms    = selectedChips.map(c => ({ name: c.label, severity: intensity }));
+      const symptomText = selectedChips.map(c => c.label).join(', ') || 'Gut discomfort';
+      const summary     = `${symptomText}. Pain level ${intensity}/10.`;
+      await createLog({
+        source:           'text',
+        raw_content:      summary,
+        natural_summary:  summary,
+        parsed_symptoms:  symptoms,
+        overall_severity: intensity,
+        confidence:       'high',
+      });
+      setLogSaved(true);
+      navigate('dashboard');
+    } catch (_) {
+      navigate('dashboard');
+    } finally {
+      setSavingLog(false);
+    }
   };
 
   // ── Shared wrap ─────────────────────────────────────────────────────────────────
@@ -416,7 +445,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       {/* Immediate first action — gives the user something to do while API responds */}
       <div style={{ ...STYLES.card, width: '100%', padding: '28px 24px', textAlign: 'center', marginBottom: 24, animation: 'fadeSlideUp 0.4s ease both' }}>
         <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
-          While we prepare your steps
+          While I prepare your steps
         </p>
         <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.text, marginBottom: 12, lineHeight: 1.4 }}>
           Sit upright and breathe slowly
@@ -617,13 +646,17 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
           </p>
           <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, marginTop: 4 }}>Pre-filled from your description →</p>
         </div>
-        <button onClick={() => navigate('dashboard')} style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.teal }}>
-          Save & return to dashboard
+        <button
+          onClick={handleSaveLog}
+          disabled={savingLog}
+          style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.teal, opacity: savingLog ? 0.6 : 1 }}
+        >
+          {savingLog ? 'Saving…' : 'Save & return to dashboard'}
         </button>
       </div>
 
-      <button onClick={() => navigate('dashboard')} style={{ ...STYLES.btnGhost, marginBottom: 16 }}>
-        Skip for now
+      <button onClick={async () => { await submitFeedbackIfRated(); navigate('dashboard'); }} style={{ ...STYLES.btnGhost, marginBottom: 16 }}>
+        Skip — don't log this
       </button>
 
       <div style={STYLES.divider} />

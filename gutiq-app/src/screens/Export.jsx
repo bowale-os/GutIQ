@@ -42,7 +42,7 @@ function detectPatterns(logs) {
     const highRate = onHigh / highDays.length;
     const lowRate  = lowDays.length ? onLow / lowDays.length : 0;
     if (highRate >= 0.9 && onHigh >= 2 && lowRate <= 0.25) {
-      patterns.push({ strength: 'Strong', text: `${cap(food)} logged on all ${onHigh} high pain days (≥6). Absent on ${lowDays.length - onLow} of ${lowDays.length} low pain days.` });
+      patterns.push({ strength: 'Strong', text: `${cap(food)} logged on all ${onHigh} high pain days (6 or above). Absent on ${lowDays.length - onLow} of ${lowDays.length} low pain days.` });
     } else if (highRate >= 0.6 && onHigh >= 2) {
       patterns.push({ strength: 'Moderate', text: `${cap(food)} appeared on ${onHigh} of ${highDays.length} high pain days.` });
     }
@@ -126,7 +126,7 @@ function generatePDF({ user, stats, patterns, trend, summary, logs, generatedDat
   const statW = (W - margin*2 - 9) / 4;
   const statData = [
     { label: 'AVG PAIN LEVEL', value: stats.avg != null ? `${stats.avg.toFixed(1)}/10` : '—', sub: '14-day mean' },
-    { label: 'HIGH PAIN DAYS', value: String(stats.highDays), sub: 'pain level ≥ 6' },
+    { label: 'HIGH PAIN DAYS', value: String(stats.highDays), sub: 'pain level 6 or above' },
     { label: 'TRACKING',       value: `${stats.daysLogged}/14`, sub: 'days recorded' },
     { label: 'AVG SLEEP',      value: stats.avgSleep != null ? `${stats.avgSleep.toFixed(1)}h` : '—', sub: 'on logged days' },
   ];
@@ -413,7 +413,7 @@ export default function Export({ user, logs }) {
         <Section title="Summary">
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <StatCard label="AVG PAIN LEVEL" value={stats.avg != null ? `${stats.avg.toFixed(1)}/10` : '—'} sub="14-day mean" accentColor={stats.avg != null ? getSeverityColor(stats.avg) : undefined} />
-            <StatCard label="HIGH PAIN DAYS" value={stats.highDays} sub="pain level ≥ 6" accentColor={stats.highDays > 0 ? COLORS.danger : undefined} />
+            <StatCard label="HIGH PAIN DAYS" value={stats.highDays} sub="pain level 6 or above" accentColor={stats.highDays > 0 ? COLORS.danger : undefined} />
             <StatCard label="TRACKING"       value={`${stats.daysLogged}/14`} sub="days recorded" />
             <StatCard label="AVG SLEEP"      value={stats.avgSleep != null ? `${stats.avgSleep.toFixed(1)}h` : '—'} sub="on logged days" />
           </div>

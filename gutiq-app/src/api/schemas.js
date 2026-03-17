@@ -43,6 +43,9 @@ export const parseTokenResponse = (raw = {}) => ({
 // ══════════════════════════════════════════════════════════════════════════════
 
 /** @type {readonly string[]} */
+export const DIGESTIVE_CONDITIONS = /** @type {const} */ (['GERD', 'IBS', "Crohn's Disease", 'Ulcerative Colitis', 'Celiac Disease', 'Other']);
+
+/** @type {readonly string[]} */
 export const AGE_RANGES = /** @type {const} */ (['Under 25', '25–40', '41–60', '60+']);
 
 /**
@@ -53,11 +56,10 @@ export const AGE_RANGES = /** @type {const} */ (['Under 25', '25–40', '41–60
  * @property {string} age_range
  */
 export const makeOnboardingCompleteRequest = (
-  name = '',
   digestive_condition = '',
   goal = '',
   age_range = '',
-) => ({ name, digestive_condition, goal, age_range });
+) => ({ digestive_condition, goal, age_range });
 
 /**
  * @typedef {Object} OnboardingStatusResponse
