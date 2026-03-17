@@ -6,42 +6,6 @@ import { complete } from '../api/onboarding';
 import { storeUser } from '../api/client';
 import { AGE_RANGES } from '../api/schemas';
 
-function SelectCard({ color, label, desc, selected, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        width: '100%', textAlign: 'left',
-        backgroundColor: selected ? COLORS.orangeLight : COLORS.surface,
-        border: `1.5px solid ${selected ? COLORS.orange : COLORS.border}`,
-        borderRadius: 14,
-        padding: '16px 18px',
-        cursor: 'pointer',
-        marginBottom: 10,
-        boxShadow: selected ? `0 0 0 3px ${COLORS.orangeLight}` : COLORS.shadow,
-        transition: 'all 0.18s ease',
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
-        <div style={{ flex: 1 }}>
-          <p style={{ fontFamily: FONTS.sans, fontWeight: 600, fontSize: 15, color: COLORS.text, marginBottom: 2 }}>{label}</p>
-          {desc && <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.muted, lineHeight: 1.4 }}>{desc}</p>}
-        </div>
-        <div style={{
-          width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
-          border: `2px solid ${selected ? COLORS.orange : COLORS.borderMid}`,
-          backgroundColor: selected ? COLORS.orange : 'transparent',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.15s ease',
-        }}>
-          {selected && <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#fff' }} />}
-        </div>
-      </div>
-    </button>
-  );
-}
-
 const CONDITIONS = [
   { id: 'GERD',   color: '#e07b39', label: 'GERD / Acid Reflux',   desc: 'Frequent heartburn, regurgitation, chest discomfort' },
   { id: 'IBS',    color: '#2c7a7b', label: 'IBS',                   desc: 'Cramping, bloating, irregular bowel habits' },
@@ -50,45 +14,82 @@ const CONDITIONS = [
   { id: 'Celiac', color: '#15803d', label: 'Celiac Disease',        desc: 'Gluten sensitivity causing intestinal damage' },
 ];
 
-const LOG_PREFS = [
-  { id: 'voice', icon: '🎙️', label: 'Voice',  desc: 'Speak naturally after meals. Tiwa listens and parses.' },
-  { id: 'text',  icon: '⌨️', label: 'Text',   desc: 'Type a quick note. Fast and familiar.' },
-  { id: 'both',  icon: '✨', label: 'Both',   desc: 'Voice when convenient, text when quiet.' },
-];
+function ConditionCard({ color, label, desc, selected, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: '100%', textAlign: 'left',
+        backgroundColor: selected ? COLORS.orangeLight : COLORS.surface,
+        border: `1.5px solid ${selected ? COLORS.orange : COLORS.border}`,
+        borderRadius: 14, padding: '14px 16px',
+        cursor: 'pointer', marginBottom: 8,
+        boxShadow: selected ? `0 0 0 3px ${COLORS.orangeLight}` : COLORS.shadow,
+        transition: 'all 0.18s ease',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <div style={{ width: 9, height: 9, borderRadius: '50%', backgroundColor: color, flexShrink: 0 }} />
+        <div style={{ flex: 1 }}>
+          <p style={{ fontFamily: FONTS.sans, fontWeight: 600, fontSize: 14, color: COLORS.text, margin: 0 }}>{label}</p>
+          {desc && <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.muted, margin: '2px 0 0', lineHeight: 1.4 }}>{desc}</p>}
+        </div>
+        <div style={{
+          width: 18, height: 18, borderRadius: '50%', flexShrink: 0,
+          border: `2px solid ${selected ? COLORS.orange : COLORS.borderMid}`,
+          backgroundColor: selected ? COLORS.orange : 'transparent',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'all 0.15s ease',
+        }}>
+          {selected && <div style={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: '#fff' }} />}
+        </div>
+      </div>
+    </button>
+  );
+}
 
-const REMINDER_TIMES = [
-  { id: 'morning', label: 'Morning', time: '8:00 am' },
-  { id: 'lunch',   label: 'Lunch',   time: '1:00 pm' },
-  { id: 'evening', label: 'Evening', time: '8:00 pm' },
-  { id: 'none',    label: 'No reminders', time: '' },
-];
+const inputStyle = (focused) => ({
+  width: '100%', boxSizing: 'border-box',
+  padding: '13px 16px',
+  border: `1.5px solid ${focused ? COLORS.orange : COLORS.border}`,
+  borderRadius: 12,
+  backgroundColor: COLORS.surface,
+  fontFamily: FONTS.sans, fontSize: 15, color: COLORS.text,
+  outline: 'none',
+  transition: 'border-color 0.15s ease',
+});
 
 export default function Onboarding({ step, setStep, navigate }) {
-  const [condition,        setCondition]       = useState(null);
-  const [customCondition,  setCustomCondition] = useState('');
-  const [logPref,          setLogPref]         = useState(null);
-  const [reminderTime,  setReminderTime] = useState('evening');
-  const [weeklySummary, setWeeklySummary] = useState(true);
-  const [ageRange,      setAgeRange]     = useState(null);
-  const [saving,        setSaving]       = useState(false);
-  const [saveError,     setSaveError]    = useState(null);
+  const [name,            setName]            = useState('');
+  const [nameFocused,     setNameFocused]     = useState(false);
+  const [condition,       setCondition]       = useState(null);
+  const [customCondition, setCustomCondition] = useState('');
+  const [customFocused,   setCustomFocused]   = useState(false);
+  const [ageRange,        setAgeRange]        = useState(null);
+  const [saving,          setSaving]          = useState(false);
+  const [saveError,       setSaveError]       = useState(null);
+
+  const finalCondition = condition === 'Other' ? customCondition.trim() : condition;
 
   const canProceed = () =>
-    step === 1 ? (condition === 'Other' ? customCondition.trim().length > 0 : !!condition) :
-    step === 2 ? !!logPref :
-    !!ageRange;
+    step === 1
+      ? name.trim().length >= 2 && (condition === 'Other' ? customCondition.trim().length > 0 : !!condition)
+      : !!ageRange;
 
   const handleNext = async () => {
-    if (step < 3) { setStep(step + 1); return; }
-    // Step 3 finish — save to backend
+    if (step < 2) { setStep(step + 1); return; }
     setSaving(true);
     setSaveError(null);
-    const finalCondition = condition === 'Other' ? customCondition.trim() : condition;
     try {
       const goal = `Identify and manage ${finalCondition} triggers`;
-      await complete(finalCondition, goal, ageRange);
-      storeUser(localStorage.getItem('gutiq_email') || '', localStorage.getItem('gutiq_user_id') || '', finalCondition);
-      navigate('dashboard');
+      await complete(name.trim(), finalCondition, goal, ageRange);
+      storeUser(
+        localStorage.getItem('gutiq_email') || '',
+        localStorage.getItem('gutiq_user_id') || '',
+        name.trim(),
+        finalCondition,
+      );
+      navigate('gutcheck');
     } catch (err) {
       setSaveError(err.message || 'Failed to save. Please try again.');
     } finally {
@@ -100,17 +101,34 @@ export default function Onboarding({ step, setStep, navigate }) {
     <div style={{ ...STYLES.page }}>
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '48px 24px 100px' }}>
 
-        <StepIndicator current={step} total={3} />
+        <StepIndicator current={step} total={2} />
 
-        {/* Step 1 */}
+        {/* ── Step 1 — Who you are ── */}
         {step === 1 && (
           <div key="step1" style={{ animation: 'fadeSlideUp 0.3s ease' }}>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 6 }}>What are you managing?</h1>
-            <p style={{ ...STYLES.muted, marginBottom: 24 }}>GutIQ personalises insights to your condition.</p>
+            <p style={{ ...STYLES.label, marginBottom: 6 }}>Hi, I'm Tiwa.</p>
+            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 24 }}>Let's get to know each other.</h1>
+
+            <p style={{ ...STYLES.label, marginBottom: 8 }}>Your name</p>
+            <input
+              autoFocus
+              value={name}
+              onChange={e => setName(e.target.value)}
+              onFocus={() => setNameFocused(true)}
+              onBlur={() => setNameFocused(false)}
+              placeholder="e.g. Daniel"
+              style={{ ...inputStyle(nameFocused), marginBottom: 24 }}
+            />
+
+            <p style={{ ...STYLES.label, marginBottom: 8 }}>What are you managing?</p>
             {CONDITIONS.map(c => (
-              <SelectCard key={c.id} {...c} selected={condition === c.id} onClick={() => setCondition(c.id)} />
+              <ConditionCard
+                key={c.id} {...c}
+                selected={condition === c.id}
+                onClick={() => setCondition(c.id)}
+              />
             ))}
-            <SelectCard
+            <ConditionCard
               color="#6b7280"
               label="Something else"
               desc={null}
@@ -122,109 +140,42 @@ export default function Onboarding({ step, setStep, navigate }) {
                 autoFocus
                 value={customCondition}
                 onChange={e => setCustomCondition(e.target.value)}
+                onFocus={() => setCustomFocused(true)}
+                onBlur={() => setCustomFocused(false)}
                 placeholder="e.g. Gastroparesis, Diverticulitis…"
-                style={{
-                  width: '100%', boxSizing: 'border-box',
-                  marginTop: -4, marginBottom: 10,
-                  padding: '13px 16px',
-                  border: `1.5px solid ${COLORS.orange}`,
-                  borderRadius: 12,
-                  backgroundColor: COLORS.surface,
-                  fontFamily: FONTS.sans, fontSize: 14, color: COLORS.text,
-                  outline: 'none',
-                }}
+                style={{ ...inputStyle(customFocused), marginTop: 4, marginBottom: 8 }}
               />
             )}
           </div>
         )}
 
-        {/* Step 2 */}
+        {/* ── Step 2 — Set yourself up ── */}
         {step === 2 && (
           <div key="step2" style={{ animation: 'fadeSlideUp 0.3s ease' }}>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 6 }}>How do you want to log?</h1>
-            <p style={{ ...STYLES.muted, marginBottom: 24 }}>You can switch anytime in settings.</p>
-            {LOG_PREFS.map(p => (
-              <SelectCard key={p.id} {...p} selected={logPref === p.id} onClick={() => setLogPref(p.id)} />
-            ))}
-          </div>
-        )}
+            <p style={{ ...STYLES.label, marginBottom: 6 }}>Almost there.</p>
+            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 6 }}>Help Tiwa understand your context.</h1>
+            <p style={{ ...STYLES.muted, marginBottom: 28 }}>This helps personalise your insights over time.</p>
 
-        {/* Step 3 */}
-        {step === 3 && (
-          <div key="step3" style={{ animation: 'fadeSlideUp 0.3s ease' }}>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 6 }}>When should we nudge you?</h1>
-            <p style={{ ...STYLES.muted, marginBottom: 24 }}>One daily reminder builds the habit.</p>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>
-              {REMINDER_TIMES.map(r => (
+            <p style={{ ...STYLES.label, marginBottom: 10 }}>Age range</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 32 }}>
+              {AGE_RANGES.map(r => (
                 <button
-                  key={r.id}
-                  onClick={() => setReminderTime(r.id)}
+                  key={r}
+                  onClick={() => setAgeRange(r)}
                   style={{
-                    padding: '10px 18px', borderRadius: 10,
-                    border: `1.5px solid ${reminderTime === r.id ? COLORS.orange : COLORS.border}`,
-                    backgroundColor: reminderTime === r.id ? COLORS.orangeLight : COLORS.surface,
-                    color: reminderTime === r.id ? COLORS.orange : COLORS.muted,
-                    fontFamily: FONTS.sans, fontWeight: reminderTime === r.id ? 600 : 400,
+                    padding: '10px 20px', borderRadius: 10,
+                    border: `1.5px solid ${ageRange === r ? COLORS.orange : COLORS.border}`,
+                    backgroundColor: ageRange === r ? COLORS.orangeLight : COLORS.surface,
+                    color: ageRange === r ? COLORS.orange : COLORS.muted,
+                    fontFamily: FONTS.mono, fontWeight: ageRange === r ? 600 : 400,
                     fontSize: 14, cursor: 'pointer',
                     boxShadow: COLORS.shadow,
                     transition: 'all 0.15s ease',
                   }}
                 >
-                  {r.label}
-                  {r.time && <span style={{ display: 'block', fontFamily: FONTS.mono, fontSize: 10, opacity: 0.6, marginTop: 2 }}>{r.time}</span>}
+                  {r}
                 </button>
               ))}
-            </div>
-
-            {/* Age range */}
-            <div style={{ marginBottom: 24 }}>
-              <p style={{ ...STYLES.label, marginBottom: 10 }}>Your age range</p>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {AGE_RANGES.map(r => (
-                  <button
-                    key={r}
-                    onClick={() => setAgeRange(r)}
-                    style={{
-                      padding: '10px 18px', borderRadius: 10,
-                      border: `1.5px solid ${ageRange === r ? COLORS.orange : COLORS.border}`,
-                      backgroundColor: ageRange === r ? COLORS.orangeLight : COLORS.surface,
-                      color: ageRange === r ? COLORS.orange : COLORS.muted,
-                      fontFamily: FONTS.mono, fontWeight: ageRange === r ? 600 : 400,
-                      fontSize: 14, cursor: 'pointer',
-                      boxShadow: COLORS.shadow,
-                      transition: 'all 0.15s ease',
-                    }}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Weekly summary toggle */}
-            <div style={{ ...STYLES.card, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <div>
-                <p style={{ fontFamily: FONTS.sans, fontWeight: 500, fontSize: 14, color: COLORS.text, marginBottom: 2 }}>Weekly summary</p>
-                <p style={{ fontSize: 12, color: COLORS.muted }}>Every Sunday — your week at a glance</p>
-              </div>
-              <button
-                onClick={() => setWeeklySummary(v => !v)}
-                style={{
-                  width: 48, height: 26, borderRadius: 999,
-                  backgroundColor: weeklySummary ? COLORS.teal : COLORS.surfaceAlt,
-                  border: 'none', cursor: 'pointer',
-                  position: 'relative', transition: 'background-color 0.2s ease', flexShrink: 0,
-                }}
-              >
-                <div style={{
-                  position: 'absolute', top: 3, left: weeklySummary ? 25 : 3,
-                  width: 20, height: 20, borderRadius: '50%',
-                  backgroundColor: '#fff',
-                  boxShadow: '0 1px 4px rgba(0,0,0,0.2)',
-                  transition: 'left 0.2s ease',
-                }} />
-              </button>
             </div>
           </div>
         )}
@@ -240,7 +191,7 @@ export default function Onboarding({ step, setStep, navigate }) {
           disabled={!canProceed() || saving}
           style={{ ...STYLES.btnPrimary, marginTop: 24, opacity: (canProceed() && !saving) ? 1 : 0.35 }}
         >
-          {saving ? 'Saving...' : step === 3 ? 'Start tracking →' : 'Continue'}
+          {saving ? 'Saving…' : step === 2 ? 'Start tracking →' : 'Continue'}
         </button>
 
         {step > 1 && (

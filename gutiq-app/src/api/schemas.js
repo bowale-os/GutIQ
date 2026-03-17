@@ -43,22 +43,21 @@ export const parseTokenResponse = (raw = {}) => ({
 // ══════════════════════════════════════════════════════════════════════════════
 
 /** @type {readonly string[]} */
-export const DIGESTIVE_CONDITIONS = /** @type {const} */ (['GERD', 'IBS', 'Ulcer', 'Other']);
-
-/** @type {readonly string[]} */
-export const AGE_RANGES = /** @type {const} */ (['Under 20', '20-30', '30-40', '40-50', '50+']);
+export const AGE_RANGES = /** @type {const} */ (['Under 25', '25–40', '41–60', '60+']);
 
 /**
  * @typedef {Object} OnboardingCompleteRequest
- * @property {'GERD'|'IBS'|'Ulcer'|'Other'} digestive_condition
- * @property {string} goal        - max 150 chars
- * @property {'Under 20'|'20-30'|'30-40'|'40-50'|'50+'} age_range
+ * @property {string} name
+ * @property {string} digestive_condition  - free text, max 100 chars
+ * @property {string} goal                 - max 150 chars
+ * @property {string} age_range
  */
 export const makeOnboardingCompleteRequest = (
-  digestive_condition = 'GERD',
+  name = '',
+  digestive_condition = '',
   goal = '',
-  age_range = '20-30',
-) => ({ digestive_condition, goal, age_range });
+  age_range = '',
+) => ({ name, digestive_condition, goal, age_range });
 
 /**
  * @typedef {Object} OnboardingStatusResponse
