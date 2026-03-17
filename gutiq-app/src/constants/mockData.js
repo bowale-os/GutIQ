@@ -1,8 +1,8 @@
 export const currentUser = {
-  name: 'Alex Rivera',
+  name: 'Daniela Mosquera',
   condition: 'GERD',
   streak: 4,
-  initials: 'AR',
+  initials: 'DM',
 };
 
 export const mockLogs = [

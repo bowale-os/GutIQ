@@ -39,7 +39,7 @@ export default function Signup({ navigate }) {
   };
 
   const fields = [
-    { key: 'name',     label: 'Full name',       type: 'text',     placeholder: 'Alex Rivera' },
+    { key: 'name',     label: 'Full name',       type: 'text',     placeholder: 'Daniela Mosquera' },
     { key: 'email',    label: 'Email',            type: 'email',    placeholder: 'you@example.com' },
     { key: 'password', label: 'Password',         type: 'password', placeholder: '8+ characters' },
     { key: 'confirm',  label: 'Confirm password', type: 'password', placeholder: 'Repeat password' },
