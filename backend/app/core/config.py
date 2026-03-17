@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     QDRANT_URL: str
     QDRANT_API_KEY: str
 
+    # Frontend origin — used to build share links (e.g. https://gutiq.vercel.app)
+    FRONTEND_URL: str = "http://localhost:5173"
+
     model_config = ConfigDict(env_file=".env")
 
 settings = Settings()

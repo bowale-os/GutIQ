@@ -116,7 +116,7 @@ export function computeTrend(logs) {
 }
 
 export function buildSummary(user, stats, patterns, trend) {
-  const { avg, avgSleep, daysLogged, compliance } = stats;
+  const { avg, avgSleep, daysLogged } = stats;
   const vals = trend.filter(t => t.avg != null).map(t => t.avg);
 
   const trendDesc = vals.length >= 2
@@ -128,7 +128,7 @@ export function buildSummary(user, stats, patterns, trend) {
     : null;
 
   const p1 =
-    `Over the 14-day period, ${user.name} logged on ${daysLogged} of 14 days (${compliance}% compliance).` +
+    `Over the 14-day period, ${user.name} logged on ${daysLogged} of 14 days.` +
     (trendDesc ? ` Pain level was ${trendDesc}.` : '') +
     (avg != null ? ` The overall mean pain level was ${avg.toFixed(1)} out of 10.` : '') +
     (avgSleep != null ? ` Average sleep was ${avgSleep.toFixed(1)} hours per night.` : '');

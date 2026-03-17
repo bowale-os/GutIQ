@@ -59,8 +59,7 @@ async def create_share(
     session.add(share)
     await session.commit()
 
-    base_url = getattr(settings, "frontend_url", "http://localhost:5173")
-    url = f"{base_url}/report/{token}"
+    url = f"{settings.FRONTEND_URL}/report/{token}"
 
     return ShareResponse(token=token, url=url)
 
