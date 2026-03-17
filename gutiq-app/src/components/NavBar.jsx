@@ -5,8 +5,7 @@ const TABS = [
   { id: 'dashboard', icon: '⌂',  label: 'Home'     },
   { id: 'gutcheck',  icon: '✦',  label: 'Gut Check' },
   { id: 'export',    icon: '↗',  label: 'Export'   },
-  { id: 'profile',    icon: '○',  label: 'Profile'   },
-  { id: 'lifestyles', icon: '◈',  label: 'Lifestyle' },
+  { id: 'profile',   icon: '○',  label: 'Profile'  },
 ];
 
 export default function NavBar({ currentScreen, navigate, onLogClick }) {
@@ -20,7 +19,7 @@ export default function NavBar({ currentScreen, navigate, onLogClick }) {
       display: 'flex', alignItems: 'center',
       maxWidth: 480, margin: '0 auto', padding: '0 8px',
     }}>
-      {/* Left tabs: Home, Insights */}
+      {/* Left tabs */}
       {TABS.slice(0, 2).map(tab => {
         const active = currentScreen === tab.id;
         return (

@@ -12,9 +12,9 @@ export default function StepIndicator({ current, total }) {
               flex: 1,
               height: 3,
               borderRadius: 999,
-              backgroundColor: i < current ? COLORS.accent : COLORS.border,
+              backgroundColor: i < current ? COLORS.orange : COLORS.border,
               transition: 'background-color 0.4s ease',
-              boxShadow: i < current ? `0 0 6px ${COLORS.accent}88` : 'none',
+              boxShadow: i < current ? `0 0 6px ${COLORS.orange}88` : 'none',
             }}
           />
         ))}

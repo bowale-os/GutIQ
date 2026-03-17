@@ -510,9 +510,14 @@ export default function Export({ user, logs }) {
                   </div>
                   <p style={{ margin: 0, fontFamily: FONTS.mono, fontSize: 10, color: COLORS.mutedLight }}>Doctor can scan this to open the report</p>
                 </div>
-                <button onClick={() => { setShareUrl(null); setShareError(null); }} style={{ marginTop: 12, background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTS.mono, fontSize: 11, color: COLORS.mutedLight, padding: 0 }}>
-                  Generate a new link
-                </button>
+                <div style={{ marginTop: 12, textAlign: 'center' }}>
+                  <button onClick={() => { setShareUrl(null); setShareError(null); setCopied(false); }} style={{ background: 'none', border: `1px solid ${COLORS.border}`, borderRadius: 6, cursor: 'pointer', fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted, padding: '5px 12px' }}>
+                    Generate a new link
+                  </button>
+                  <p style={{ margin: '6px 0 0', fontFamily: FONTS.mono, fontSize: 10, color: COLORS.mutedLight }}>
+                    The previous link stays active until it expires in 7 days.
+                  </p>
+                </div>
               </>
             )}
           </div>

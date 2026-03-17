@@ -70,14 +70,7 @@ export default function GutCheck({ user, demoMode = false }) {
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }, 80);
     return () => clearTimeout(t);
-  }, [conversation.length, toolCallStates.length, phase]);
-
-  useEffect(() => {
-    const t = requestAnimationFrame(() =>
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' })
-    );
-    return () => cancelAnimationFrame(t);
-  }, [streamedAnswer]);
+  }, [conversation.length, toolCallStates.length, phase, streamedAnswer]);
 
   async function runConversation(question) {
     if (busyRef.current) return;
@@ -173,7 +166,7 @@ export default function GutCheck({ user, demoMode = false }) {
   }
 
   function handleMicTap() {
-    if (phase !== 'idle') return;
+    if (phase !== 'idle' && phase !== 'done') return;
     setPhase('listening');
     // In demo mode: animate a random preset question into the transcript
     // In real mode: TODO — wire Web Speech API (same pattern as PainRelief.jsx)
@@ -399,12 +392,12 @@ export default function GutCheck({ user, demoMode = false }) {
               )}
               <button
                 onClick={handleMicTap}
-                disabled={phase !== 'idle' && phase !== 'listening'}
+                disabled={phase === 'thinking' || phase === 'responding'}
                 style={{
                   width: 42, height: 42, borderRadius: '50%',
                   backgroundColor: phase === 'listening' ? COLORS.orangeHover : COLORS.orange,
                   border: 'none',
-                  cursor: phase !== 'idle' && phase !== 'listening' ? 'default' : 'pointer',
+                  cursor: (phase === 'thinking' || phase === 'responding') ? 'default' : 'pointer',
                   fontSize: 18,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'background-color 0.2s ease',
