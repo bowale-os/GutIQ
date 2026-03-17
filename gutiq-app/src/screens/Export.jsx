@@ -85,7 +85,7 @@ function buildSummary(user, stats, patterns, trend) {
     : vals[vals.length-1] - vals[0] < -1.5 ? `improving from ${vals[0].toFixed(1)} to ${vals[vals.length-1].toFixed(1)}`
     : 'broadly stable' : null;
 
-  const p1 = `Over the 14-day period, ${user.name} logged on ${daysLogged} of 14 days (${compliance}% compliance).`
+  const p1 = `Over the 14-day period, ${user.name} logged on ${daysLogged} of 14 days.`
     + (trendDesc ? ` Pain level was ${trendDesc}.` : '')
     + (avg != null ? ` The overall mean pain level was ${avg.toFixed(1)} out of 10.` : '')
     + (avgSleep != null ? ` Average sleep was ${avgSleep.toFixed(1)} hours per night.` : '');
@@ -127,7 +127,7 @@ function generatePDF({ user, stats, patterns, trend, summary, logs, generatedDat
   const statData = [
     { label: 'AVG PAIN LEVEL', value: stats.avg != null ? `${stats.avg.toFixed(1)}/10` : '—', sub: '14-day mean' },
     { label: 'HIGH PAIN DAYS', value: String(stats.highDays), sub: 'pain level ≥ 6' },
-    { label: 'DAYS LOGGED',    value: `${stats.daysLogged}/14`, sub: `${stats.compliance}% compliance` },
+    { label: 'TRACKING',       value: `${stats.daysLogged}/14`, sub: 'days recorded' },
     { label: 'AVG SLEEP',      value: stats.avgSleep != null ? `${stats.avgSleep.toFixed(1)}h` : '—', sub: 'on logged days' },
   ];
   statData.forEach((s, i) => {
@@ -414,7 +414,7 @@ export default function Export({ user, logs }) {
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <StatCard label="AVG PAIN LEVEL" value={stats.avg != null ? `${stats.avg.toFixed(1)}/10` : '—'} sub="14-day mean" accentColor={stats.avg != null ? getSeverityColor(stats.avg) : undefined} />
             <StatCard label="HIGH PAIN DAYS" value={stats.highDays} sub="pain level ≥ 6" accentColor={stats.highDays > 0 ? COLORS.danger : undefined} />
-            <StatCard label="DAYS LOGGED"    value={`${stats.daysLogged}/14`} sub={`${stats.compliance}% compliance`} />
+            <StatCard label="TRACKING"       value={`${stats.daysLogged}/14`} sub="days recorded" />
             <StatCard label="AVG SLEEP"      value={stats.avgSleep != null ? `${stats.avgSleep.toFixed(1)}h` : '—'} sub="on logged days" />
           </div>
         </Section>
