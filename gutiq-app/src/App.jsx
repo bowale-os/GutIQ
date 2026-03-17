@@ -115,9 +115,14 @@ export default function App() {
     }
   }, [currentScreen]);
 
+  const LOG_SCREENS = new Set(['dashboard', 'export', 'pain_relief']);
   useEffect(() => {
+    if (!LOG_SCREENS.has(currentScreen)) return;
     if (demoMode) { setLogs(mockLogs); return; }
-    if (isLoggedIn()) fetchRealLogs().then(setLogs);
+    if (!isLoggedIn()) return;
+    let stale = false;
+    fetchRealLogs().then(data => { if (!stale) setLogs(data); });
+    return () => { stale = true; };
   }, [currentScreen, demoMode]);
 
   const navigate = (screen) => {

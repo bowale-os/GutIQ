@@ -13,8 +13,13 @@ const EMERGENCY_BY_REGION = {
   AU: { emergency: '000', nonemergency: '1800 022 222', erLabel: 'ED' },
   IE: { emergency: '112', nonemergency: '1850 24 1850', erLabel: 'ED' },
 };
-const _region = navigator.language?.split('-')[1]?.toUpperCase() ?? 'GB';
-const EMERGENCY = EMERGENCY_BY_REGION[_region] ?? EMERGENCY_BY_REGION.GB;
+const _getRegion = () => {
+  if (typeof navigator === 'undefined') return null;
+  const match = (navigator.language ?? '').match(/[-_]([A-Za-z]{2})$/);
+  return match?.[1]?.toUpperCase() ?? null;
+};
+const EMERGENCY = EMERGENCY_BY_REGION[_getRegion()] ?? EMERGENCY_BY_REGION.GB;
+const toTelHref = (value) => `tel:${String(value).replace(/[^\d+]/g, '')}`;
 
 // ── Symptom chips ────────────────────────────────────────────────────────────────
 const SYMPTOM_CHIPS = [
@@ -668,14 +673,14 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
         {!isSoftFlag ? (
           <>
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.danger, letterSpacing: '0.06em', marginBottom: 16 }}>THIS MAY BE AN EMERGENCY</p>
-            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.danger, marginBottom: 10 }} onClick={() => window.open(`tel:${EMERGENCY.emergency}`)}>
+            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.danger, marginBottom: 10 }} onClick={() => window.open(toTelHref(EMERGENCY.emergency))}>
               Call {EMERGENCY.emergency} / Go to {EMERGENCY.erLabel} now
             </button>
           </>
         ) : (
           <>
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.amber, letterSpacing: '0.06em', marginBottom: 16 }}>DON'T WAIT ON THIS</p>
-            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.amber, marginBottom: 10 }} onClick={() => window.open(`tel:${EMERGENCY.nonemergency}`)}>
+            <button style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.amber, marginBottom: 10 }} onClick={() => window.open(toTelHref(EMERGENCY.nonemergency))}>
               Call {EMERGENCY.nonemergency} or see your doctor today
             </button>
           </>
