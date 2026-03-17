@@ -7,7 +7,7 @@ class OnboardingStatusResponse(BaseModel):
 
 
 class OnboardingCompleteRequest(BaseModel):
-    digestive_condition: Literal["GERD", "IBS", "Ulcer", "Crohns", "UC", "Celiac", "Gastroparesis", "Dyspepsia", "Other"] = Field(..., description="Digestive condition being tracked")
+    digestive_condition: str = Field(..., min_length=1, max_length=100, description="Digestive condition being tracked")
     goal: str = Field(..., max_length=150, description="Tracking goal (e.g. 'identify food triggers')")
     age_range: Literal["Under 20", "20-30", "30-40", "40-50", "50+"] = Field(..., description="User age range")
 

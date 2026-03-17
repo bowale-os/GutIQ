@@ -43,15 +43,11 @@ function SelectCard({ color, label, desc, selected, onClick }) {
 }
 
 const CONDITIONS = [
-  { id: 'GERD',        color: '#e07b39', label: 'GERD / Acid Reflux',      desc: 'Frequent heartburn, regurgitation, chest discomfort' },
-  { id: 'IBS',         color: '#2c7a7b', label: 'IBS',                      desc: 'Cramping, bloating, irregular bowel habits' },
-  { id: 'Ulcer',       color: '#b45309', label: 'Peptic Ulcer',             desc: 'Burning stomach pain, nausea, sensitivity to food' },
-  { id: 'Crohns',      color: '#7c3aed', label: "Crohn's Disease",          desc: 'Chronic inflammation anywhere along the digestive tract' },
-  { id: 'UC',          color: '#0369a1', label: 'Ulcerative Colitis',       desc: 'Inflammation and ulcers in the colon and rectum' },
-  { id: 'Celiac',      color: '#15803d', label: 'Celiac Disease',           desc: 'Gluten sensitivity causing intestinal damage' },
-  { id: 'Gastroparesis', color: '#9f1239', label: 'Gastroparesis',          desc: 'Delayed stomach emptying, nausea, early fullness' },
-  { id: 'Dyspepsia',   color: '#92400e', label: 'Functional Dyspepsia',     desc: 'Chronic indigestion, bloating, discomfort after eating' },
-  { id: 'Other',       color: '#6b7280', label: 'Other / General',          desc: 'General digestive discomfort or exploration' },
+  { id: 'GERD',   color: '#e07b39', label: 'GERD / Acid Reflux',   desc: 'Frequent heartburn, regurgitation, chest discomfort' },
+  { id: 'IBS',    color: '#2c7a7b', label: 'IBS',                   desc: 'Cramping, bloating, irregular bowel habits' },
+  { id: 'Crohns', color: '#7c3aed', label: "Crohn's Disease",       desc: 'Chronic inflammation anywhere along the digestive tract' },
+  { id: 'UC',     color: '#0369a1', label: 'Ulcerative Colitis',    desc: 'Inflammation and ulcers in the colon and rectum' },
+  { id: 'Celiac', color: '#15803d', label: 'Celiac Disease',        desc: 'Gluten sensitivity causing intestinal damage' },
 ];
 
 const LOG_PREFS = [
@@ -68,8 +64,9 @@ const REMINDER_TIMES = [
 ];
 
 export default function Onboarding({ step, setStep, navigate }) {
-  const [condition,     setCondition]    = useState(null);
-  const [logPref,       setLogPref]      = useState(null);
+  const [condition,        setCondition]       = useState(null);
+  const [customCondition,  setCustomCondition] = useState('');
+  const [logPref,          setLogPref]         = useState(null);
   const [reminderTime,  setReminderTime] = useState('evening');
   const [weeklySummary, setWeeklySummary] = useState(true);
   const [ageRange,      setAgeRange]     = useState(null);
@@ -77,7 +74,7 @@ export default function Onboarding({ step, setStep, navigate }) {
   const [saveError,     setSaveError]    = useState(null);
 
   const canProceed = () =>
-    step === 1 ? !!condition :
+    step === 1 ? (condition === 'Other' ? customCondition.trim().length > 0 : !!condition) :
     step === 2 ? !!logPref :
     !!ageRange;
 
@@ -86,10 +83,11 @@ export default function Onboarding({ step, setStep, navigate }) {
     // Step 3 finish — save to backend
     setSaving(true);
     setSaveError(null);
+    const finalCondition = condition === 'Other' ? customCondition.trim() : condition;
     try {
-      const goal = `Identify and manage ${condition} triggers`;
-      await complete(condition, goal, ageRange);
-      storeUser(localStorage.getItem('gutiq_email') || '', localStorage.getItem('gutiq_user_id') || '', condition);
+      const goal = `Identify and manage ${finalCondition} triggers`;
+      await complete(finalCondition, goal, ageRange);
+      storeUser(localStorage.getItem('gutiq_email') || '', localStorage.getItem('gutiq_user_id') || '', finalCondition);
       navigate('dashboard');
     } catch (err) {
       setSaveError(err.message || 'Failed to save. Please try again.');
@@ -112,6 +110,31 @@ export default function Onboarding({ step, setStep, navigate }) {
             {CONDITIONS.map(c => (
               <SelectCard key={c.id} {...c} selected={condition === c.id} onClick={() => setCondition(c.id)} />
             ))}
+            <SelectCard
+              color="#6b7280"
+              label="Something else"
+              desc={null}
+              selected={condition === 'Other'}
+              onClick={() => setCondition('Other')}
+            />
+            {condition === 'Other' && (
+              <input
+                autoFocus
+                value={customCondition}
+                onChange={e => setCustomCondition(e.target.value)}
+                placeholder="e.g. Gastroparesis, Diverticulitis…"
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  marginTop: -4, marginBottom: 10,
+                  padding: '13px 16px',
+                  border: `1.5px solid ${COLORS.orange}`,
+                  borderRadius: 12,
+                  backgroundColor: COLORS.surface,
+                  fontFamily: FONTS.sans, fontSize: 14, color: COLORS.text,
+                  outline: 'none',
+                }}
+              />
+            )}
           </div>
         )}
 
