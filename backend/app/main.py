@@ -16,6 +16,7 @@ origins = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",  # Add these
     "http://localhost:8000",   # Your backend, if needed for proxy
+    "https://gut-iq.vercel.app",
 ]
 
 app.add_middleware(
