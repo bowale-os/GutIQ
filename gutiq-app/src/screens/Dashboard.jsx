@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { HeartPulse } from 'lucide-react';
+import { HeartPulse, Mic } from 'lucide-react';
 import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import LogCard from '../components/LogCard';
@@ -108,7 +108,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             Log your first meal or symptom to start building your gut profile.
           </p>
           <button onClick={openLog} style={{ ...STYLES.btnPrimary, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%' }}>
-            <span style={{ animation: 'pulse 2s ease infinite', fontSize: 18 }}>🎙️</span>
+            <Mic size={20} color="#fff" strokeWidth={1.5} style={{ animation: 'pulse 2s ease infinite', flexShrink: 0 }} />
             Log now
           </button>
         </div>
@@ -204,7 +204,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
             }}
           >
-            <span style={{ animation: 'pulse 2s ease infinite', fontSize: 18 }}>🎙️</span>
+            <Mic size={20} color="#fff" strokeWidth={1.5} style={{ animation: 'pulse 2s ease infinite', flexShrink: 0 }} />
             Log now
           </button>
         </div>

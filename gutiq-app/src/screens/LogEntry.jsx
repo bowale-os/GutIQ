@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Utensils, Activity, Brain, Moon, Dumbbell } from 'lucide-react';
+import { Utensils, Activity, Brain, Moon, Dumbbell, Mic } from 'lucide-react';
 import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { preview, create } from '../api/logs';
@@ -379,10 +379,10 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
               style={{
                 position: 'absolute', inset: 0, margin: 'auto', width: 88, height: 88,
                 borderRadius: '50%', backgroundColor: COLORS.orange, border: 'none', cursor: 'pointer',
-                fontSize: 32, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: `0 0 32px ${COLORS.orange}44, 0 4px 16px rgba(0,0,0,0.3)`, zIndex: 1,
               }}
-            >🎙️</button>
+            ><Mic size={34} color="#fff" strokeWidth={1.5} /></button>
           </div>
           <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400, marginBottom: 8 }}>
             Just talk
@@ -417,8 +417,9 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
               <div style={{
                 position: 'absolute', inset: 0, margin: 'auto', width: 88, height: 88, borderRadius: '50%',
                 backgroundColor: COLORS.orange, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 30, zIndex: 1, boxShadow: `0 0 40px ${COLORS.orange}66`,
-              }}>🎙️</div>
+                zIndex: 1, boxShadow: `0 0 40px ${COLORS.orange}66`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}><Mic size={32} color="#fff" strokeWidth={1.5} /></div>
             </div>
             <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.orange, animation: 'pulse 1.2s ease infinite', marginBottom: 14, flexShrink: 0 }}>
               Listening...
@@ -508,7 +509,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
               {/* Voice transcript */}
               {source === 'voice' && transcript && (
                 <div style={{ backgroundColor: COLORS.darkSurfaceAlt, borderRadius: 10, padding: '10px 12px', marginBottom: 12 }}>
-                  <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.08em', marginBottom: 4 }}>🎙️ TIWA HEARD</p>
+                  <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.08em', marginBottom: 4, display: 'flex', alignItems: 'center', gap: 5 }}><Mic size={10} strokeWidth={2} /> TIWA HEARD</p>
                   <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.darkMuted, lineHeight: 1.6, fontStyle: 'italic' }}>
                     "{transcript.replace(/\n/g, ' ')}"
                   </p>
