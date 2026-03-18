@@ -56,7 +56,7 @@ export default function NavBar({ currentScreen, navigate, onLogClick, demoMode, 
             boxShadow: `0 0 20px ${COLORS.orange}44, 0 4px 12px rgba(0,0,0,0.2)`,
             marginBottom: 8, flexShrink: 0, color: '#fff',
           }}
-          title="Log today"
+          title="Tell me about it"
         >
           +
         </button>

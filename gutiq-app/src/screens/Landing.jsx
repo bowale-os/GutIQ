@@ -252,7 +252,7 @@ export default function Landing({ navigate, onDemo }) {
         backdropFilter: scrolled ? 'blur(12px)' : 'none',
         borderBottom: scrolled ? `1px solid ${COLORS.border}` : '1px solid transparent',
         transition: 'all 0.3s ease',
-        padding: '0 24px',
+        padding: '0 clamp(16px, 4vw, 24px)',
       }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
@@ -262,16 +262,16 @@ export default function Landing({ navigate, onDemo }) {
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <button onClick={() => navigate('login')} style={{
               background: 'none', border: `1px solid ${COLORS.border}`, borderRadius: 10,
-              padding: '8px 16px', cursor: 'pointer', fontFamily: FONTS.sans,
-              fontSize: 14, color: COLORS.muted, fontWeight: 500,
+              padding: '7px 12px', cursor: 'pointer', fontFamily: FONTS.sans,
+              fontSize: 13, color: COLORS.muted, fontWeight: 500,
               transition: 'border-color 0.15s',
             }}>
               Sign in
             </button>
             <button onClick={() => navigate('signup')} style={{
               backgroundColor: COLORS.orange, color: '#fff', border: 'none',
-              borderRadius: 10, padding: '8px 18px', cursor: 'pointer',
-              fontFamily: FONTS.sans, fontSize: 14, fontWeight: 600,
+              borderRadius: 10, padding: '7px 14px', cursor: 'pointer',
+              fontFamily: FONTS.sans, fontSize: 13, fontWeight: 600,
             }}>
               Start free
             </button>
@@ -280,7 +280,7 @@ export default function Landing({ navigate, onDemo }) {
       </nav>
 
       {/* ── Hero ────────────────────────────────────────────────────────────── */}
-      <section style={{ paddingTop: 130, paddingBottom: 80, paddingLeft: 24, paddingRight: 24 }}>
+      <section style={{ paddingTop: 'clamp(90px, 14vh, 130px)', paddingBottom: 'clamp(48px, 8vh, 80px)', paddingLeft: 'clamp(16px, 4vw, 24px)', paddingRight: 'clamp(16px, 4vw, 24px)' }}>
         {/* Subtle radial glow behind hero */}
         <div style={{
           position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
@@ -289,7 +289,7 @@ export default function Landing({ navigate, onDemo }) {
           pointerEvents: 'none',
         }} />
 
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 60, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', gap: 'clamp(24px, 5vw, 60px)', alignItems: 'center', flexWrap: 'wrap' }}>
 
           {/* Left: copy */}
           <div style={{ flex: '1 1 340px', animation: 'fadeSlideUp 0.6s ease both' }}>
@@ -304,31 +304,33 @@ export default function Landing({ navigate, onDemo }) {
               </span>
             </div>
 
-            <h1 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(38px, 5vw, 60px)', fontWeight: 400, color: COLORS.text, lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 20px' }}>
+            <h1 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(28px, 7vw, 60px)', fontWeight: 400, color: COLORS.text, lineHeight: 1.1, letterSpacing: '-0.02em', margin: '0 0 20px' }}>
               Finally understand<br />
               <span style={{ color: COLORS.orange }}>what's wrecking</span><br />
               your gut.
             </h1>
 
-            <p style={{ fontSize: 17, color: COLORS.muted, lineHeight: 1.7, margin: '0 0 32px', maxWidth: 420 }}>
+            <p style={{ fontSize: 'clamp(14px, 4vw, 17px)', color: COLORS.muted, lineHeight: 1.7, margin: '0 0 32px', maxWidth: 420 }}>
               GutIQ connects your food, stress, and sleep to your symptoms and shows you exactly which triggers are hitting hardest, backed by peer-reviewed research.
             </p>
 
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 16 }}>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
               <button onClick={() => navigate('signup')} style={{
                 backgroundColor: COLORS.orange, color: '#fff', border: 'none',
-                borderRadius: 12, padding: '14px 28px', cursor: 'pointer',
-                fontFamily: FONTS.sans, fontSize: 16, fontWeight: 600,
+                borderRadius: 12, padding: '13px 24px', cursor: 'pointer',
+                fontFamily: FONTS.sans, fontSize: 15, fontWeight: 600,
                 boxShadow: `0 4px 20px rgba(201,106,43,0.30)`,
                 transition: 'transform 0.15s, box-shadow 0.15s',
+                flex: '1 1 140px',
               }}>
                 Start for free
               </button>
               <button onClick={onDemo} style={{
                 backgroundColor: 'transparent', color: COLORS.teal,
                 border: `1px solid ${COLORS.tealBorder}`, borderRadius: 12,
-                padding: '14px 24px', cursor: 'pointer',
-                fontFamily: FONTS.sans, fontSize: 15, fontWeight: 500,
+                padding: '13px 20px', cursor: 'pointer',
+                fontFamily: FONTS.sans, fontSize: 14, fontWeight: 500,
+                flex: '1 1 120px',
               }}>
                 Try demo →
               </button>
@@ -352,12 +354,12 @@ export default function Landing({ navigate, onDemo }) {
       </section>
 
       {/* ── Problem ─────────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px', backgroundColor: COLORS.surfaceAlt }}>
+      <section style={{ padding: 'clamp(48px, 10vh, 80px) clamp(16px, 4vw, 24px)', backgroundColor: COLORS.surfaceAlt }}>
         <div style={{ maxWidth: 720, margin: '0 auto', textAlign: 'center' }}>
           <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 20 }}>
             The problem
           </p>
-          <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(28px, 4vw, 42px)', fontWeight: 400, color: COLORS.text, lineHeight: 1.2, margin: '0 0 20px' }}>
+          <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(22px, 5vw, 42px)', fontWeight: 400, color: COLORS.text, lineHeight: 1.2, margin: '0 0 20px' }}>
             You've been managing symptoms.<br />You should be managing{' '}
             <span style={{ color: COLORS.orange }}>triggers</span>.
           </h2>
@@ -380,13 +382,13 @@ export default function Landing({ navigate, onDemo }) {
       </section>
 
       {/* ── How it works ────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px' }}>
+      <section style={{ padding: 'clamp(48px, 10vh, 80px) clamp(16px, 4vw, 24px)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 12 }}>
               How it works
             </p>
-            <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 400, color: COLORS.text, margin: 0 }}>
+            <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(20px, 5vw, 38px)', fontWeight: 400, color: COLORS.text, margin: 0 }}>
               It is simple to start. You log and it gets smarter.
             </h2>
           </div>
@@ -399,7 +401,7 @@ export default function Landing({ navigate, onDemo }) {
       </section>
 
       {/* ── Research credibility ─────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px', backgroundColor: COLORS.surfaceAlt }}>
+      <section style={{ padding: 'clamp(48px, 10vh, 80px) clamp(16px, 4vw, 24px)', backgroundColor: COLORS.surfaceAlt }}>
         <div style={{ maxWidth: 860, margin: '0 auto', textAlign: 'center' }}>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -412,7 +414,7 @@ export default function Landing({ navigate, onDemo }) {
             </span>
           </div>
 
-          <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px' }}>
+          <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(20px, 5vw, 40px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px' }}>
             Relief steps grounded in real research.
           </h2>
           <p style={{ fontSize: 16, color: COLORS.muted, lineHeight: 1.7, margin: '0 0 36px', maxWidth: 560, marginLeft: 'auto', marginRight: 'auto' }}>
@@ -460,13 +462,13 @@ export default function Landing({ navigate, onDemo }) {
       </section>
 
       {/* ── Privacy promise ──────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px' }}>
+      <section style={{ padding: 'clamp(48px, 10vh, 80px) clamp(16px, 4vw, 24px)' }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted, textTransform: 'uppercase', letterSpacing: '0.09em', marginBottom: 12 }}>
               Your data, your rules
             </p>
-            <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(26px, 3.5vw, 38px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px' }}>
+            <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(20px, 5vw, 38px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px' }}>
               No email required.
             </h2>
             <p style={{ fontSize: 16, color: COLORS.muted, lineHeight: 1.7, maxWidth: 520, margin: '0 auto' }}>
@@ -528,9 +530,9 @@ export default function Landing({ navigate, onDemo }) {
       </section>
 
       {/* ── Final CTA ────────────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 24px 100px', backgroundColor: COLORS.surfaceAlt }}>
+      <section style={{ padding: 'clamp(48px, 10vh, 80px) clamp(16px, 4vw, 24px) 100px', backgroundColor: COLORS.surfaceAlt }}>
         <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(30px, 4vw, 46px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px', lineHeight: 1.15 }}>
+          <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(24px, 6vw, 46px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px', lineHeight: 1.15 }}>
             Start understanding<br />your gut today.
           </h2>
           <p style={{ fontSize: 16, color: COLORS.muted, lineHeight: 1.7, margin: '0 0 36px' }}>

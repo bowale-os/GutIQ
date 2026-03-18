@@ -91,13 +91,13 @@ export default function Signup({ navigate }) {
       {/* Logo */}
       <div style={{ textAlign: 'center', marginBottom: 32 }}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 2, marginBottom: 8 }}>
-          <span style={{ fontFamily: FONTS.serif, fontSize: 48, color: COLORS.text, letterSpacing: '-0.02em', lineHeight: 1 }}>Gut</span>
-          <span style={{ fontFamily: FONTS.serif, fontSize: 48, color: COLORS.orange, letterSpacing: '-0.02em', lineHeight: 1 }}>IQ</span>
+          <span style={{ fontFamily: FONTS.serif, fontSize: 'clamp(34px, 11vw, 48px)', color: COLORS.text, letterSpacing: '-0.02em', lineHeight: 1 }}>Gut</span>
+          <span style={{ fontFamily: FONTS.serif, fontSize: 'clamp(34px, 11vw, 48px)', color: COLORS.orange, letterSpacing: '-0.02em', lineHeight: 1 }}>IQ</span>
         </div>
         <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted }}>Create your account</p>
       </div>
 
-      <div style={{ ...STYLES.card, padding: '28px 24px' }}>
+      <div style={{ ...STYLES.card, padding: 'clamp(18px, 4vw, 28px) clamp(16px, 4vw, 24px)' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
 
           {/* Username */}
