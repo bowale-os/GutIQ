@@ -13,11 +13,11 @@ export const getStatus = async () => {
 };
 
 // POST /onboarding/complete
-export const complete = async (digestive_condition, goal, age_range) => {
+export const complete = async (digestive_condition, goal, age_range, reminder_time = null, reminder_channel = null) => {
   const res = await fetch(`${BASE}/onboarding/complete`, {
     method: 'POST',
     headers: authJsonHeaders(),
-    body: JSON.stringify(makeOnboardingCompleteRequest(digestive_condition, goal, age_range)),
+    body: JSON.stringify(makeOnboardingCompleteRequest(digestive_condition, goal, age_range, reminder_time, reminder_channel)),
   });
   await throwIfNotOk(res);
   return parseOnboardingCompleteResponse(await res.json());

@@ -418,7 +418,6 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
                 position: 'absolute', inset: 0, margin: 'auto', width: 88, height: 88, borderRadius: '50%',
                 backgroundColor: COLORS.orange, display: 'flex', alignItems: 'center', justifyContent: 'center',
                 zIndex: 1, boxShadow: `0 0 40px ${COLORS.orange}66`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}><Mic size={32} color="#fff" strokeWidth={1.5} /></div>
             </div>
             <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.orange, animation: 'pulse 1.2s ease infinite', marginBottom: 14, flexShrink: 0 }}>

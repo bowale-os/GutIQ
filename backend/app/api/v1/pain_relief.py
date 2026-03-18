@@ -27,6 +27,7 @@ from app.db import get_session
 from app.models import User
 from app.models.pain_relief import PainReliefChunk, PainReliefFeedback, PainReliefSession
 from app.schemas.pain_relief import (
+    CitationInfo,
     GutCondition,
     PainReliefRequest,
     PainReliefResponse,
@@ -172,12 +173,20 @@ async def pain_relief_session(
     except Exception:
         logger.exception("DB save failed (non-fatal) | session=%s", result.session_id)
 
+    # Top 2 chunks with a real PMID become the citations shown in the UI
+    citations = [
+        CitationInfo(title=c.title, source=c.source, year=c.year, pmid=c.pmid)
+        for c in result.chunks
+        if c.pmid
+    ][:2]
+
     return PainReliefResponse(
         session_id=result.session_id,
         is_red_flag=False,
         condition=result.condition,
-        structured=reply,   # reply is now StructuredRelief
+        structured=reply,
         reply="",
+        citations=citations,
     )
 
 

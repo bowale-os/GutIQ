@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { COLORS } from './constants/colors';
+import { FONTS } from './constants/styles';
 import { currentUser, mockLogs } from './constants/mockData';
 import { isLoggedIn, getStoredUser, storeUser } from './api/client';
 import { fetchRealLogs, apiLogToFrontend } from './api/logs';
@@ -7,6 +8,7 @@ import { getStatus } from './api/onboarding';
 import { getUserData } from './api/user';
 
 import NavBar      from './components/NavBar';
+import Landing     from './screens/Landing';
 import Login       from './screens/Login';
 import Signup      from './screens/Signup';
 import Onboarding  from './screens/Onboarding';
@@ -69,49 +71,116 @@ const GLOBAL_STYLES = `
 
 const AUTH_SCREENS = ['dashboard', 'gutcheck', 'export', 'profile', 'lifestyles', 'pain_relief'];
 
+// ── Non-intrusive demo banner ──────────────────────────────────────────────────
+function DemoBanner({ navigate, onExit }) {
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 72, // sits just above the NavBar
+      left: '50%', transform: 'translateX(-50%)',
+      width: '100%', maxWidth: 480,
+      zIndex: 99,
+      padding: '0 12px',
+      pointerEvents: 'none', // let clicks fall through to app
+    }}>
+      <div style={{
+        backgroundColor: COLORS.darkBg,
+        border: `1px solid rgba(255,255,255,0.10)`,
+        borderRadius: 14,
+        padding: '10px 14px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10,
+        boxShadow: '0 4px 24px rgba(0,0,0,0.25)',
+        pointerEvents: 'auto',
+        animation: 'fadeSlideUp 0.35s ease both',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{
+            width: 6, height: 6, borderRadius: '50%',
+            backgroundColor: COLORS.orange,
+            animation: 'pulse 2s ease infinite',
+            flexShrink: 0,
+          }} />
+          <span style={{
+            fontFamily: FONTS.mono, fontSize: 11,
+            color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em',
+          }}>
+            You're in demo mode. Nothing is saved.
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <button
+            onClick={() => navigate('signup')}
+            style={{
+              backgroundColor: COLORS.orange, color: '#fff',
+              border: 'none', borderRadius: 8,
+              padding: '6px 14px', cursor: 'pointer',
+              fontFamily: FONTS.sans, fontSize: 12, fontWeight: 600,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Create account
+          </button>
+          <button
+            onClick={onExit}
+            style={{
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: 'rgba(255,255,255,0.35)', fontSize: 18, lineHeight: 1,
+              padding: '2px 4px',
+            }}
+            title="Exit demo"
+          >
+            ×
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── App ────────────────────────────────────────────────────────────────────────
 export default function App() {
-  const [currentScreen,  setCurrentScreen]  = useState(() => isLoggedIn() ? 'dashboard' : 'login');
+  const [currentScreen,  setCurrentScreen]  = useState(() => isLoggedIn() ? 'dashboard' : 'landing');
   const [onboardingStep, setOnboardingStep] = useState(1);
   const [logModalOpen,   setLogModalOpen]   = useState(false);
   const [user,           setUser]           = useState(() => {
     if (isLoggedIn()) {
       const stored = getStoredUser();
-      return stored.email ? { ...currentUser, ...stored } : currentUser;
+      return stored.username ? { ...currentUser, ...stored } : currentUser;
     }
     return currentUser;
   });
-  const [demoMode, setDemoMode] = useState(false);
-  const [logs, setLogs] = useState([]);
+  const [demoMode,       setDemoMode]       = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [logs,           setLogs]           = useState([]);
 
   // On mount: fetch real name from backend and update state + localStorage.
   useEffect(() => {
     if (!isLoggedIn()) return;
     getUserData()
       .then(u => {
-        if (u.name) {
+        if (u.name || u.username) {
           const stored = getStoredUser();
-          storeUser(stored.email, stored.userId, u.name, stored.condition);
-          setUser(prev => ({ ...prev, name: u.name }));
+          storeUser(u.username || stored.username, stored.userId, u.name, stored.condition, u.email || '');
+          setUser(prev => ({ ...prev, name: u.name, username: u.username }));
         }
       })
       .catch(() => {});
   }, []);
 
-  // On refresh: re-check onboarding completion so a token-only isLoggedIn()
-  // doesn't skip the onboarding gate when the user hasn't finished it yet.
+  // On refresh: re-check onboarding completion.
   useEffect(() => {
     if (!isLoggedIn()) return;
     getStatus()
       .then(status => { if (!status.is_complete) navigate('onboarding'); })
-      .catch(() => {}); // stay on dashboard if the check fails
+      .catch(() => {});
   }, []);
 
-  // Sync user state whenever we navigate, so storeUser() calls in Login/Signup/
-  // Onboarding are reflected without a reload.
+  // Sync user state on navigation.
   useEffect(() => {
     if (isLoggedIn()) {
       const stored = getStoredUser();
-      if (stored.email) setUser(u => ({ ...u, ...stored }));
+      if (stored.username) setUser(u => ({ ...u, ...stored }));
     }
   }, [currentScreen]);
 
@@ -130,6 +199,18 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
+  const startDemo = () => {
+    setDemoMode(true);
+    setBannerDismissed(false);
+    setOnboardingStep(1);
+    navigate('onboarding');
+  };
+
+  const exitDemo = () => {
+    setDemoMode(false);
+    navigate('landing');
+  };
+
   useEffect(() => {
     document.body.style.overflow = logModalOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -140,24 +221,32 @@ export default function App() {
 
   const renderScreen = () => {
     switch (currentScreen) {
-      case 'login':      return <Login navigate={navigate} onDemo={() => { setDemoMode(true); navigate('dashboard'); }} onLogin={() => setDemoMode(false)} />;
-      case 'signup':     return <Signup navigate={navigate} />;
-      case 'onboarding': return <Onboarding step={onboardingStep} setStep={setOnboardingStep} navigate={navigate} />;
-      case 'dashboard':  return <Dashboard user={user} logs={logs} navigate={navigate} openLog={openLog} />;
-      case 'gutcheck':   return <GutCheck user={user} demoMode={demoMode} />;
-      case 'export':     return <Export user={user} logs={logs} navigate={navigate} />;
-      case 'profile':    return <Profile user={user} navigate={navigate} onUpdate={updated => setUser(u => ({ ...u, ...updated }))} />;
+      case 'landing':     return <Landing navigate={navigate} onDemo={startDemo} />;
+      case 'login':       return <Login navigate={navigate} onLogin={() => setDemoMode(false)} />;
+      case 'signup':      return <Signup navigate={navigate} />;
+      case 'onboarding':  return <Onboarding step={onboardingStep} setStep={setOnboardingStep} navigate={navigate} demoMode={demoMode} />;
+      case 'dashboard':   return <Dashboard user={user} logs={logs} navigate={navigate} openLog={openLog} />;
+      case 'gutcheck':    return <GutCheck user={user} demoMode={demoMode} />;
+      case 'export':      return <Export user={user} logs={logs} navigate={navigate} />;
+      case 'profile':     return <Profile user={user} navigate={navigate} onUpdate={updated => setUser(u => ({ ...u, ...updated }))} />;
       case 'pain_relief': return <PainRelief navigate={navigate} logs={logs} demoMode={demoMode} />;
-      default:            return <Login navigate={navigate} />;
+      default:            return <Landing navigate={navigate} onDemo={startDemo} />;
     }
   };
+
+  const showNav    = AUTH_SCREENS.includes(currentScreen);
+  const showBanner = demoMode && showNav && !bannerDismissed;
 
   return (
     <div style={{ backgroundColor: COLORS.background, minHeight: '100vh' }}>
       <style>{GLOBAL_STYLES}</style>
 
-      {AUTH_SCREENS.includes(currentScreen) && (
-        <NavBar currentScreen={currentScreen} navigate={navigate} onLogClick={openLog} />
+      {showNav && (
+        <NavBar currentScreen={currentScreen} navigate={navigate} onLogClick={openLog} demoMode={demoMode} onExitDemo={exitDemo} />
+      )}
+
+      {showBanner && (
+        <DemoBanner navigate={navigate} onExit={() => setBannerDismissed(true)} />
       )}
 
       <div key={currentScreen} style={{ animation: 'fadeSlideUp 0.3s ease both' }}>

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Mic, MicOff } from 'lucide-react';
+import { Mic, MicOff, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import { COLORS } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { submitPainSession, submitPainFeedback } from '../api/painRelief';
 import { create as createLog } from '../api/logs';
+import { mockCitations } from '../constants/mockData';
 
 // ── Regional emergency numbers ────────────────────────────────────────────────────
 // Detect locale from browser; default to international fallback.
@@ -132,6 +133,81 @@ const MOCK_RELIEF = {
   when_to_seek_care: 'Seek care if pain radiates to your arm or jaw, or if symptoms haven\'t eased after 20 minutes.',
 };
 
+// ── Citation row ──────────────────────────────────────────────────────────────────
+function CitationRow({ citations }) {
+  const [expanded, setExpanded] = useState(false);
+  const top = citations[0];
+  const rest = citations.slice(1);
+
+  const pmidUrl = (pmid) => `https://pubmed.ncbi.nlm.nih.gov/${pmid}/`;
+
+  return (
+    <div style={{ marginBottom: 20, animation: 'fadeIn 0.3s ease both' }}>
+      {/* Collapsed pill */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          backgroundColor: COLORS.tealLight,
+          border: `1px solid ${COLORS.tealBorder}`,
+          borderRadius: 999, padding: '5px 12px 5px 9px',
+          cursor: 'pointer', transition: 'background-color 0.15s ease',
+        }}
+      >
+        <BookOpen size={12} color={COLORS.teal} />
+        <span style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, letterSpacing: '0.07em', textTransform: 'uppercase' }}>
+          Based on research
+        </span>
+        {expanded
+          ? <ChevronUp size={12} color={COLORS.teal} />
+          : <ChevronDown size={12} color={COLORS.teal} />
+        }
+      </button>
+
+      {/* Expanded citations */}
+      {expanded && (
+        <div style={{
+          marginTop: 8,
+          backgroundColor: COLORS.tealLight,
+          border: `1px solid ${COLORS.tealBorder}`,
+          borderRadius: 12, padding: '12px 14px',
+          display: 'flex', flexDirection: 'column', gap: 10,
+          animation: 'fadeSlideUp 0.2s ease both',
+        }}>
+          {[top, ...rest].map((c, i) => (
+            <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+              <span style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, marginTop: 1, flexShrink: 0 }}>
+                [{i + 1}]
+              </span>
+              <div>
+                <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.textSoft, margin: '0 0 2px', lineHeight: 1.4 }}>
+                  {c.title}
+                </p>
+                <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, margin: 0 }}>
+                  {c.source} · {c.year}
+                  {c.pmid && (
+                    <>
+                      {' · '}
+                      <a
+                        href={pmidUrl(c.pmid)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ color: COLORS.teal, textDecoration: 'underline', textUnderlineOffset: 2 }}
+                      >
+                        PMID {c.pmid}
+                      </a>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────────
 export default function PainRelief({ navigate, logs = [], demoMode = false }) {
   const [view, setView] = useState('intake');
@@ -147,6 +223,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
 
   // Relief
   const [structured,        setStructured]       = useState(null);
+  const [citations,         setCitations]        = useState([]);
   const [altIdx,            setAltIdx]           = useState(0);
   const [sessionTimeLeft,   setSessionTimeLeft]  = useState(0);
   const [sessionTotalTime,  setSessionTotalTime] = useState(0);
@@ -230,6 +307,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       await new Promise(r => setTimeout(r, 1800)); // simulate latency
       const totalSecs = MOCK_RELIEF.session_duration_minutes * 60;
       setStructured(MOCK_RELIEF);
+      setCitations(mockCitations);
       setAltIdx(0);
       setSessionTimeLeft(totalSecs);
       setSessionTotalTime(totalSecs);
@@ -258,6 +336,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
 
       const totalSecs = (s.session_duration_minutes || 15) * 60;
       setStructured(s);
+      setCitations(res.citations || []);
       setAltIdx(0);
       setSessionTimeLeft(totalSecs);
       setSessionTotalTime(totalSecs);
@@ -533,6 +612,11 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
         }}>
           {current.instruction}
         </p>
+
+        {/* Citations — small, expandable, below instruction */}
+        {citations.length > 0 && (
+          <CitationRow citations={citations} />
+        )}
 
         {/* Maintain + Avoid — whisper level, not advice */}
         {(structured.maintain?.length > 0 || structured.avoid?.length > 0) && (

@@ -1,13 +1,15 @@
 export const currentUser = {
-  name: 'Daniela Mosquera',
+  username: 'gut_warrior',
+  name: 'Alex',
   condition: 'GERD',
-  streak: 4,
-  initials: 'DM',
+  streak: 11,
+  initials: 'AX',
 };
 
+// Dates cover the last 14 days (Mar 3 – Mar 16, 2026)
 export const mockLogs = [
   {
-    date: 'Feb 19',
+    date: 'Mar 3',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'pizza'],
     parsed_symptoms: ['heartburn'],
@@ -15,11 +17,11 @@ export const mockLogs = [
     parsed_stress: 'high',
     parsed_sleep: 5,
     parsed_exercise: null,
-    natural_summary: 'Heartburn after dinner, stressed about work deadline',
+    natural_summary: 'Heartburn after dinner, stressed about a work deadline',
     confidence: 'high',
   },
   {
-    date: 'Feb 20',
+    date: 'Mar 4',
     log_categories: ['food', 'symptom', 'sleep'],
     parsed_foods: ['oatmeal', 'salad', 'chicken'],
     parsed_symptoms: [],
@@ -31,7 +33,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 21',
+    date: 'Mar 5',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'burger', 'soda'],
     parsed_symptoms: ['heartburn', 'bloating'],
@@ -43,7 +45,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 22',
+    date: 'Mar 6',
     log_categories: ['food', 'symptom', 'sleep', 'exercise'],
     parsed_foods: ['yogurt', 'grilled fish', 'vegetables'],
     parsed_symptoms: [],
@@ -55,7 +57,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 23',
+    date: 'Mar 7',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'pasta', 'wine'],
     parsed_symptoms: ['heartburn'],
@@ -67,9 +69,9 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 24',
+    date: 'Mar 8',
     log_categories: ['food', 'symptom', 'sleep'],
-    parsed_foods: ['tea', 'soup', 'bread'],
+    parsed_foods: ['herbal tea', 'soup', 'bread'],
     parsed_symptoms: ['bloating'],
     parsed_severity: 4,
     parsed_stress: 'low',
@@ -79,11 +81,11 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 25',
+    date: 'Mar 9',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'spicy food', 'beer'],
-    parsed_symptoms: ['heartburn', 'chest pain'],
-    parsed_severity: 8,
+    parsed_symptoms: ['heartburn', 'bloating'],
+    parsed_severity: 9,
     parsed_stress: 'high',
     parsed_sleep: 4,
     parsed_exercise: null,
@@ -91,11 +93,11 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 26',
+    date: 'Mar 10',
     log_categories: ['food', 'symptom', 'sleep', 'exercise'],
     parsed_foods: ['herbal tea', 'rice', 'steamed vegetables'],
     parsed_symptoms: [],
-    parsed_severity: 3,
+    parsed_severity: 2,
     parsed_stress: 'low',
     parsed_sleep: 8,
     parsed_exercise: 'light',
@@ -103,7 +105,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 27',
+    date: 'Mar 11',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'sandwich', 'chips'],
     parsed_symptoms: ['heartburn'],
@@ -115,7 +117,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Feb 28',
+    date: 'Mar 12',
     log_categories: ['food', 'symptom', 'sleep', 'exercise'],
     parsed_foods: ['oatmeal', 'banana', 'water'],
     parsed_symptoms: [],
@@ -127,7 +129,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Mar 1',
+    date: 'Mar 13',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'pizza', 'soda'],
     parsed_symptoms: ['heartburn', 'bloating'],
@@ -139,7 +141,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Mar 2',
+    date: 'Mar 14',
     log_categories: ['food', 'symptom', 'sleep', 'exercise'],
     parsed_foods: ['herbal tea', 'salad', 'chicken'],
     parsed_symptoms: [],
@@ -147,11 +149,11 @@ export const mockLogs = [
     parsed_stress: 'low',
     parsed_sleep: 8,
     parsed_exercise: 'moderate',
-    natural_summary: 'Best day in weeks, everything dialed in',
+    natural_summary: 'Best day in two weeks, everything dialed in',
     confidence: 'high',
   },
   {
-    date: 'Mar 3',
+    date: 'Mar 15',
     log_categories: ['food', 'symptom', 'sleep'],
     parsed_foods: ['coffee', 'toast', 'soup'],
     parsed_symptoms: ['heartburn'],
@@ -163,7 +165,7 @@ export const mockLogs = [
     confidence: 'high',
   },
   {
-    date: 'Mar 4',
+    date: 'Mar 16',
     log_categories: ['food', 'symptom', 'stress', 'sleep'],
     parsed_foods: ['coffee', 'takeout', 'dessert'],
     parsed_symptoms: ['heartburn', 'bloating'],
@@ -213,16 +215,32 @@ export const mockConversationHistory = [
   {
     id: 1,
     question: "Why was last week so bad?",
-    answer: "Your three worst days last week all had coffee in the morning and under 5 hours sleep the night before. On your two good days, you had neither. Coffee alone raises your average pain level from 2.1 to 5.8, but combined with poor sleep it jumps to 7.2.",
-    timestamp: "Mar 4, 8:32pm",
-    tools_used: ["query_logs", "correlate", "fetch_research"],
+    answer: "Your three worst days (Mar 5, Mar 9, Mar 13) all had coffee in the morning and under 5 hours sleep the night before. On your five good days you had neither. Coffee alone raises your average pain level from 2.1 to 5.8, but combined with poor sleep it jumps to 7.8.",
+    timestamp: "Mar 16, 8:32 PM",
+    tools_used: ["query_logs", "fetch_research"],
   },
   {
     id: 2,
     question: "Is stress making things worse?",
-    answer: "Yes, significantly. On high-stress days your average pain level is 7.2 versus 2.8 on low-stress days. That is your strongest single predictor, even stronger than coffee. The gut-brain axis research backs this up directly.",
-    timestamp: "Mar 3, 9:14pm",
-    tools_used: ["correlate", "fetch_research"],
+    answer: "Yes, significantly. On high-stress days your average pain level is 7.2 versus 2.8 on low-stress days. That is your strongest single predictor, even stronger than coffee alone. The gut-brain axis research backs this up directly.",
+    timestamp: "Mar 15, 9:14 PM",
+    tools_used: ["query_logs", "fetch_research"],
+  },
+];
+
+// Mock citations for Pain Relief demo — mirrors what the real RAG pipeline returns
+export const mockCitations = [
+  {
+    title: 'Effect of head-of-bed elevation in patients with nocturnal gastroesophageal reflux',
+    source: 'Journal of Gastroenterology and Hepatology',
+    year: '2012',
+    pmid: '22067111',
+  },
+  {
+    title: 'Chewing sugar-free gum reduces postprandial acid exposure in healthy volunteers',
+    source: 'Gut (BMJ)',
+    year: '2005',
+    pmid: '15831918',
   },
 ];
 

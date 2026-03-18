@@ -40,6 +40,8 @@ async def complete_onboarding(
     user_db.digestive_condition = data.digestive_condition
     user_db.goal = data.goal
     user_db.age_range = data.age_range
+    if data.reminder_time:    user_db.reminder_time    = data.reminder_time
+    if data.reminder_channel: user_db.reminder_channel = data.reminder_channel
     
     await session.commit()
     await session.refresh(user_db)
