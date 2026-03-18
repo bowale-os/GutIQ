@@ -96,7 +96,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
   if (logs.length === 0) return (
     <div style={{ ...STYLES.page, paddingBottom: 90 }}>
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '32px 20px 0' }}>
-        <h1 style={{ fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 8 }}>
+        <h1 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(24px, 7vw, 32px)', color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 8 }}>
           Hi, {user.name?.split(' ')[0] ?? 'there'}
         </h1>
         <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted, marginBottom: 32 }}>
@@ -159,7 +159,7 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
           <div>
-            <h1 style={{ fontFamily: FONTS.serif, fontSize: 32, color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 4 }}>
+            <h1 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(24px, 7vw, 32px)', color: COLORS.text, letterSpacing: '-0.01em', marginBottom: 4 }}>
               Hi, {user.name?.split(' ')[0] ?? 'there'}
             </h1>
           </div>

@@ -217,7 +217,7 @@ export default function Onboarding({ step, setStep, navigate, demoMode = false }
 
   return (
     <div style={{ ...STYLES.page }}>
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '48px 24px 100px' }}>
+      <div style={{ maxWidth: 480, margin: '0 auto', padding: 'clamp(28px, 7vh, 48px) 20px 100px' }}>
 
         <StepIndicator current={step} total={3} />
 
@@ -227,7 +227,7 @@ export default function Onboarding({ step, setStep, navigate, demoMode = false }
             <p style={{ ...STYLES.label, marginBottom: 6 }}>
               {demoMode ? 'Demo mode · ' : ''}Hi{displayName ? `, ${displayName}` : ''}. I'm Tiwa.
             </p>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 24 }}>What are you managing?</h1>
+            <h1 style={{ ...STYLES.h1, fontSize: 'clamp(22px, 6vw, 28px)', marginBottom: 24 }}>What are you managing?</h1>
             {CONDITIONS.map(c => (
               <ConditionCard
                 key={c.id} {...c}
@@ -260,7 +260,7 @@ export default function Onboarding({ step, setStep, navigate, demoMode = false }
         {step === 2 && (
           <div key="step2" style={{ animation: 'fadeSlideUp 0.3s ease' }}>
             <p style={{ ...STYLES.label, marginBottom: 6 }}>Almost there.</p>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 6 }}>Help Tiwa understand your context.</h1>
+            <h1 style={{ ...STYLES.h1, fontSize: 'clamp(22px, 6vw, 28px)', marginBottom: 6 }}>Help Tiwa understand your context.</h1>
             <p style={{ ...STYLES.muted, marginBottom: 28 }}>This helps personalise your insights over time.</p>
 
             <p style={{ ...STYLES.label, marginBottom: 10 }}>Age range</p>
@@ -291,7 +291,7 @@ export default function Onboarding({ step, setStep, navigate, demoMode = false }
         {step === 3 && (
           <div key="step3" style={{ animation: 'fadeSlideUp 0.3s ease' }}>
             <p style={{ ...STYLES.label, marginBottom: 6 }}>One last thing.</p>
-            <h1 style={{ ...STYLES.h1, fontSize: 28, marginBottom: 6 }}>
+            <h1 style={{ ...STYLES.h1, fontSize: 'clamp(22px, 6vw, 28px)', marginBottom: 6 }}>
               When do you want to log each day?
             </h1>
             <p style={{ ...STYLES.muted, marginBottom: 28 }}>
@@ -328,7 +328,7 @@ export default function Onboarding({ step, setStep, navigate, demoMode = false }
                 style={{
                   width: '100%', border: 'none', outline: 'none',
                   backgroundColor: 'transparent',
-                  fontFamily: FONTS.mono, fontSize: 30, fontWeight: 500,
+                  fontFamily: FONTS.mono, fontSize: 'clamp(22px, 7vw, 30px)', fontWeight: 500,
                   color: reminderTime ? COLORS.teal : COLORS.text,
                   letterSpacing: '0.04em',
                   caretColor: COLORS.teal,

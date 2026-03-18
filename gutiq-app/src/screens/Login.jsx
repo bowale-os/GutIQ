@@ -46,8 +46,8 @@ export default function Login({ navigate, onDemo, onLogin }) {
       {/* Logo + tagline */}
       <div style={{ textAlign: 'center', marginBottom: 40 }}>
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: 2, marginBottom: 12 }}>
-          <span style={{ fontFamily: FONTS.serif, fontSize: 54, color: COLORS.text, letterSpacing: '-0.02em', lineHeight: 1 }}>Gut</span>
-          <span style={{ fontFamily: FONTS.serif, fontSize: 54, color: COLORS.orange, letterSpacing: '-0.02em', lineHeight: 1 }}>IQ</span>
+          <span style={{ fontFamily: FONTS.serif, fontSize: 'clamp(38px, 12vw, 54px)', color: COLORS.text, letterSpacing: '-0.02em', lineHeight: 1 }}>Gut</span>
+          <span style={{ fontFamily: FONTS.serif, fontSize: 'clamp(38px, 12vw, 54px)', color: COLORS.orange, letterSpacing: '-0.02em', lineHeight: 1 }}>IQ</span>
         </div>
         <p style={{ fontFamily: FONTS.sans, fontSize: 15, color: COLORS.muted, lineHeight: 1.6 }}>
           Understand your gut.<br />One voice note a day.
@@ -55,7 +55,7 @@ export default function Login({ navigate, onDemo, onLogin }) {
       </div>
 
       {/* Form card */}
-      <div style={{ ...STYLES.card, padding: '28px 24px' }}>
+      <div style={{ ...STYLES.card, padding: 'clamp(18px, 4vw, 28px) clamp(16px, 4vw, 24px)' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
             <p style={{ ...STYLES.label, marginBottom: 6 }}>Username or email</p>

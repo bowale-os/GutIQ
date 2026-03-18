@@ -471,7 +471,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
               disabled={!rawContent.trim()}
               style={{ ...STYLES.btnPrimary, opacity: rawContent.trim() ? 1 : 0.4, marginBottom: 8 }}
             >
-              Parse →
+              Continue →
             </button>
           </div>
         );
@@ -801,8 +801,8 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
 
   const showX = !['saving', 'saved'].includes(phase);
   const headerContent = {
-    idle: <h2 style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400 }}>Log today</h2>,
-    capturing: source === 'text' ? <h2 style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400 }}>Log today</h2> : <span />,
+    idle: <h2 style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400 }}>Tell me about it...</h2>,
+    capturing: source === 'text' ? <h2 style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400 }}>Tell me about it...</h2> : <span />,
     previewing: <span />,
     reviewing: <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.1em' }}>REVIEW</p>,
     editing: <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.1em' }}>ADJUSTING</p>,

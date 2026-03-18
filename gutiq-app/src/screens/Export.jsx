@@ -293,10 +293,16 @@ function Section({ title, children, style }) {
 
 function StatCard({ label, value, sub, accentColor }) {
   return (
-    <div style={{ ...STYLES.cardSmall, flex: 1, minWidth: 80, textAlign: 'center' }}>
-      <p style={{ ...STYLES.label, marginBottom: 6, fontSize: 9 }}>{label}</p>
-      <p style={{ margin: 0, fontFamily: FONTS.mono, fontSize: 22, fontWeight: 700, color: accentColor || COLORS.text, lineHeight: 1 }}>{value}</p>
-      {sub && <p style={{ margin: '4px 0 0', fontFamily: FONTS.mono, fontSize: 9, color: COLORS.mutedLight }}>{sub}</p>}
+    <div style={{
+      ...STYLES.cardSmall, flex: '1 1 60px', minWidth: 60,
+      padding: '10px 8px 8px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      justifyContent: 'space-between', textAlign: 'center',
+      minHeight: 80,
+    }}>
+      <p style={{ ...STYLES.label, fontSize: 8, letterSpacing: '0.06em', margin: 0 }}>{label}</p>
+      <p style={{ margin: '6px 0', fontFamily: FONTS.mono, fontSize: 'clamp(14px, 4.5vw, 20px)', fontWeight: 700, color: accentColor || COLORS.text, lineHeight: 1 }}>{value}</p>
+      {sub && <p style={{ margin: 0, fontFamily: FONTS.mono, fontSize: 8, color: COLORS.mutedLight, lineHeight: 1.3 }}>{sub}</p>}
     </div>
   );
 }
@@ -322,7 +328,7 @@ function TrendBar({ label, avg }) {
   const color = avg != null ? getSeverityColor(avg) : COLORS.mutedLight;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '6px 0' }}>
-      <p style={{ margin: 0, fontFamily: FONTS.mono, fontSize: 10, color: COLORS.muted, width: 88, flexShrink: 0 }}>{label}</p>
+      <p style={{ margin: 0, fontFamily: FONTS.mono, fontSize: 9, color: COLORS.muted, width: 'clamp(68px, 22vw, 88px)', flexShrink: 0 }}>{label}</p>
       <div style={{ flex: 1, height: 8, backgroundColor: COLORS.surfaceAlt, borderRadius: 4, overflow: 'hidden' }}>
         {avg != null && <div style={{ width: `${pct}%`, height: '100%', backgroundColor: color, borderRadius: 4, transition: 'width 0.6s cubic-bezier(0.34,1.56,0.64,1)' }} />}
       </div>
@@ -403,7 +409,7 @@ export default function Export({ user, logs }) {
         {/* ── Header ── */}
         <div style={{ padding: '24px 0 20px', borderBottom: `1px solid ${COLORS.border}`, marginBottom: 24 }}>
           <p style={{ ...STYLES.label, margin: '0 0 6px' }}>GutIQ · Doctor Export</p>
-          <h1 style={{ ...STYLES.h1, fontSize: 26, margin: '0 0 4px' }}>{user.name}</h1>
+          <h1 style={{ ...STYLES.h1, fontSize: 'clamp(20px, 6vw, 26px)', margin: '0 0 4px' }}>{user.name}</h1>
           <p style={{ margin: 0, fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted }}>
             {user.digestive_condition || user.condition || 'Condition not set'} · {dateRange} · Generated {generatedDate}
           </p>
@@ -411,7 +417,7 @@ export default function Export({ user, logs }) {
 
         {/* ── Stats ── */}
         <Section title="Summary">
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'nowrap' }}>
             <StatCard label="AVG PAIN LEVEL" value={stats.avg != null ? `${stats.avg.toFixed(1)}/10` : '—'} sub="14-day mean" accentColor={stats.avg != null ? getSeverityColor(stats.avg) : undefined} />
             <StatCard label="HIGH PAIN DAYS" value={stats.highDays} sub="pain level 6 or above" accentColor={stats.highDays > 0 ? COLORS.danger : undefined} />
             <StatCard label="TRACKING"       value={`${stats.daysLogged}/14`} sub="days recorded" />

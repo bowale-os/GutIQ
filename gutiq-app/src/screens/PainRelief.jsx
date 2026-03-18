@@ -411,7 +411,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 6 }}>
         Tiwa · Pain Relief
       </p>
-      <h1 style={{ fontFamily: FONTS.serif, fontSize: 28, color: COLORS.text, lineHeight: 1.25, marginBottom: 6 }}>
+      <h1 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(22px, 6vw, 28px)', color: COLORS.text, lineHeight: 1.25, marginBottom: 6 }}>
         Let me help you through this.
       </h1>
       <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted, lineHeight: 1.5, marginBottom: 28 }}>
@@ -440,7 +440,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       <div style={{ ...STYLES.card, padding: '18px 20px', marginBottom: 16 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
           <p style={STYLES.label}>How bad is it?</p>
-          <span style={{ fontFamily: FONTS.mono, fontSize: 28, fontWeight: 500, color: COLORS.teal, lineHeight: 1 }}>
+          <span style={{ fontFamily: FONTS.mono, fontSize: 'clamp(22px, 6vw, 28px)', fontWeight: 500, color: COLORS.teal, lineHeight: 1 }}>
             {intensity}<span style={{ fontSize: 13, color: COLORS.muted, fontWeight: 400 }}>/10</span>
           </span>
         </div>
@@ -597,7 +597,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
 
         {/* Action title */}
         <h1 style={{
-          fontFamily: FONTS.serif, fontSize: 34, color: COLORS.text,
+          fontFamily: FONTS.serif, fontSize: 'clamp(26px, 8vw, 34px)', color: COLORS.text,
           lineHeight: 1.2, marginBottom: 14, textAlign: 'center',
           animation: 'fadeSlideUp 0.35s ease both',
         }}>

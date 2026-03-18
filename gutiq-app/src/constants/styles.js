@@ -17,7 +17,7 @@ export const STYLES = {
   centeredAuth: {
     maxWidth: 420,
     margin: '0 auto',
-    padding: '60px 24px 40px',
+    padding: 'clamp(32px, 8vh, 60px) 20px 40px',
     minHeight: '100vh',
     display: 'flex',
     flexDirection: 'column',
@@ -94,7 +94,7 @@ export const STYLES = {
   // ── Typography ────────────────────────────────────────
   h1: {
     fontFamily: FONTS.serif,
-    fontSize: 36,
+    fontSize: 'clamp(26px, 7vw, 36px)',
     fontWeight: 400,
     color: COLORS.text,
     lineHeight: 1.2,
@@ -102,7 +102,7 @@ export const STYLES = {
   },
   h2: {
     fontFamily: FONTS.serif,
-    fontSize: 28,
+    fontSize: 'clamp(22px, 6vw, 28px)',
     fontWeight: 400,
     color: COLORS.text,
     lineHeight: 1.25,
