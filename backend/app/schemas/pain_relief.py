@@ -155,6 +155,14 @@ class StructuredRelief(BaseModel):
     when_to_seek_care:        str
 
 
+class CitationInfo(BaseModel):
+    """A single source citation surfaced to the frontend."""
+    title:  str
+    source: str   # journal name, "NHS", "PubMed", etc.
+    year:   str
+    pmid:   str   # empty string when not a PubMed source
+
+
 class PainReliefResponse(BaseModel):
     """Returned to the frontend after the full pipeline completes."""
     session_id:      str
@@ -163,3 +171,4 @@ class PainReliefResponse(BaseModel):
     condition:       GutCondition | None = None
     structured:      StructuredRelief | None = None
     reply:           str  # red flag message only; empty string on normal response
+    citations:       list[CitationInfo] = []

@@ -11,20 +11,20 @@
 
 /**
  * @typedef {Object} UserCreateRequest
- * @property {string} name        - 2–50 chars
- * @property {string} email
- * @property {string} password    - min 8 chars
+ * @property {string}      username  - 3–30 chars, letters/numbers/underscores
+ * @property {string|null} email     - optional
+ * @property {string}      password  - min 8 chars
  */
-export const makeUserCreateRequest = (name = '', email = '', password = '') =>
-  ({ name, email, password });
+export const makeUserCreateRequest = (username = '', password = '', email = null) =>
+  ({ username, password, ...(email ? { email } : {}) });
 
 /**
  * @typedef {Object} LogInRequest
- * @property {string} email
+ * @property {string} identifier - username or email
  * @property {string} password
  */
-export const makeLogInRequest = (email = '', password = '') =>
-  ({ email, password });
+export const makeLogInRequest = (identifier = '', password = '') =>
+  ({ identifier, password });
 
 /**
  * @typedef {Object} TokenResponse
@@ -59,7 +59,15 @@ export const makeOnboardingCompleteRequest = (
   digestive_condition = '',
   goal = '',
   age_range = '',
-) => ({ digestive_condition, goal, age_range });
+  reminder_time = null,
+  reminder_channel = null,
+) => ({
+  digestive_condition,
+  goal,
+  age_range,
+  ...(reminder_time    ? { reminder_time }    : {}),
+  ...(reminder_channel ? { reminder_channel } : {}),
+});
 
 /**
  * @typedef {Object} OnboardingStatusResponse
@@ -237,6 +245,7 @@ export const makeUserUpdateRequest = ({
  * @property {string}      updated_at   - ISO datetime
  */
 export const parseUserUpdateResponse = (raw = {}) => ({
+  username:            raw.username            ?? '',
   name:                raw.name                ?? '',
   email:               raw.email               ?? '',
   digestive_condition: raw.digestive_condition  ?? null,

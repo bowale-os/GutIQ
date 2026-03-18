@@ -7,25 +7,25 @@ import { getUserData } from '../api/user';
 import { setToken, storeUser } from '../api/client';
 
 export default function Login({ navigate, onDemo, onLogin }) {
-  const [email,    setEmail]    = useState('');
-  const [password, setPassword] = useState('');
-  const [error,    setError]    = useState('');
-  const [loading,  setLoading]  = useState(false);
-  const [focused,  setFocused]  = useState('');
+  const [identifier, setIdentifier] = useState('');
+  const [password,   setPassword]   = useState('');
+  const [error,      setError]      = useState('');
+  const [loading,    setLoading]    = useState(false);
+  const [focused,    setFocused]    = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email.includes('@') || password.length < 6) {
-      setError('Invalid email or password (min 6 characters).');
+    if (!identifier.trim() || password.length < 6) {
+      setError('Enter your username or email, and password (min 6 characters).');
       return;
     }
     setLoading(true);
     try {
-      const data = await login(email, password);
+      const data = await login(identifier.trim(), password);
       setToken(data.access_token);
-      storeUser(email, data.user_id);
-      try { const u = await getUserData(); if (u.name) storeUser(email, data.user_id, u.name); } catch {}
+      storeUser(identifier.trim(), data.user_id);
+      try { const u = await getUserData(); if (u.name || u.username) storeUser(u.username || identifier.trim(), data.user_id, u.name, '', u.email || ''); } catch {}
       onLogin?.();
       try {
         const status = await getStatus();
@@ -58,15 +58,17 @@ export default function Login({ navigate, onDemo, onLogin }) {
       <div style={{ ...STYLES.card, padding: '28px 24px' }}>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div>
-            <p style={{ ...STYLES.label, marginBottom: 6 }}>Email</p>
+            <p style={{ ...STYLES.label, marginBottom: 6 }}>Username or email</p>
             <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              onFocus={() => setFocused('email')}
+              type="text"
+              value={identifier}
+              onChange={e => setIdentifier(e.target.value)}
+              onFocus={() => setFocused('identifier')}
               onBlur={() => setFocused('')}
-              placeholder="you@example.com"
-              style={{ ...STYLES.input, borderColor: focused === 'email' ? COLORS.orange : COLORS.border }}
+              placeholder="your_username"
+              autoCapitalize="none"
+              autoCorrect="off"
+              style={{ ...STYLES.input, borderColor: focused === 'identifier' ? COLORS.orange : COLORS.border }}
             />
           </div>
           <div>
@@ -107,8 +109,8 @@ export default function Login({ navigate, onDemo, onLogin }) {
         </button>
       </p>
       <p style={{ textAlign: 'center', marginTop: 14 }}>
-        <button onClick={onDemo} style={{ background: 'none', border: 'none', cursor: 'pointer', color: COLORS.mutedLight, fontSize: 12, fontFamily: FONTS.mono, letterSpacing: '0.04em', textDecoration: 'underline', textUnderlineOffset: 3 }}>
-          skip to demo →
+        <button onClick={() => navigate('landing')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: COLORS.mutedLight, fontSize: 12, fontFamily: FONTS.mono, letterSpacing: '0.04em', textDecoration: 'underline', textUnderlineOffset: 3 }}>
+          ← back to home
         </button>
       </p>
     </div>

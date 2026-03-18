@@ -10,14 +10,19 @@ class User(SQLModel, table=True):
     __tablename__ = "users"
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str
-    email: str = Field(index=True, unique=True)
+    username: str = Field(index=True, unique=True)
+    name: Optional[str] = Field(default=None)
+    email: Optional[str] = Field(default=None, index=True, unique=True)
     hashed_password: str
     digestive_condition: Optional[str] = Field(default=None, index=True)
     goal: Optional[str] = Field(default=None)
     age_range: Optional[str] = Field(default=None)  # e.g., "Under 20", "20-30", "30-40", "40-50", "50+"
     
     
+    # ── Reminders ────────────────────────────────────────────────────────────
+    reminder_time:    Optional[str] = Field(default=None)  # "08:00" (24-hr, user's local time)
+    reminder_channel: Optional[str] = Field(default=None)  # "email" | "push" | "none"
+
     # ── GutCheck health profile ───────────────────────────────────────────────
     # Compact Claude-generated summary of all the user's logs.
     # Regenerated in the background every 5 new logs (see gut_check_profile.py).

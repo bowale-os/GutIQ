@@ -8,7 +8,7 @@ const TABS = [
   { id: 'profile',   icon: '○',  label: 'Profile'  },
 ];
 
-export default function NavBar({ currentScreen, navigate, onLogClick }) {
+export default function NavBar({ currentScreen, navigate, onLogClick, demoMode, onExitDemo }) {
   return (
     <nav style={{
       position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 100,
@@ -62,8 +62,27 @@ export default function NavBar({ currentScreen, navigate, onLogClick }) {
         </button>
       </div>
 
-      {/* Right tabs: Export, Profile */}
+      {/* Right tabs: Export + Profile (or Exit demo) */}
       {TABS.slice(2).map(tab => {
+        if (tab.id === 'profile' && demoMode) {
+          return (
+            <button
+              key="exit-demo"
+              onClick={onExitDemo}
+              style={{
+                flex: 1, background: 'none', border: 'none', cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                padding: '8px 0',
+              }}
+            >
+              <span style={{ fontSize: 18, lineHeight: 1, color: COLORS.orange }}>✕</span>
+              <span style={{
+                fontFamily: FONTS.sans, fontSize: 10, fontWeight: 600,
+                color: COLORS.orange, letterSpacing: '0.03em',
+              }}>Exit demo</span>
+            </button>
+          );
+        }
         const active = currentScreen === tab.id;
         return (
           <button

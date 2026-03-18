@@ -7,24 +7,26 @@ export const setToken       = (t) => localStorage.setItem('gutiq_token', t);
 export const clearToken     = () => localStorage.removeItem('gutiq_token');
 export const isLoggedIn     = () => !!getToken();
 
-export const storeUser = (email, userId = '', name = '', condition = '') => {
-  localStorage.setItem('gutiq_email', email);
+export const storeUser = (username, userId = '', name = '', condition = '', email = '') => {
+  localStorage.setItem('gutiq_username', username);
   if (userId)    localStorage.setItem('gutiq_user_id', userId);
   if (name)      localStorage.setItem('gutiq_name', name);
   if (condition) localStorage.setItem('gutiq_condition', condition);
+  if (email)     localStorage.setItem('gutiq_email', email);
 };
 
 export const getStoredUser = () => {
-  const email     = localStorage.getItem('gutiq_email') || '';
+  const username  = localStorage.getItem('gutiq_username') || '';
   const userId    = localStorage.getItem('gutiq_user_id') || '';
   const condition = localStorage.getItem('gutiq_condition') || 'GERD';
   const stored    = localStorage.getItem('gutiq_name') || '';
-  const name      = stored || email.split('@')[0].replace(/[._-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) || 'User';
-  return { email, userId, condition, name };
+  const name      = stored || username || 'User';
+  const email     = localStorage.getItem('gutiq_email') || '';
+  return { username, userId, condition, name, email };
 };
 
 export const clearStoredUser = () => {
-  ['gutiq_token', 'gutiq_email', 'gutiq_user_id', 'gutiq_name', 'gutiq_condition'].forEach(k => localStorage.removeItem(k));
+  ['gutiq_token', 'gutiq_username', 'gutiq_user_id', 'gutiq_name', 'gutiq_condition', 'gutiq_email'].forEach(k => localStorage.removeItem(k));
 };
 
 // ── Shared headers ─────────────────────────────────────────────────────────────
