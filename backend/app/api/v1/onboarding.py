@@ -15,13 +15,12 @@ async def get_onboarding_status(
 ):
     """Check if user needs onboarding (missing fields)"""
 
-    complete = bool(current_user.digestive_condition and current_user.goal and current_user.age_range)
+    complete = bool(current_user.digestive_condition and current_user.goal)
     response = OnboardingStatusResponse(
         is_complete = complete,
         missing={
             "digestive_condition": not current_user.digestive_condition,
             "goal": not current_user.goal,
-            "age_range": not current_user.age_range
         }
     )
     return response
@@ -39,9 +38,13 @@ async def complete_onboarding(
     # Safe direct assignment (validated by Pydantic)
     user_db.digestive_condition = data.digestive_condition
     user_db.goal = data.goal
-    user_db.age_range = data.age_range
-    if data.reminder_time:    user_db.reminder_time    = data.reminder_time
-    if data.reminder_channel: user_db.reminder_channel = data.reminder_channel
+    if data.age_range:        user_db.age_range        = data.age_range
+    if data.reminder_time:     user_db.reminder_time     = data.reminder_time
+    if data.reminder_channel:  user_db.reminder_channel  = data.reminder_channel
+    if data.reminder_timezone: user_db.reminder_timezone = data.reminder_timezone
+    if data.preferred_name:   user_db.name             = data.preferred_name
+    if data.medications:      user_db.medications      = data.medications
+    if data.dietary_protocol: user_db.dietary_protocol = data.dietary_protocol
     
     await session.commit()
     await session.refresh(user_db)

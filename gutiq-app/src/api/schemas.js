@@ -42,8 +42,20 @@ export const parseTokenResponse = (raw = {}) => ({
 // ONBOARDING  (backend: schemas/onboarding.py)
 // ══════════════════════════════════════════════════════════════════════════════
 
-/** @type {readonly string[]} */
-export const DIGESTIVE_CONDITIONS = /** @type {const} */ (['GERD', 'IBS', "Crohn's Disease", 'Ulcerative Colitis', 'Celiac Disease', 'Other']);
+/** @type {readonly string[]} — mirrors CONDITIONS labels in onboarding/constants.js */
+export const DIGESTIVE_CONDITIONS = /** @type {const} */ ([
+  'GERD / Acid Reflux',
+  'IBS (Irritable Bowel Syndrome)',
+  'Lactose Intolerance',
+  'Chronic Constipation',
+  'Functional Dyspepsia',
+  'H. pylori (Helicobacter pylori)',
+  'Peptic Ulcer Disease',
+  'Celiac Disease',
+  'Ulcerative Colitis',
+  "Crohn's Disease",
+  'undiagnosed',
+]);
 
 /** @type {readonly string[]} */
 export const AGE_RANGES = /** @type {const} */ (['Under 25', '25–40', '41–60', '60+']);
@@ -58,16 +70,28 @@ export const AGE_RANGES = /** @type {const} */ (['Under 25', '25–40', '41–60
 export const makeOnboardingCompleteRequest = (
   digestive_condition = '',
   goal = '',
-  age_range = '',
+  age_range = null,
   reminder_time = null,
   reminder_channel = null,
-) => ({
-  digestive_condition,
-  goal,
-  age_range,
-  ...(reminder_time    ? { reminder_time }    : {}),
-  ...(reminder_channel ? { reminder_channel } : {}),
-});
+  preferred_name = null,
+  medications = null,
+  dietary_protocol = null,
+) => {
+  const reminder_timezone = reminder_time
+    ? Intl.DateTimeFormat().resolvedOptions().timeZone
+    : null;
+  return {
+    digestive_condition,
+    goal,
+    ...(age_range          ? { age_range }          : {}),
+    ...(reminder_time      ? { reminder_time }      : {}),
+    ...(reminder_channel   ? { reminder_channel }   : {}),
+    ...(reminder_timezone  ? { reminder_timezone }  : {}),
+    ...(preferred_name     ? { preferred_name }     : {}),
+    ...(medications        ? { medications }        : {}),
+    ...(dietary_protocol   ? { dietary_protocol }   : {}),
+  };
+};
 
 /**
  * @typedef {Object} OnboardingStatusResponse

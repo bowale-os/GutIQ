@@ -50,6 +50,7 @@ TOP_K           = 6   # chunks returned per query
 # Checked before any retrieval. If triggered, skip Qdrant entirely.
 
 _RED_FLAG_PATTERNS: list[tuple[str, str]] = [
+    # ── original ──────────────────────────────────────────────────────────────
     ("sudden severe",        "Sudden severe pain can indicate a serious condition."),
     ("worst pain",           "Worst-ever pain requires immediate medical evaluation."),
     ("rigid abdomen",        "Abdominal rigidity may indicate a surgical emergency."),
@@ -62,6 +63,23 @@ _RED_FLAG_PATTERNS: list[tuple[str, str]] = [
     ("difficulty breathing", "Difficulty breathing requires emergency care."),
     ("high fever",           "Fever with abdominal pain may indicate infection or inflammation."),
     ("jaundice",             "Yellowing skin with abdominal pain requires urgent evaluation."),
+    # ── expanded ──────────────────────────────────────────────────────────────
+    ("can't move",           "Inability to move due to pain requires emergency care."),
+    ("cannot move",          "Inability to move due to pain requires emergency care."),
+    ("barely move",          "Inability to move due to pain requires emergency care."),
+    ("doubled over",         "Severe pain causing inability to stand requires evaluation."),
+    ("shoulder tip",         "Shoulder tip pain with abdominal symptoms may indicate a biliary emergency."),
+    ("black stool",          "Black or tarry stools may indicate internal bleeding."),
+    ("tarry stool",          "Black or tarry stools may indicate internal bleeding."),
+    ("coffee ground",        "Coffee-ground vomit may indicate internal bleeding."),
+    ("feel faint",           "Fainting with abdominal pain requires immediate evaluation."),
+    ("feeling faint",        "Fainting with abdominal pain requires immediate evaluation."),
+    ("passed out",           "Loss of consciousness with abdominal pain requires emergency care."),
+    ("rigid",                "Abdominal rigidity may indicate a surgical emergency."),
+    ("rebound",              "Rebound tenderness may indicate a surgical emergency."),
+    ("out of nowhere",       "Sudden-onset pain requires immediate medical evaluation."),
+    ("hit me suddenly",      "Sudden-onset pain requires immediate medical evaluation."),
+    ("came on suddenly",     "Sudden-onset pain requires immediate medical evaluation."),
 ]
 
 # Lower-right anterior + intensity ≥ this threshold → possible appendicitis
@@ -73,24 +91,24 @@ _APPENDIX_INTENSITY_THRESHOLD = 6
 # subsequent entries are secondary candidates (score 1.0 each).
 
 _ANTERIOR_MAP: dict[AnteriorRegion, list[GutCondition]] = {
-    AnteriorRegion.throat_chest:  [GutCondition.acid_reflux,  GutCondition.nausea],
-    AnteriorRegion.upper_center:  [GutCondition.acid_reflux,  GutCondition.gas_bloating],
-    AnteriorRegion.upper_right:   [GutCondition.acid_reflux,  GutCondition.general],
-    AnteriorRegion.upper_left:    [GutCondition.gas_bloating, GutCondition.general],
-    AnteriorRegion.central:       [GutCondition.gas_bloating, GutCondition.ibs_cramping],
-    AnteriorRegion.lower_right:   [GutCondition.ibs_cramping, GutCondition.constipation],
-    AnteriorRegion.lower_left:    [GutCondition.ibs_cramping, GutCondition.constipation],
-    AnteriorRegion.lower_center:  [GutCondition.constipation, GutCondition.ibs_cramping],
-    AnteriorRegion.whole_abdomen: [GutCondition.general,      GutCondition.gas_bloating],
+    AnteriorRegion.throat_chest:  [GutCondition.acid_reflux,          GutCondition.nausea],
+    AnteriorRegion.upper_center:  [GutCondition.acid_reflux,          GutCondition.functional_dyspepsia],
+    AnteriorRegion.upper_right:   [GutCondition.peptic_ulcer,         GutCondition.acid_reflux],
+    AnteriorRegion.upper_left:    [GutCondition.gas_bloating,         GutCondition.functional_dyspepsia],
+    AnteriorRegion.central:       [GutCondition.gas_bloating,         GutCondition.ibs_cramping],
+    AnteriorRegion.lower_right:   [GutCondition.ibs_cramping,         GutCondition.ibd_flare],
+    AnteriorRegion.lower_left:    [GutCondition.ibd_flare,            GutCondition.ibs_cramping],
+    AnteriorRegion.lower_center:  [GutCondition.constipation,         GutCondition.ibs_cramping],
+    AnteriorRegion.whole_abdomen: [GutCondition.general,              GutCondition.gas_bloating],
 }
 
 _POSTERIOR_MAP: dict[PosteriorRegion, list[GutCondition]] = {
-    PosteriorRegion.upper_back_center: [GutCondition.acid_reflux,  GutCondition.general],
-    PosteriorRegion.upper_back_left:   [GutCondition.gas_bloating, GutCondition.general],
-    PosteriorRegion.upper_back_right:  [GutCondition.acid_reflux,  GutCondition.general],
-    PosteriorRegion.lower_back_center: [GutCondition.constipation, GutCondition.ibs_cramping],
-    PosteriorRegion.lower_back_left:   [GutCondition.ibs_cramping, GutCondition.general],
-    PosteriorRegion.lower_back_right:  [GutCondition.ibs_cramping, GutCondition.general],
+    PosteriorRegion.upper_back_center: [GutCondition.acid_reflux,    GutCondition.peptic_ulcer],
+    PosteriorRegion.upper_back_left:   [GutCondition.gas_bloating,   GutCondition.general],
+    PosteriorRegion.upper_back_right:  [GutCondition.acid_reflux,    GutCondition.general],
+    PosteriorRegion.lower_back_center: [GutCondition.constipation,   GutCondition.ibs_cramping],
+    PosteriorRegion.lower_back_left:   [GutCondition.ibd_flare,      GutCondition.ibs_cramping],
+    PosteriorRegion.lower_back_right:  [GutCondition.ibs_cramping,   GutCondition.general],
 }
 
 # ── Keyword → condition boost ──────────────────────────────────────────────────
@@ -98,16 +116,26 @@ _POSTERIOR_MAP: dict[PosteriorRegion, list[GutCondition]] = {
 # added to the region-derived scores to pick the winning condition.
 
 _KEYWORD_WEIGHTS: list[tuple[list[str], GutCondition, float]] = [
-    (["burning", "fire", "acid", "sour", "after eating", "regurgitat"],
+    (["burning", "fire", "acid", "sour", "after eating", "regurgitat", "heartburn"],
      GutCondition.acid_reflux, 1.5),
     (["cramping", "cramp", "spasm", "waves", "comes and goes"],
      GutCondition.ibs_cramping, 1.5),
-    (["bloated", "bloating", "full", "distended", "gas", "gassy", "trapped wind"],
+    (["bloated", "bloating", "full", "distended", "gas", "gassy", "trapped wind", "flatulence"],
      GutCondition.gas_bloating, 1.5),
     (["can't go", "cannot go", "haven't gone", "no bowel", "constipat", "hard stool"],
      GutCondition.constipation, 1.5),
     (["nauseous", "nausea", "sick", "want to vomit", "vomit", "queasy"],
      GutCondition.nausea, 1.5),
+    (["indigestion", "dyspepsia", "fullness after eating", "early satiety", "epigastric"],
+     GutCondition.functional_dyspepsia, 1.5),
+    (["flare", "flare-up", "crohn", "colitis", "bloody stool", "mucus stool", "urgency"],
+     GutCondition.ibd_flare, 1.5),
+    (["dairy", "milk", "lactose", "cheese", "after milk", "after dairy"],
+     GutCondition.lactose_intolerance, 1.5),
+    (["ulcer", "pylori", "stomach ulcer", "gnawing", "empty stomach", "hunger pain"],
+     GutCondition.peptic_ulcer, 1.5),
+    (["gluten", "wheat", "after bread", "after pasta", "celiac", "coeliac"],
+     GutCondition.celiac, 1.5),
 ]
 
 _CHARACTER_MAP: dict[PainCharacter, GutCondition] = {

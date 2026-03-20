@@ -74,54 +74,166 @@ INGEST_BATCH_SIZE = 100   # upsert to Qdrant in batches to avoid timeouts
 
 # ── PubMed queries ─────────────────────────────────────────────────────────────
 # (condition_key, search_query, max_docs)
-# Only non-pharmacological, immediately-applicable interventions.
+# Focused on non-pharmacological self-management, lifestyle, and immediate relief.
 PUBMED_QUERIES: list[tuple[str, str, int]] = [
-    ("ibs_cramping", "irritable bowel syndrome heat therapy abdominal pain relief", 20),
+    # ── IBS ────────────────────────────────────────────────────────────────────
+    ("ibs_cramping", "irritable bowel syndrome abdominal pain heat therapy randomized", 20),
     ("ibs_cramping", "diaphragmatic breathing irritable bowel syndrome randomized controlled trial", 20),
-    ("ibs_cramping", "peppermint oil irritable bowel syndrome systematic review", 15),
-    ("ibs_cramping", "yoga IBS abdominal pain reduction randomized", 15),
-    ("ibs_cramping", "IBS abdominal pain non-pharmacological self-management", 20),
-    ("ibs_cramping", "progressive muscle relaxation irritable bowel syndrome", 15),
+    ("ibs_cramping", "peppermint oil irritable bowel syndrome systematic review meta-analysis", 20),
+    ("ibs_cramping", "yoga IBS symptom reduction randomized controlled trial", 15),
+    ("ibs_cramping", "cognitive behavioural therapy irritable bowel syndrome abdominal pain", 20),
+    ("ibs_cramping", "low FODMAP diet irritable bowel syndrome symptom relief", 20),
+    ("ibs_cramping", "gut directed hypnotherapy irritable bowel syndrome randomized", 15),
+    ("ibs_cramping", "IBS-D IBS-C mixed irritable bowel syndrome self-management lifestyle", 20),
+
+    # ── Gas / Bloating ─────────────────────────────────────────────────────────
     ("gas_bloating", "abdominal bloating massage intervention randomized controlled trial", 20),
-    ("gas_bloating", "intestinal gas body position relief flatulence", 15),
-    ("gas_bloating", "peppermint oil bloating abdominal distension randomized", 15),
-    ("gas_bloating", "walking exercise intestinal gas bloating symptom relief", 15),
-    ("acid_reflux",  "GERD positional therapy left lateral decubitus randomized", 20),
-    ("acid_reflux",  "gastroesophageal reflux chewing gum acid clearance randomized", 15),
-    ("acid_reflux",  "heartburn posture position esophageal acid clearance", 15),
-    ("acid_reflux",  "acid reflux lifestyle intervention immediate symptom relief", 20),
-    ("acid_reflux",  "GERD head elevation sleep position randomized", 15),
-    ("constipation", "constipation abdominal massage randomized controlled trial", 20),
-    ("constipation", "defecation squatting posture toilet anorectal angle", 15),
-    ("constipation", "warm water intake bowel movement constipation relief", 15),
-    ("constipation", "functional constipation non-pharmacological physical intervention", 20),
-    ("constipation", "abdominal massage bowel function systematic review", 15),
-    ("nausea",       "pericardium 6 acupressure nausea systematic review meta-analysis", 20),
-    ("nausea",       "ginger nausea vomiting randomized controlled trial", 20),
-    ("nausea",       "slow breathing nausea vagal nerve autonomic", 15),
-    ("nausea",       "nausea non-pharmacological self management cold compress", 15),
-    ("general",      "abdominal pain self management non-pharmacological heat", 20),
-    ("general",      "gut directed relaxation breathing techniques abdominal pain", 15),
-    ("general",      "mindfulness based intervention functional gut pain reduction", 15),
+    ("gas_bloating", "intestinal gas body position flatulence relief systematic review", 15),
+    ("gas_bloating", "peppermint oil abdominal distension bloating randomized", 15),
+    ("gas_bloating", "walking exercise intestinal gas bloating symptom reduction", 15),
+    ("gas_bloating", "simethicone activated charcoal intestinal gas randomized", 15),
+    ("gas_bloating", "low FODMAP diet bloating abdominal distension clinical trial", 20),
+    ("gas_bloating", "probiotic Lactobacillus Bifidobacterium abdominal bloating flatulence randomized", 20),
+    ("gas_bloating", "probiotic supplementation intestinal gas bloating meta-analysis systematic review", 20),
+    ("gas_bloating", "alpha-galactosidase enzyme legume gas flatulence randomized controlled", 15),
+    ("gas_bloating", "functional bloating Rome criteria dietary intervention clinical trial", 15),
+    ("gas_bloating", "SIBO small intestinal bacterial overgrowth bloating treatment response", 15),
+    ("gas_bloating", "diaphragm pelvic floor abdominal distension postural biofeedback", 15),
+    ("gas_bloating", "digestive enzyme supplement bloating postprandial distension randomized", 15),
+    ("gas_bloating", "exclusion diet food intolerance abdominal bloating gas elimination", 15),
+
+    # ── GERD / Acid Reflux ─────────────────────────────────────────────────────
+    ("acid_reflux",  "GERD left lateral decubitus positional therapy randomized controlled", 20),
+    ("acid_reflux",  "gastroesophageal reflux chewing gum saliva acid clearance randomized", 15),
+    ("acid_reflux",  "GERD head of bed elevation nocturnal symptoms randomized", 15),
+    ("acid_reflux",  "acid reflux weight loss lifestyle intervention systematic review", 20),
+    ("acid_reflux",  "GERD dietary trigger food avoidance systematic review", 20),
+    ("acid_reflux",  "coffee alcohol smoking GERD symptom randomized observational", 15),
+    ("acid_reflux",  "GERD meal timing portion size postprandial symptoms", 15),
+    ("acid_reflux",  "gastroesophageal reflux disease lifestyle modification systematic review meta-analysis", 20),
+    ("acid_reflux",  "GERD obesity body mass index weight reduction symptom improvement randomized", 20),
+    ("acid_reflux",  "laryngopharyngeal reflux dietary management lifestyle modification clinical", 15),
+    ("acid_reflux",  "acid reflux chocolate fat dietary elimination trigger symptom randomized", 15),
+    ("acid_reflux",  "GERD nocturnal heartburn sleep position wedge pillow randomized", 15),
+    ("acid_reflux",  "acid reflux stress anxiety psychological intervention symptom systematic review", 15),
+    ("acid_reflux",  "GERD Mediterranean diet anti-inflammatory eating pattern observational", 15),
+
+    # ── Constipation ──────────────────────────────────────────────────────────
+    ("constipation", "abdominal massage chronic constipation bowel movement randomized", 20),
+    ("constipation", "squatting posture defecation anorectal angle stool passage", 15),
+    ("constipation", "warm water intake bowel movement constipation relief randomized", 15),
+    ("constipation", "physical activity exercise chronic constipation systematic review", 20),
+    ("constipation", "dietary fibre soluble insoluble constipation bowel frequency", 20),
+    ("constipation", "biofeedback pelvic floor dysfunction constipation randomized", 15),
+
+    # ── Nausea ────────────────────────────────────────────────────────────────
+    ("nausea",       "pericardium 6 acupressure PC6 nausea meta-analysis systematic review", 20),
+    ("nausea",       "ginger nausea vomiting randomized controlled trial systematic review", 20),
+    ("nausea",       "slow diaphragmatic breathing nausea autonomic vagal", 15),
+    ("nausea",       "cold compress wrist nausea non-pharmacological relief", 10),
+    ("nausea",       "dietary modification nausea gastroparesis delayed gastric emptying", 20),
+
+    # ── Functional Dyspepsia ──────────────────────────────────────────────────
+    ("functional_dyspepsia", "functional dyspepsia dietary intervention systematic review", 20),
+    ("functional_dyspepsia", "functional dyspepsia low acid diet symptom relief randomized", 15),
+    ("functional_dyspepsia", "postprandial distress epigastric pain syndrome lifestyle management", 20),
+    ("functional_dyspepsia", "functional dyspepsia mindfulness stress reduction randomized", 15),
+    ("functional_dyspepsia", "dyspepsia meal size fat content symptom trigger", 20),
+    ("functional_dyspepsia", "peppermint caraway oil functional dyspepsia randomized", 15),
+    ("functional_dyspepsia", "cognitive behavioural therapy functional dyspepsia RCT", 15),
+
+    # ── IBD — Crohn's + Ulcerative Colitis ────────────────────────────────────
+    ("ibd_flare",    "Crohn's disease remission dietary management nutritional therapy", 20),
+    ("ibd_flare",    "ulcerative colitis flare dietary modification symptom management", 20),
+    ("ibd_flare",    "inflammatory bowel disease stress psychological intervention RCT", 15),
+    ("ibd_flare",    "IBD fatigue exercise physical activity randomized controlled", 15),
+    ("ibd_flare",    "Crohn's ulcerative colitis low residue diet acute flare management", 20),
+    ("ibd_flare",    "inflammatory bowel disease gut microbiome dietary intervention", 20),
+    ("ibd_flare",    "IBD abdominal pain heat therapy non-pharmacological relief", 15),
+
+    # ── Lactose Intolerance ───────────────────────────────────────────────────
+    ("lactose_intolerance", "lactose intolerance dietary management symptom reduction review", 20),
+    ("lactose_intolerance", "lactase enzyme supplementation lactose intolerance randomized", 20),
+    ("lactose_intolerance", "lactose threshold dose response symptoms randomized", 15),
+    ("lactose_intolerance", "dairy-free diet lactose intolerance bloating diarrhea", 15),
+    ("lactose_intolerance", "fermented dairy yogurt kefir lactose intolerance tolerance", 20),
+    ("lactose_intolerance", "lactose intolerance IBS overlap differential diagnosis", 15),
+    ("lactose_intolerance", "probiotic bacteria lactase production lactose fermentation tolerance improvement", 20),
+    ("lactose_intolerance", "lactose intolerance calcium bone health dairy alternative supplementation", 15),
+    ("lactose_intolerance", "hypolactasia lactase non-persistence primary secondary management clinical", 15),
+    ("lactose_intolerance", "lactose malabsorption breath test hydrogen symptom correlation", 15),
+    ("lactose_intolerance", "lactose intolerance milk chocolate hard cheese tolerance threshold", 15),
+    ("lactose_intolerance", "lactose intolerance gut microbiome adaptation colonic fermentation", 15),
+
+    # ── Peptic Ulcer / H. pylori ──────────────────────────────────────────────
+    ("peptic_ulcer",  "peptic ulcer disease non-pharmacological dietary lifestyle management", 20),
+    ("peptic_ulcer",  "H pylori infection dietary factors lifestyle symptom management", 20),
+    ("peptic_ulcer",  "peptic ulcer NSAID avoidance alcohol smoking risk reduction", 15),
+    ("peptic_ulcer",  "gastric ulcer meal timing dietary modification pain relief", 15),
+    ("peptic_ulcer",  "Helicobacter pylori probiotics symptom randomized controlled trial", 20),
+
+    # ── Celiac Disease ────────────────────────────────────────────────────────
+    ("celiac",        "coeliac disease gluten free diet adherence symptom remission", 20),
+    ("celiac",        "celiac disease gluten contamination cross contamination management", 15),
+    ("celiac",        "gluten free diet quality of life celiac disease randomized", 20),
+    ("celiac",        "celiac disease refractory symptoms persistent despite gluten free", 15),
+    ("celiac",        "coeliac abdominal pain bloating dietary management systematic review", 20),
+
+    # ── General gut health ────────────────────────────────────────────────────
+    ("general",       "gut microbiome dietary patterns abdominal symptoms systematic review", 20),
+    ("general",       "mindfulness based stress reduction functional GI disorders randomized", 15),
+    ("general",       "Mediterranean diet gut health inflammation systematic review", 15),
+    ("general",       "abdominal pain self management non-pharmacological heat relaxation", 20),
 ]
 
 # ── NHS pages ──────────────────────────────────────────────────────────────────
 NHS_PAGES: list[tuple[str, str]] = [
-    ("ibs_cramping", "https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/self-help/"),
-    ("ibs_cramping", "https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/treatment/"),
-    ("gas_bloating", "https://www.nhs.uk/conditions/bloating/"),
-    ("acid_reflux",  "https://www.nhs.uk/conditions/heartburn-and-acid-reflux/"),
-    ("constipation", "https://www.nhs.uk/conditions/constipation/"),
-    ("nausea",       "https://www.nhs.uk/conditions/feeling-sick-nausea/"),
+    ("ibs_cramping",         "https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/self-help/"),
+    ("ibs_cramping",         "https://www.nhs.uk/conditions/irritable-bowel-syndrome-ibs/treatment/"),
+    ("gas_bloating",         "https://www.nhs.uk/conditions/bloating/"),
+    ("acid_reflux",          "https://www.nhs.uk/conditions/heartburn-and-acid-reflux/"),
+    ("constipation",         "https://www.nhs.uk/conditions/constipation/"),
+    ("nausea",               "https://www.nhs.uk/conditions/feeling-sick-nausea/"),
+    ("functional_dyspepsia", "https://www.nhs.uk/conditions/indigestion/"),
+    ("ibd_flare",            "https://www.nhs.uk/conditions/crohns-disease/living-with/"),
+    ("ibd_flare",            "https://www.nhs.uk/conditions/ulcerative-colitis/living-with/"),
+    ("celiac",               "https://www.nhs.uk/conditions/coeliac-disease/living-with/"),
+    ("lactose_intolerance",  "https://www.nhs.uk/conditions/lactose-intolerance/"),
+    ("peptic_ulcer",         "https://www.nhs.uk/conditions/stomach-ulcer/"),
 ]
 
-# Filename keyword -> condition (auto-tags PDFs dropped in knowledge/pdfs/)
+# ── Subfolder name → condition key ────────────────────────────────────────────
+# PDF subfolders are named by condition — use the parent folder to tag the chunk.
+PDF_FOLDER_MAP: dict[str, str] = {
+    "IBS":                  "ibs_cramping",
+    "GERD":                 "acid_reflux",
+    "Functional-Dyspepsia": "functional_dyspepsia",
+    "H.pylori":             "peptic_ulcer",
+    "Crohns":               "ibd_flare",
+    "UC":                   "ibd_flare",
+    "IBD":                  "ibd_flare",
+    "Celiac":               "celiac",
+    "Coeliac":              "celiac",
+    "Constipation":         "constipation",
+    "Lactose":              "lactose_intolerance",
+    "Nausea":               "nausea",
+    "Gastroparesis":        "nausea",
+    "Gas-Bloating":         "gas_bloating",
+    "Peptic-Ulcer":         "peptic_ulcer",
+}
+
+# Fallback: filename keywords (for PDFs sitting directly in pdfs/ root)
 PDF_CONDITION_MAP: list[tuple[list[str], str]] = [
-    (["ibs", "irritable"],                    "ibs_cramping"),
-    (["bloat", "gas", "flatulence"],          "gas_bloating"),
-    (["gerd", "reflux", "heartburn", "acid"], "acid_reflux"),
-    (["constipat"],                           "constipation"),
-    (["nausea", "vomit"],                     "nausea"),
+    (["ibs", "irritable"],                           "ibs_cramping"),
+    (["bloat", "gas", "flatulence"],                 "gas_bloating"),
+    (["gerd", "reflux", "heartburn", "acid"],        "acid_reflux"),
+    (["constipat"],                                   "constipation"),
+    (["nausea", "vomit", "gastroparesis"],           "nausea"),
+    (["dyspepsia", "dyspep", "indigestion"],         "functional_dyspepsia"),
+    (["crohn", "ulcerative", "colitis", "ibd"],      "ibd_flare"),
+    (["celiac", "coeliac", "gluten"],                "celiac"),
+    (["lactose", "dairy"],                           "lactose_intolerance"),
+    (["pylori", "helicobacter", "peptic", "ulcer"],  "peptic_ulcer"),
 ]
 
 
@@ -132,15 +244,31 @@ def _fetch_pubmed() -> list[dict[str, Any]]:
     seen: set[str] = set()
     records: list[dict[str, Any]] = []
 
-    for condition, query, max_docs in PUBMED_QUERIES:
-        print(f"  [{condition}] {query[:60]}...")
+    # Resume from checkpoint if it exists — skip already-seen PMIDs
+    if CACHE_PATH.exists():
         try:
-            docs = PubMedLoader(query=query, load_max_docs=max_docs).load()
+            cached_df = pd.read_parquet(CACHE_PATH)
+            cached    = cached_df[cached_df["source"] == "pubmed"].to_dict(orient="records")
+            for r in cached:
+                pmid = str(r.get("pmid", ""))
+                if pmid and pmid not in seen:
+                    seen.add(pmid)
+                    records.append(r)
+            print(f"  [checkpoint] Loaded {len(records)} previously fetched abstracts — skipping duplicates")
+        except Exception:
+            pass  # corrupt or missing cache — start fresh
+
+    for i, (condition, query, max_docs) in enumerate(PUBMED_QUERIES):
+        print(f"  [{condition}] {query[:60]}...", end=" ", flush=True)
+        try:
+            docs     = PubMedLoader(query=query, load_max_docs=max_docs).load()
+            new_docs = 0
             for doc in docs:
                 uid = doc.metadata.get("uid", "")
                 if uid in seen:
                     continue
                 seen.add(uid)
+                new_docs += 1
                 records.append({
                     "text":      str(doc.page_content),
                     "condition": condition,
@@ -149,11 +277,17 @@ def _fetch_pubmed() -> list[dict[str, Any]]:
                     "pmid":      str(uid),
                     "year":      str(doc.metadata.get("PublishedDate", "") or "")[:4],
                 })
+            print(f"{new_docs} new")
             time.sleep(0.4)  # NCBI rate limit: ~3 req/s unauthenticated
         except Exception as exc:
-            print(f"    ✗ {exc}")
+            print(f"✗ {exc}")
 
-    print(f"  -> {len(records)} unique abstracts")
+        # Save checkpoint every 10 queries so --from-cache can resume if interrupted
+        if (i + 1) % 10 == 0:
+            _save_cache(records)
+            print(f"  [checkpoint] Saved {len(records)} records after query {i + 1}/{len(PUBMED_QUERIES)}")
+
+    print(f"  -> {len(records)} unique abstracts total")
     return records
 
 
@@ -187,23 +321,32 @@ def _fetch_nhs() -> list[dict[str, Any]]:
 
 def _load_pdfs() -> list[dict[str, Any]]:
     print(f"\n[PDF] {PDF_DIR}")
-    pdf_files = list(PDF_DIR.glob("*.pdf"))
+    # Walk all subfolders — organised as knowledge/pdfs/<Condition>/<file>.pdf
+    pdf_files = list(PDF_DIR.glob("**/*.pdf"))
 
     if not pdf_files:
-        print("  No PDFs — drop ACG/BSG/Rome Foundation guidelines into knowledge/pdfs/")
+        print("  No PDFs — drop ACG/BSG/Rome Foundation guidelines into knowledge/pdfs/<Condition>/")
         return []
 
     records: list[dict[str, Any]] = []
     for path in pdf_files:
-        print(f"  {path.name}")
+        print(f"  {path.parent.name}/{path.name}")
         try:
-            docs     = PyMuPDFLoader(str(path)).load()
-            text     = "\n\n".join(d.page_content for d in docs if d.page_content.strip())
-            name     = path.stem.lower()
-            condition = next(
-                (cond for kws, cond in PDF_CONDITION_MAP if any(k in name for k in kws)),
-                "general",
-            )
+            docs = PyMuPDFLoader(str(path)).load()
+            text = "\n\n".join(d.page_content for d in docs if d.page_content.strip())
+
+            # 1. Try to resolve condition from subfolder name
+            folder_name = path.parent.name
+            condition   = PDF_FOLDER_MAP.get(folder_name)
+
+            # 2. Fall back to filename keyword scan
+            if condition is None:
+                name      = path.stem.lower()
+                condition = next(
+                    (cond for kws, cond in PDF_CONDITION_MAP if any(k in name for k in kws)),
+                    "general",
+                )
+
             records.append({
                 "text":      text,
                 "condition": condition,
@@ -368,6 +511,35 @@ def _upsert_to_qdrant(chunks: list[Document], recreate: bool) -> None:
 
 # ── Main ───────────────────────────────────────────────────────────────────────
 
+def _count_pubmed() -> None:
+    """Dry-run: fetch PubMed abstracts and print counts per condition without indexing."""
+    from collections import defaultdict
+    print("\n[PubMed Count] Fetching abstracts (no indexing)...")
+    counts: dict[str, int] = defaultdict(int)
+    seen: set[str] = set()
+
+    for condition, query, max_docs in PUBMED_QUERIES:
+        print(f"  [{condition}] {query[:65]}...", end=" ", flush=True)
+        try:
+            docs = PubMedLoader(query=query, load_max_docs=max_docs).load()
+            new  = [d for d in docs if d.metadata.get("uid", "") not in seen]
+            for d in new:
+                seen.add(d.metadata.get("uid", ""))
+            counts[condition] += len(new)
+            print(f"{len(new)} new abstracts")
+            time.sleep(0.4)
+        except Exception as exc:
+            print(f"✗ {exc}")
+
+    print("\n" + "=" * 50)
+    print("Abstracts per condition (unique, deduplicated):")
+    print("=" * 50)
+    for cond, n in sorted(counts.items(), key=lambda x: -x[1]):
+        bar = "█" * (n // 3)
+        print(f"  {cond:<25}  {n:>3}  {bar}")
+    print(f"\n  Total unique abstracts: {sum(counts.values())}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="GutIQ knowledge base ingestion")
     parser.add_argument(
@@ -380,6 +552,11 @@ def main() -> None:
         action="store_true",
         help="Wipe and recreate the Qdrant collection before upserting",
     )
+    parser.add_argument(
+        "--count-only",
+        action="store_true",
+        help="Dry-run: fetch PubMed and print article counts per condition, then exit",
+    )
     args = parser.parse_args()
 
     print("=" * 60)
@@ -388,6 +565,10 @@ def main() -> None:
     print(f"  Qdrant : {QDRANT_URL}")
     print(f"  Collection: {COLLECTION_NAME}")
     print(f"  Embeddings: {EMBEDDING_MODEL}")
+
+    if args.count_only:
+        _count_pubmed()
+        return
 
     if args.from_cache:
         # Reload PubMed/NHS from Parquet — skip API calls

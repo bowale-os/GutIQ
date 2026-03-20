@@ -7,17 +7,18 @@
 // state — this module is purely transport.
 //
 // Callbacks:
-//   onSessionId(id)   — fired once, first event. Store and send back next turn.
-//   onToolStart(tool) — Claude is calling a tool (show spinner)
-//   onToolDone(tool)  — tool finished (mark done)
-//   onChunk(text)     — append text to the streamed answer
-//   onDone()          — stream complete
-//   onError(message)  — something went wrong
+//   onSessionId(id)       — fired once, first event. Store and send back next turn.
+//   onToolStart(tool)     — Claude is calling a tool (show spinner)
+//   onToolDone(tool)      — tool finished (mark done)
+//   onChunk(text)         — append text to the streamed answer
+//   onSafety(level)       — "none" | "see_doctor" | "emergency" — fired before onDone
+//   onDone()              — stream complete
+//   onError(message)      — something went wrong
 
 import { BASE, getToken } from './client';
 
 export async function askGutCheck(question, sessionId, callbacks) {
-  const { onSessionId, onToolStart, onToolDone, onChunk, onDone, onError } = callbacks;
+  const { onSessionId, onToolStart, onToolDone, onChunk, onSafety, onDone, onError } = callbacks;
 
   let response;
   try {
@@ -72,7 +73,8 @@ export async function askGutCheck(question, sessionId, callbacks) {
           case 'session_id':    onSessionId?.(event.id);     break;
           case 'tool_start':    onToolStart?.(event.tool);   break;
           case 'tool_done':     onToolDone?.(event.tool);    break;
-          case 'answer_chunk':  onChunk?.(event.text);       break;
+          case 'answer_chunk':  onChunk?.(event.text);        break;
+          case 'safety':        onSafety?.(event.level);     break;
           case 'done':          onDone?.();                  break;
           default:              break;
         }

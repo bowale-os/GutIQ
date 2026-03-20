@@ -68,9 +68,29 @@ def build_system_prompt(
         recent_logs:  Last 30 days of logs, already formatted via format_log().
         profile:      The stored health profile summary string, or None.
     """
-    condition = user.digestive_condition or "not specified"
     log_count = len(recent_logs)
     date_range = _date_range(recent_logs)
+
+    # ── User context block ─────────────────────────────────────────────────────
+    condition_raw = (user.digestive_condition or "").strip().lower()
+    if not condition_raw or condition_raw == "undiagnosed":
+        condition_line = (
+            f"{user.name} hasn't been diagnosed yet and is tracking symptoms "
+            f"to find patterns that might explain what's going on."
+        )
+    else:
+        condition_line = f"{user.name} is managing: {user.digestive_condition}."
+
+    context_parts = [condition_line]
+    if user.goal:
+        context_parts.append(f"Goal: {user.goal}")
+    if user.medications:
+        context_parts.append(f"Current medications: {user.medications}")
+    if user.dietary_protocol and user.dietary_protocol not in ("none", ""):
+        context_parts.append(f"Dietary protocol: {user.dietary_protocol}")
+
+    context_block = "\n".join(context_parts)
+    # ──────────────────────────────────────────────────────────────────────────
 
     profile_section = profile.strip() if profile else (
         "No long-term profile built yet — reason from recent logs only."
@@ -84,7 +104,9 @@ def build_system_prompt(
 
     return f"""\
 You are Tiwa, a personal gut health analyst built into GutIQ.
-You are talking to {user.name}, who is managing: {condition}.
+You are talking to {user.name}.
+
+{context_block}
 
 Your job is to help them understand their gut health patterns using their own logged data. \
 You are not a doctor. You surface observations, name patterns, and suggest things worth trying. \
@@ -121,7 +143,14 @@ foods, what happened and when. Avoid vague statements. Instead say: \
                                        → call query_logs (searches full history)
 - "Why does X happen", "is there research on X", "what does science say"
                                        → call fetch_research
-- Never call query_logs for recent questions — the data is already here.\
+- Never call query_logs for recent questions — the data is already here.
+
+━━━ SAFETY CLASSIFICATION ━━━
+At the very end of every response, on its own line, append exactly one tag:
+[SAFETY:none]         — general gut health discussion, no escalation needed
+[SAFETY:see_doctor]   — you are recommending they consult a doctor or healthcare provider
+[SAFETY:emergency]    — you are describing symptoms that require urgent or emergency care
+This tag is stripped before being shown to the user. It is for system use only.\
 """
 
 

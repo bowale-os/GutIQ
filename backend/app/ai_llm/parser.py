@@ -99,6 +99,7 @@ async def parse_with_llm(
     message = await client.messages.create(
         model="claude-haiku-4-5-20251001",
         max_tokens=600,
+        temperature=0.1,
         system=system,
         messages=[{"role": "user", "content": user_prompt}],
     )

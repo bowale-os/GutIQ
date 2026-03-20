@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GutIQ · Codebase Reference</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3348;
+    --orange: #e07b39;
+    --teal: #2c7a7b;
+    --text: #e8e6e0;
+    --muted: #7c7f8e;
+    --green: #3f6212;
+    --blue: #3b82f6;
+    --purple: #8b5cf6;
+    --red: #ef4444;
+    --tag-bg: #1e2035;
+    --font-sans: 'DM Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--orange);
+    letter-spacing: .02em;
+    flex-shrink: 0;
+  }
+  header h1 span { color: var(--muted); font-weight: 400; }
+  #search {
+    flex: 1;
+    min-width: 220px;
+    max-width: 480px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color .15s;
+  }
+  #search:focus { border-color: var(--orange); }
+  #search::placeholder { color: var(--muted); }
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: transparent;
+    transition: all .12s;
+    user-select: none;
+  }
+  .pill:hover, .pill.active { border-color: var(--orange); color: var(--orange); }
+  .pill[data-tag="backend"].active { border-color: var(--teal); color: var(--teal); }
+  .pill[data-tag="frontend"].active { border-color: var(--orange); color: var(--orange); }
+  .count { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+
+  main { max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 32px 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .section-header::before {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    transition: border-color .12s;
+  }
+  .card:hover { border-color: #3a3f58; }
+  .card.highlight { border-color: var(--orange); }
+
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .card-header:hover { background: rgba(255,255,255,.02); }
+  .file-path {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--orange);
+    flex: 1;
+    word-break: break-all;
+  }
+  .file-path .dir { color: var(--muted); }
+  .card-desc { font-size: 13px; color: var(--text); margin-top: 3px; }
+  .chevron {
+    color: var(--muted);
+    font-size: 11px;
+    transition: transform .15s;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .card.open .chevron { transform: rotate(90deg); }
+
+  .card-body {
+    border-top: 1px solid var(--border);
+    padding: 16px;
+    display: none;
+  }
+  .card.open .card-body { display: block; }
+
+  .entry { margin-bottom: 14px; }
+  .entry:last-child { margin-bottom: 0; }
+  .entry-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 3px;
+  }
+  .entry-name.const { color: var(--purple); }
+  .entry-name.type  { color: var(--teal); }
+  .entry-name.route { color: var(--green); }
+  .entry-name.model { color: #f59e0b; }
+  .badge {
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+  }
+  .badge.fn    { background: #1e3a5f; color: #60a5fa; }
+  .badge.const { background: #2a1f4e; color: #a78bfa; }
+  .badge.type  { background: #0f3030; color: #2dd4bf; }
+  .badge.route { background: #172d10; color: #86efac; }
+  .badge.model { background: #2d1f0f; color: #fbbf24; }
+  .badge.enum  { background: #2d0f2f; color: #e879f9; }
+  .badge.hook  { background: #1f2d10; color: #a3e635; }
+  .entry-text { font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+  .fields { margin-top: 6px; }
+  .field {
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    padding: 2px 0;
+    border-left: 2px solid var(--border);
+    padding-left: 10px;
+    margin-bottom: 2px;
+  }
+  .field em { color: #7dd3fc; font-style: normal; }
+  .field strong { color: var(--text); font-weight: 400; }
+
+  .note {
+    background: var(--surface2);
+    border-left: 3px solid var(--orange);
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+  .note.teal { border-left-color: var(--teal); }
+  .note strong { color: var(--text); font-weight: 500; }
+
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 500;
+    background: rgba(255,255,255,.06);
+    color: var(--muted);
+  }
+
+  #no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    display: none;
+  }
+  #no-results span { font-size: 32px; display: block; margin-bottom: 10px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>GutIQ <span>/ Codebase</span></h1>
+  <input id="search" type="text" placeholder="Search files, functions, fields…" autocomplete="off" spellcheck="false">
+  <div class="pills">
+    <div class="pill" data-tag="all">All</div>
+    <div class="pill" data-tag="frontend">Frontend</div>
+    <div class="pill" data-tag="backend">Backend</div>
+    <div class="pill" data-tag="api">API</div>
+    <div class="pill" data-tag="rag">RAG</div>
+    <div class="pill" data-tag="schema">Schema</div>
+    <div class="pill" data-tag="onboarding">Onboarding</div>
+  </div>
+  <span class="count" id="count">— files</span>
+</header>
+
+<main>
+<div id="no-results">
+  <span>🔍</span>
+  No matches. Try a function name, field, or keyword.
+</div>
+
+<!-- ─── FRONTEND ────────────────────────────────────────────────── -->
+
+<div class="section-header" data-section="frontend">Frontend</div>
+
+<!-- App.jsx -->
+<div class="card" data-tags="frontend routing" data-text="App.jsx root routing navigation demo mode log modal screen switcher">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/</span>App.jsx</div>
+      <div class="card-desc">Root component — routing, demo mode, global state, log modal</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> App()</div>
+      <div class="entry-text">Main router. Manages <code>currentScreen</code>, user state, demo mode. Fetches user profile on mount. Renders one screen at a time.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> navigate(screen)</div>
+      <div class="entry-text">Screen switcher. Scrolls to top. Used everywhere in the app.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> startDemo() / exitDemo()</div>
+      <div class="entry-text">Toggle demo mode. Demo creates a fake guest user; exit clears it.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> DemoBanner()</div>
+      <div class="entry-text">Sticky overlay during demo. Shows "This is a demo — data is not saved".</div>
+    </div>
+    <div class="note"><strong>Screens routed:</strong> landing, login, signup, onboarding, dashboard, gutcheck, export, profile, pain_relief, lifestyles</div>
+    <div class="note teal"><strong>Side effect:</strong> On mount — fetches real user name from backend, checks onboarding completion. Body scroll locked when log modal is open.</div>
+  </div>
+</div>
+
+<!-- screens/Onboarding.jsx -->
+<div class="card" data-tags="frontend onboarding" data-text="Onboarding orchestrator screens steps wizard branching diagnosed undiagnosed goBack handleNext handleConditionSelect canProceed finalCondition">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/screens/</span>Onboarding.jsx</div>
+      <div class="card-desc">Multi-step onboarding wizard orchestrator — state, navigation, submission</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> goBack()</div>
+      <div class="entry-text">Smart back navigation. Diagnosed skips screen 3→1, undiagnosed skips 4→1.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> handleConditionSelect(id, customText)</div>
+      <div class="entry-text">Sets condition. Branches: diagnosed → screen 2 (meds). Undiagnosed → screen 4 (age). Dot count changes accordingly.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> handleNext()</div>
+      <div class="entry-text">Advance screen, or on screen 4 build and POST the onboarding payload, store user, navigate to dashboard.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> canProceed()</div>
+      <div class="entry-text">Gate logic. Screen 0: name required. Screen 3: if "other" diet, custom text required. All others: free.</div>
+    </div>
+    <div class="note"><strong>Path logic:</strong> Diagnosed: 0 → 1 → 2 → 3 → 4 (5 dots). Undiagnosed: 0 → 1 → 4 (3 dots).</div>
+    <div class="note teal"><strong>finalCondition:</strong> If custom input → raw text. If "undiagnosed" → "undiagnosed". Otherwise → <code>conditionLabel(id)</code> (human-readable label, never the ID).</div>
+  </div>
+</div>
+
+<!-- onboarding/constants.js -->
+<div class="card" data-tags="frontend onboarding constants" data-text="CONDITIONS CONDITIONS_DEFAULT MED_LIST DIETARY_PROTOCOLS AGE_RANGES QUICK_TIMES GERD IBS Lactose">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/onboarding/</span>constants.js</div>
+      <div class="card-desc">All condition, medication, dietary, and reminder data</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> CONDITIONS_DEFAULT</div>
+      <div class="entry-text">3 conditions shown by default on screen 1: GERD, IBS, Lactose Intolerance.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> CONDITIONS</div>
+      <div class="entry-text">Full 10 conditions with IDs and brand colors. Searched when user types. Includes: Chronic Constipation, Functional Dyspepsia, H. pylori, PUD, Coeliac, UC, Crohn's.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> MED_LIST</div>
+      <div class="entry-text">47 common GI medications. PPIs, antihistamines, antiemetics, biologics, antidiarrheals. Used as autocomplete source in ScreenMedications.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> DIETARY_PROTOCOLS</div>
+      <div class="entry-text">8 protocols: none, low-FODMAP, gluten-free, dairy-free, SCD, Mediterranean, low-residue, other.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> QUICK_TIMES</div>
+      <div class="entry-text">4 preset reminder times (8 AM, 12 PM, 7 PM, 9 PM). Each sets <code>timeHours</code> and <code>timeMins</code> directly.</div>
+    </div>
+  </div>
+</div>
+
+<!-- onboarding/helpers.js -->
+<div class="card" data-tags="frontend onboarding helpers" data-text="formatTime getInitialName conditionLabel inputStyle helpers utils format time">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/onboarding/</span>helpers.js</div>
+      <div class="card-desc">Utility functions for form logic and formatting</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> formatTime(value)</div>
+      <div class="entry-text">Converts 24-hr "HH:MM" → 12-hr "H:MM AM/PM". Used in summary text on screen 4.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> getInitialName(name, username)</div>
+      <div class="entry-text">Returns <code>name</code> if set, else capitalises the stored username. Used on screen 0 pre-fill.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> conditionLabel(id)</div>
+      <div class="entry-text">Maps condition ID → human label. E.g. "IBS" → "IBS (Irritable Bowel Syndrome)". Falls back to the id itself if unknown.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> inputStyle(focused)</div>
+      <div class="entry-text">Returns inline style object. Orange border when focused, subtle border when not. Consistent across all text inputs in onboarding.</div>
+    </div>
+  </div>
+</div>
+
+<!-- onboarding/components -->
+<div class="card" data-tags="frontend onboarding components" data-text="BackButton DotIndicator ConditionRow MedPill ProtocolRow ChannelButton components shared UI">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/onboarding/components/</span>* (6 components)</div>
+      <div class="card-desc">Shared primitive UI components used across onboarding screens</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> BackButton({ onClick })</div>
+      <div class="entry-text">Top-left ‹ Back button. Hover darkens text. Always triggers <code>goBack()</code> in parent.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> DotIndicator({ current, total })</div>
+      <div class="entry-text">Progress dots. Completed = teal. Current = orange, wider. Upcoming = light grey.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ConditionRow({ color, label, onClick, delay })</div>
+      <div class="entry-text">Animated row button for each condition. <code>delay</code> staggers entry animation when list filters.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> MedPill({ name, onRemove })</div>
+      <div class="entry-text">Teal chip with × to remove. Renders in the medication list on screen 2.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ProtocolRow({ id, label, desc, selected, onClick, customProtocol, onCustomChange })</div>
+      <div class="entry-text">Radio row for dietary protocols. If <code>id === "other"</code> and selected, shows text input for custom protocol.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ChannelButton({ icon, title, desc, selected, onClick, accent })</div>
+      <div class="entry-text">Icon + text reminder channel button (Email / Push / None). Orange ring on selected. Email and Push show "(coming soon)".</div>
+    </div>
+  </div>
+</div>
+
+<!-- onboarding/steps — individual screens -->
+<div class="card" data-tags="frontend onboarding steps screens" data-text="ScreenName ScreenCondition ScreenMedications ScreenDiet ScreenAgeReminder screen steps age reminder time input">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/onboarding/steps/</span>* (5 screens)</div>
+      <div class="card-desc">Individual onboarding screen components (stateless — state lives in Onboarding.jsx)</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ScreenName — Screen 0</div>
+      <div class="entry-text">Text input for preferred name. Enter key or button → <code>onNext()</code>.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ScreenCondition — Screen 1</div>
+      <div class="entry-text">Searchable condition picker. No search → shows 3 defaults. Typing → filters all 10 + "I have [text]" custom option. Clicking calls <code>onSelect(id, customText)</code>.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ScreenMedications — Screen 2</div>
+      <div class="entry-text">Autocomplete med input (from MED_LIST). Enter/comma adds to list. Pills display with remove. Skip button shown when list empty. Diagnosed only.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ScreenDiet — Screen 3</div>
+      <div class="entry-text">8 dietary protocol radio rows. Custom text input if "other" selected. Diagnosed only.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> ScreenAgeReminder — Screen 4</div>
+      <div class="entry-text">Age range radio buttons. Split time input (hours / mins, digit-only, no colon needed). Quick-pick preset buttons. Reminder channel selector (Email/Push/None).</div>
+      <div class="fields">
+        <div class="field"><em>timeHours / timeMins</em> — split state: <strong>2-digit strings</strong>, validated in onChange</div>
+        <div class="field"><em>reminderTime</em> — computed "HH:MM" only when both fields valid</div>
+        <div class="field"><em>onBlur</em> on timeMins — pads single digit "7" → "07" automatically</div>
+        <div class="field"><em>email disabled</em> — if user has no email, email channel is greyed out</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- api/client.js -->
+<div class="card" data-tags="frontend api auth token localstorage" data-text="api client BASE getToken setToken clearToken isLoggedIn storeUser getStoredUser authJsonHeaders throwIfNotOk localStorage">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/api/</span>client.js</div>
+      <div class="card-desc">Auth tokens, localStorage user cache, shared HTTP utilities</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> BASE</div>
+      <div class="entry-text">API base URL. Set via <code>VITE_API_URL</code> env var.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> getToken / setToken / clearToken / isLoggedIn</div>
+      <div class="entry-text">JWT lifecycle in localStorage (<code>gutiq_token</code>).</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> storeUser(username, userId, name, condition, email)</div>
+      <div class="entry-text">Caches user profile to localStorage. Called after signup/login/onboarding complete.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> getStoredUser()</div>
+      <div class="entry-text">Returns <code>{ username, userId, name, condition, email }</code> from localStorage. Used everywhere to get current user without a fetch.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> authJsonHeaders() / authHeaders()</div>
+      <div class="entry-text">Returns headers with Bearer token. <code>authJsonHeaders</code> adds Content-Type: application/json.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> throwIfNotOk(res)</div>
+      <div class="entry-text">Throws on HTTP error. Parses FastAPI/Pydantic detail messages so errors are readable.</div>
+    </div>
+    <div class="note"><strong>localStorage keys:</strong> gutiq_token, gutiq_username, gutiq_user_id, gutiq_name, gutiq_condition, gutiq_email</div>
+  </div>
+</div>
+
+<!-- api/onboarding.js -->
+<div class="card" data-tags="frontend api onboarding" data-text="getStatus complete onboarding api status complete POST GET">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/api/</span>onboarding.js</div>
+      <div class="card-desc">API calls for onboarding endpoints</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> getStatus()</div>
+      <div class="entry-text">GET <code>/onboarding/status</code> → <code>{ is_complete, missing }</code>. Used in App.jsx on mount to skip onboarding if already done.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> complete(...fields)</div>
+      <div class="entry-text">POST <code>/onboarding/complete</code>. Sends condition, goal, age_range, reminder_time, reminder_channel, preferred_name, medications, dietary_protocol. Requires auth token.</div>
+    </div>
+  </div>
+</div>
+
+<!-- api/schemas.js -->
+<div class="card" data-tags="frontend api schema request response parse make" data-text="schemas makeOnboardingCompleteRequest makeLogCreateRequest parseTokenResponse parseLogResponse DIGESTIVE_CONDITIONS AGE_RANGES">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/api/</span>schemas.js</div>
+      <div class="card-desc">Request builders (make*) and response parsers (parse*)</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> makeOnboardingCompleteRequest(...)</div>
+      <div class="entry-text">Builds onboarding POST body. Auto-detects timezone via <code>Intl</code>. Omits null/empty optional fields.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> makeUserCreateRequest / makeLogInRequest</div>
+      <div class="entry-text">Auth request builders.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> parseTokenResponse / parseOnboardingStatusResponse / parseOnboardingCompleteResponse</div>
+      <div class="entry-text">Strip/rename fields from raw API response to clean frontend shapes.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> DIGESTIVE_CONDITIONS</div>
+      <div class="entry-text">Array of all 10 human-readable condition labels + "undiagnosed". Mirrors CONDITIONS labels in onboarding/constants.js.</div>
+    </div>
+  </div>
+</div>
+
+<!-- constants/ -->
+<div class="card" data-tags="frontend constants styles colors" data-text="COLORS FONTS STYLES getSeverityColor colors styles typography btnPrimary card chip input">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">gutiq-app/src/constants/</span>colors.js + styles.js</div>
+      <div class="card-desc">Design system — color palette, typography, reusable inline style objects</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> COLORS</div>
+      <div class="entry-text">Central palette: background <code>#FAF7F2</code>, orange <code>#e07b39</code>, teal <code>#2c7a7b</code>, surface, text, muted, danger, amber, borders.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> getSeverityColor(v)</div>
+      <div class="entry-text">Severity 1–3 → teal, 4–6 → amber, 7–10 → danger (red).</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> FONTS</div>
+      <div class="entry-text">serif (DM Serif Display), mono (IBM Plex Mono), sans (DM Sans).</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name const"><span class="badge const">const</span> STYLES</div>
+      <div class="entry-text">Pre-built inline style objects: <code>page, centeredAuth, card, cardSmall, btnPrimary, btnGhost, input, h1–h3, label, chip, chipOrange, chipTeal, chipDanger, divider</code>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── BACKEND ────────────────────────────────────────────────── -->
+
+<div class="section-header" data-section="backend">Backend</div>
+
+<!-- api/v1/onboarding.py -->
+<div class="card" data-tags="backend api onboarding route" data-text="onboarding status complete GET POST FastAPI endpoint v1 /onboarding/status /onboarding/complete">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">backend/app/api/v1/</span>onboarding.py</div>
+      <div class="card-desc">FastAPI onboarding endpoints — status check and profile completion</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name route"><span class="badge route">GET</span> /onboarding/status</div>
+      <div class="entry-text">Returns <code>{ is_complete: bool, missing: { digestive_condition, goal } }</code>. Used by frontend on mount to decide whether to show onboarding.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name route"><span class="badge route">POST</span> /onboarding/complete</div>
+      <div class="entry-text">Accepts <code>OnboardingCompleteRequest</code>. Updates User row: condition, goal, age_range, reminder time/channel/timezone, preferred_name, medications, dietary_protocol. Commits to DB. Returns <code>{ message, user_id }</code>.</div>
+    </div>
+  </div>
+</div>
+
+<!-- schemas/onboarding.py -->
+<div class="card" data-tags="backend schema onboarding pydantic" data-text="OnboardingCompleteRequest OnboardingStatusResponse OnboardingCompleteResponse pydantic schema validation reminder_time reminder_channel reminder_timezone">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">backend/app/schemas/</span>onboarding.py</div>
+      <div class="card-desc">Pydantic request/response models for onboarding</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name type"><span class="badge type">model</span> OnboardingCompleteRequest</div>
+      <div class="fields">
+        <div class="field"><em>digestive_condition</em> — str, 1–100 chars</div>
+        <div class="field"><em>goal</em> — str, max 150 chars</div>
+        <div class="field"><em>age_range</em> — Optional str ("Under 25", "25–40", "41–60", "60+")</div>
+        <div class="field"><em>reminder_time</em> — Optional "HH:MM" (24-hr)</div>
+        <div class="field"><em>reminder_channel</em> — Optional "email" | "push" | "none"</div>
+        <div class="field"><em>reminder_timezone</em> — Optional IANA string e.g. "America/Chicago"</div>
+        <div class="field"><em>preferred_name</em> — Optional, max 60 chars</div>
+        <div class="field"><em>medications</em> — Optional, max 500 chars, comma-separated</div>
+        <div class="field"><em>dietary_protocol</em> — Optional, max 100 chars</div>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="entry-name type"><span class="badge type">model</span> OnboardingStatusResponse</div>
+      <div class="entry-text"><code>{ is_complete: bool, missing: Dict[str, bool] }</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- models/user.py -->
+<div class="card" data-tags="backend model database user sqlmodel" data-text="User model database table id username email hashed_password digestive_condition goal age_range medications dietary_protocol reminder_time reminder_channel health_profile_summary">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">backend/app/models/</span>user.py</div>
+      <div class="card-desc">SQLModel ORM User table — all persistent user fields</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name model"><span class="badge model">table</span> User</div>
+      <div class="fields">
+        <div class="field"><em>id</em> — UUID primary key</div>
+        <div class="field"><em>username</em> — unique, indexed</div>
+        <div class="field"><em>email</em> — optional, unique, indexed</div>
+        <div class="field"><em>hashed_password</em> — bcrypt hash</div>
+        <div class="field"><em>name</em> — preferred display name</div>
+        <div class="field"><em>digestive_condition</em> — indexed; free text (human label, not enum ID)</div>
+        <div class="field"><em>goal</em> — user's stated health goal</div>
+        <div class="field"><em>age_range</em> — bucketed string</div>
+        <div class="field"><em>medications</em> — comma-separated string</div>
+        <div class="field"><em>dietary_protocol</em> — e.g. "low-fodmap", "none"</div>
+        <div class="field"><em>reminder_time</em> — "HH:MM" 24-hr in user's timezone</div>
+        <div class="field"><em>reminder_channel</em> — "email" | "push" | "none"</div>
+        <div class="field"><em>reminder_timezone</em> — IANA string</div>
+        <div class="field"><em>health_profile_summary</em> — Claude-generated GutCheck text</div>
+        <div class="field"><em>profile_updated_at / logs_since_last_profile_change</em> — tracks when to regenerate GutCheck</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- schemas/pain_relief.py -->
+<div class="card" data-tags="backend schema pain relief rag enum" data-text="GutCondition PainCharacter BodyView AnteriorRegion PosteriorRegion PainReliefRequest RetrievalResult StructuredRelief PainReliefResponse ibs gerd acid_reflux constipation">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">backend/app/schemas/</span>pain_relief.py</div>
+      <div class="card-desc">All enums and models for the pain relief feature</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name type"><span class="badge enum">enum</span> GutCondition</div>
+      <div class="entry-text">11 values: ibs_cramping, gas_bloating, acid_reflux, constipation, nausea, functional_dyspepsia, ibd_flare, lactose_intolerance, peptic_ulcer, celiac, general</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name type"><span class="badge enum">enum</span> AnteriorRegion / PosteriorRegion</div>
+      <div class="entry-text">Body map regions. Anterior: throat_chest, upper_center/right/left, central, lower_right/left/center, whole_abdomen. Posterior: upper/lower back center/left/right.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name type"><span class="badge enum">enum</span> PainCharacter</div>
+      <div class="entry-text">sharp, dull, cramping, burning, pressure, bloating</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name type"><span class="badge type">model</span> PainReliefRequest</div>
+      <div class="fields">
+        <div class="field"><em>session_id</em> — client-generated UUID</div>
+        <div class="field"><em>body_clicks[]</em> — list of BodyClickPoint (region + view)</div>
+        <div class="field"><em>description</em> — free text</div>
+        <div class="field"><em>intensity</em> — 1–10</div>
+        <div class="field"><em>pain_character</em> — PainCharacter enum</div>
+      </div>
+    </div>
+    <div class="entry">
+      <div class="entry-name type"><span class="badge type">model</span> PainReliefResponse</div>
+      <div class="entry-text">Returns: session_id, is_red_flag, red_flag_reason, condition (GutCondition), structured (StructuredRelief), reply (LLM text), citations[]</div>
+    </div>
+  </div>
+</div>
+
+<!-- rag/retriever.py -->
+<div class="card" data-tags="backend rag retriever qdrant condition inference" data-text="retrieve _check_red_flags _resolve_condition _search _get_vector_store KEYWORD_WEIGHTS ANTERIOR_MAP red flag qdrant condition scoring">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">backend/app/rag/</span>retriever.py</div>
+      <div class="card-desc">Pain relief pipeline — red-flag detection, condition inference, Qdrant search</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> retrieve(request) → RetrievalResult</div>
+      <div class="entry-text">Main entry point. Red flag check → condition inference → Qdrant search → return result.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _check_red_flags(request)</div>
+      <div class="entry-text">13 keyword patterns (blood, vomiting, fever, etc.) + structural rule: lower_right region + intensity ≥ 6 → appendicitis flag. Returns (is_red_flag, reason).</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _resolve_condition(body_clicks, description, pain_character)</div>
+      <div class="entry-text">Scoring algorithm: region → primary 2.0 / secondary 1.0 points, keyword match → +1.5, pain character → +1.0. Returns highest-scoring GutCondition.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _search(condition, query)</div>
+      <div class="entry-text">Qdrant similarity search filtered by condition. If &lt;2 results → falls back to unfiltered search. Returns top-K chunks.</div>
+    </div>
+    <div class="note teal"><strong>Collection:</strong> "gut_pain_relief" · <strong>Embedding:</strong> BAAI/bge-small-en-v1.5 (384-dim) · <strong>TOP_K:</strong> 6 chunks</div>
+  </div>
+</div>
+
+<!-- rag/ingest.py -->
+<div class="card" data-tags="backend rag ingest pubmed qdrant etl" data-text="ingest PubMed fetch PDF load parquet cache qdrant upsert _fetch_pubmed _load_pdfs _split _upsert_to_qdrant checkpoint recreate count-only PUBMED_QUERIES">
+  <div class="card-header" onclick="toggle(this)">
+    <div>
+      <div class="file-path"><span class="dir">backend/app/rag/</span>ingest.py</div>
+      <div class="card-desc">ETL pipeline — PubMed + PDFs → Parquet cache → Qdrant Cloud</div>
+    </div>
+    <div class="chevron">▶</div>
+  </div>
+  <div class="card-body">
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _fetch_pubmed()</div>
+      <div class="entry-text">Queries PubMed via LangChain with 100+ queries across 11 conditions. Checkpoints every 10 queries. Skips PMIDs already in cache (resumable).</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _load_pdfs()</div>
+      <div class="entry-text">Glob <code>knowledge/pdfs/**/*.pdf</code>. Infers condition tag from parent subfolder name via <code>PDF_FOLDER_MAP</code>.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _split(records)</div>
+      <div class="entry-text">RecursiveCharacterTextSplitter: 512 chunk size, 64 overlap. Preserves condition metadata per chunk.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _upsert_to_qdrant(chunks, recreate)</div>
+      <div class="entry-text">Batch embed + upsert. Batch size 100. Creates payload index on <code>condition</code> field for filtered search.</div>
+    </div>
+    <div class="entry">
+      <div class="entry-name"><span class="badge fn">fn</span> _count_pubmed()</div>
+      <div class="entry-text">Dry-run. Counts how many abstracts each condition query would return without ingesting anything. Run with <code>--count-only</code>.</div>
+    </div>
+    <div class="note"><strong>CLI flags:</strong> <code>--from-cache</code> skip PubMed fetch · <code>--recreate</code> drop + rebuild Qdrant collection · <code>--count-only</code> dry-run counts</div>
+    <div class="note teal"><strong>PDF folder structure:</strong> <code>knowledge/pdfs/&lt;ConditionName&gt;/file.pdf</code> — folder name maps to condition via PDF_FOLDER_MAP</div>
+    <div class="note" style="border-left-color:#8b5cf6"><strong>Cache:</strong> <code>knowledge/cache/raw_docs.parquet</code> — gitignored. Delete to force full re-fetch.</div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const cards = Array.from(document.querySelectorAll('.card'));
+const searchEl = document.getElementById('search');
+const countEl = document.getElementById('count');
+const noResults = document.getElementById('no-results');
+let activeTag = 'all';
+
+function toggle(headerEl) {
+  headerEl.closest('.card').classList.toggle('open');
+}
+
+function normalize(s) {
+  return (s || '').toLowerCase();
+}
+
+function update() {
+  const q = normalize(searchEl.value.trim());
+  let visible = 0;
+
+  cards.forEach(card => {
+    const text = normalize(card.dataset.text || '') + ' ' + normalize(card.innerHTML);
+    const tags = (card.dataset.tags || '').split(' ');
+    const tagMatch = activeTag === 'all' || tags.includes(activeTag);
+    const textMatch = !q || text.includes(q);
+
+    if (tagMatch && textMatch) {
+      card.classList.remove('hidden');
+      if (q) card.classList.add('highlight');
+      else card.classList.remove('highlight');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+      card.classList.remove('highlight');
+    }
+  });
+
+  // Hide section headers if all cards in their section are hidden
+  document.querySelectorAll('.section-header').forEach(header => {
+    const section = header.dataset.section;
+    const sectionCards = cards.filter(c => (c.dataset.tags || '').includes(section));
+    const anyVisible = sectionCards.some(c => !c.classList.contains('hidden'));
+    header.classList.toggle('hidden', !anyVisible);
+  });
+
+  countEl.textContent = visible + ' file' + (visible !== 1 ? 's' : '');
+  noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+searchEl.addEventListener('input', update);
+
+document.querySelectorAll('.pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeTag = pill.dataset.tag;
+    update();
+  });
+});
+
+// Activate "All" by default
+document.querySelector('.pill[data-tag="all"]').classList.add('active');
+update();
+
+// Keyboard shortcut: / to focus search
+document.addEventListener('keydown', e => {
+  if (e.key === '/' && document.activeElement !== searchEl) {
+    e.preventDefault();
+    searchEl.focus();
+  }
+  if (e.key === 'Escape') searchEl.blur();
+});
+</script>
+</body>
+</html>

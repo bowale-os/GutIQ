@@ -36,6 +36,7 @@ from app.schemas.pain_relief import (
 )
 from app.rag.retriever import retrieve
 from app.ai_llm.pain_relief_gen import generate_relief_steps
+from app.ai_llm.red_flag_check import semantic_red_flag_check
 
 logger = logging.getLogger(__name__)
 
@@ -126,9 +127,13 @@ async def pain_relief_session(
         body.intensity,
     )
 
-    # ── 1. Retrieve — sync Qdrant call, run in thread pool ────────────────────
+    # ── 1. Retrieve + semantic red flag check — run in parallel ───────────────
+    regions = [f"{c.region.value} ({c.view.value})" for c in body.body_clicks]
     try:
-        result: RetrievalResult = await asyncio.to_thread(retrieve, body)
+        result, (sem_flag, sem_reason) = await asyncio.gather(
+            asyncio.to_thread(retrieve, body),
+            semantic_red_flag_check(body.description, body.intensity, regions),
+        )
     except Exception as exc:
         logger.exception("Retriever error | user=%s", current_user.id)
         raise HTTPException(
@@ -139,6 +144,17 @@ async def pain_relief_session(
                 "python -m app.rag.ingest"
             ),
         ) from exc
+
+    # Merge: semantic may catch signals the keyword scan missed
+    if sem_flag and not result.is_red_flag:
+        logger.warning(
+            "Semantic red flag overrides keyword result | session=%s reason=%s",
+            result.session_id, sem_reason,
+        )
+        result = result.model_copy(update={
+            "is_red_flag":     True,
+            "red_flag_reason": sem_reason,
+        })
 
     # ── 2. Red flag — skip Claude, return escalation immediately ─────────────
     if result.is_red_flag:

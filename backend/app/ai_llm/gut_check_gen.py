@@ -135,6 +135,7 @@ async def run_gutcheck(
             messages=messages,
             tools=TOOL_DEFINITIONS,
             max_tokens=MAX_TOKENS,
+            temperature=0.6,
         ) as stream:
 
             async for event in stream:
@@ -201,12 +202,21 @@ async def run_gutcheck(
                 ],
             })
 
-    # ── 5. Persist both turns in one transaction ───────────────────────────────
-    # Both rows must land together. A partial write (user saved, assistant not)
-    # breaks the paired-turn assumption that _trim_history() relies on.
+    # ── 5. Extract safety tag, strip it, persist, emit events ─────────────────
     answer_text = "".join(full_answer)
+
+    # Claude appends [SAFETY:level] on the last line per system prompt instructions.
+    # Parse it, strip it from the stored message, and send as a dedicated SSE event.
+    safety_level = "none"
+    import re as _re
+    tag_match = _re.search(r'\[SAFETY:(none|see_doctor|emergency)\]\s*$', answer_text.strip())
+    if tag_match:
+        safety_level = tag_match.group(1)
+        answer_text  = answer_text[:tag_match.start()].rstrip()
+
     await _save_exchange(session_id, user.id, question, answer_text, tools_used, db_session)
 
+    yield _sse("safety", level=safety_level)
     yield _sse("done")
 
 

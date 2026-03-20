@@ -114,6 +114,7 @@ async def regenerate_profile(user_id, db_session: AsyncSession) -> None:
         response = await _client.messages.create(
             model=MODEL,
             max_tokens=650,
+            temperature=0.3,
             system=PROFILE_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": user_message}],
         )
