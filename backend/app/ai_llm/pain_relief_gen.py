@@ -198,6 +198,7 @@ async def generate_relief_steps(
     message = await client.messages.create(
         model=MODEL,
         max_tokens=MAX_TOKENS,
+        temperature=0.2,
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_prompt}],
     )

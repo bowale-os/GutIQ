@@ -7,3 +7,4 @@ alembic.ini
 node_modules
 install.cmd
 .github
+knowledge/cache/

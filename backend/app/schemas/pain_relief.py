@@ -42,12 +42,17 @@ class PosteriorRegion(str, Enum):
 
 class GutCondition(str, Enum):
     """Gut conditions the system can identify and retrieve for."""
-    ibs_cramping = "ibs_cramping"
-    gas_bloating = "gas_bloating"
-    acid_reflux  = "acid_reflux"
-    constipation = "constipation"
-    nausea       = "nausea"
-    general      = "general"
+    ibs_cramping         = "ibs_cramping"
+    gas_bloating         = "gas_bloating"
+    acid_reflux          = "acid_reflux"
+    constipation         = "constipation"
+    nausea               = "nausea"
+    functional_dyspepsia = "functional_dyspepsia"
+    ibd_flare            = "ibd_flare"           # Crohn's + UC
+    lactose_intolerance  = "lactose_intolerance"
+    peptic_ulcer         = "peptic_ulcer"         # includes H. pylori
+    celiac               = "celiac"
+    general              = "general"
 
 
 class PainCharacter(str, Enum):

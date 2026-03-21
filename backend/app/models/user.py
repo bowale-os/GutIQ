@@ -19,9 +19,14 @@ class User(SQLModel, table=True):
     age_range: Optional[str] = Field(default=None)  # e.g., "Under 20", "20-30", "30-40", "40-50", "50+"
     
     
+    # ── Health context (collected in onboarding) ──────────────────────────────
+    medications:      Optional[str] = Field(default=None)  # comma-separated, e.g. "omeprazole, buscopan"
+    dietary_protocol: Optional[str] = Field(default=None)  # e.g. "low-fodmap", "gluten-free", "none"
+
     # ── Reminders ────────────────────────────────────────────────────────────
-    reminder_time:    Optional[str] = Field(default=None)  # "08:00" (24-hr, user's local time)
-    reminder_channel: Optional[str] = Field(default=None)  # "email" | "push" | "none"
+    reminder_time:     Optional[str] = Field(default=None)  # "08:00" (24-hr, user's local time)
+    reminder_channel:  Optional[str] = Field(default=None)  # "email" | "push" | "none"
+    reminder_timezone: Optional[str] = Field(default=None)  # IANA tz, e.g. "America/Chicago"
 
     # ── GutCheck health profile ───────────────────────────────────────────────
     # Compact Claude-generated summary of all the user's logs.

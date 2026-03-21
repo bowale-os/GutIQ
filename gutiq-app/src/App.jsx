@@ -61,6 +61,14 @@ const GLOBAL_STYLES = `
     0%, 100% { transform: scale(1);    opacity: 0.25; }
     50%       { transform: scale(1.28); opacity: 0.5;  }
   }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
   * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
   body { margin: 0; }
   button { transition: opacity 0.15s ease, transform 0.1s ease; }
@@ -141,7 +149,6 @@ function DemoBanner({ navigate, onExit }) {
 // ── App ────────────────────────────────────────────────────────────────────────
 export default function App() {
   const [currentScreen,  setCurrentScreen]  = useState(() => isLoggedIn() ? 'dashboard' : 'landing');
-  const [onboardingStep, setOnboardingStep] = useState(1);
   const [logModalOpen,   setLogModalOpen]   = useState(false);
   const [user,           setUser]           = useState(() => {
     if (isLoggedIn()) {
@@ -202,7 +209,6 @@ export default function App() {
   const startDemo = () => {
     setDemoMode(true);
     setBannerDismissed(false);
-    setOnboardingStep(1);
     navigate('onboarding');
   };
 
@@ -224,7 +230,7 @@ export default function App() {
       case 'landing':     return <Landing navigate={navigate} onDemo={startDemo} />;
       case 'login':       return <Login navigate={navigate} onLogin={() => setDemoMode(false)} />;
       case 'signup':      return <Signup navigate={navigate} />;
-      case 'onboarding':  return <Onboarding step={onboardingStep} setStep={setOnboardingStep} navigate={navigate} demoMode={demoMode} />;
+      case 'onboarding':  return <Onboarding navigate={navigate} demoMode={demoMode} />;
       case 'dashboard':   return <Dashboard user={user} logs={logs} navigate={navigate} openLog={openLog} />;
       case 'gutcheck':    return <GutCheck user={user} demoMode={demoMode} />;
       case 'export':      return <Export user={user} logs={logs} navigate={navigate} />;

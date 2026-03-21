@@ -5,6 +5,7 @@ import { FONTS, STYLES } from '../constants/styles';
 import { submitPainSession, submitPainFeedback } from '../api/painRelief';
 import { create as createLog } from '../api/logs';
 import { mockCitations } from '../constants/mockData';
+import { getStoredUser } from '../api/client';
 
 // ── Regional emergency numbers ────────────────────────────────────────────────────
 // Detect locale from browser; default to international fallback.
@@ -523,14 +524,14 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
     <div style={{ minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 8px' }}>
       {/* Immediate first action — gives the user something to do while API responds */}
       <div style={{ ...STYLES.card, width: '100%', padding: '28px 24px', textAlign: 'center', marginBottom: 24, animation: 'fadeSlideUp 0.4s ease both' }}>
-        <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
+        <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.teal, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 14 }}>
           While I prepare your steps
         </p>
-        <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.text, marginBottom: 12, lineHeight: 1.4 }}>
-          Sit upright and breathe slowly
+        <p style={{ fontFamily: FONTS.serif, fontSize: 26, color: COLORS.text, marginBottom: 14, lineHeight: 1.35 }}>
+          Breathe from your belly
         </p>
-        <p style={{ fontSize: 13, color: COLORS.muted, lineHeight: 1.7 }}>
-          Sit up straight, let gravity hold the acid down. Take three slow breaths in through your nose, out through your mouth. This alone helps.
+        <p style={{ fontFamily: FONTS.sans, fontSize: 15, color: COLORS.muted, lineHeight: 1.75 }}>
+          Place one hand on your stomach. Breathe in slowly through your nose for 4 seconds. Feel your belly rise, not your chest. Breathe out through your mouth for 6 seconds. Do this three times. It'll prepare you for more effective pain relief.
         </p>
       </div>
       {/* Subtle spinner below — not the focus */}

@@ -311,7 +311,7 @@ export default function Landing({ navigate, onDemo }) {
             </h1>
 
             <p style={{ fontSize: 'clamp(14px, 4vw, 17px)', color: COLORS.muted, lineHeight: 1.7, margin: '0 0 32px', maxWidth: 420 }}>
-              GutIQ connects your food, stress, and sleep to your symptoms and shows you exactly which triggers are hitting hardest, backed by peer-reviewed research.
+              GutIQ connects your food, stress, and sleep to your symptoms and shows you exactly which triggers are hitting hardest, backed by publicly-available, peer-reviewed research.
             </p>
 
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -337,7 +337,7 @@ export default function Landing({ navigate, onDemo }) {
             </div>
 
             <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.mutedLight, letterSpacing: '0.05em' }}>
-              No email required · Username only · Free to use
+              Email is not required · Username only · Free to use
             </p>
           </div>
 
@@ -469,7 +469,7 @@ export default function Landing({ navigate, onDemo }) {
               Your data, your rules
             </p>
             <h2 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(20px, 5vw, 38px)', fontWeight: 400, color: COLORS.text, margin: '0 0 16px' }}>
-              No email required.
+              Email is not required.
             </h2>
             <p style={{ fontSize: 16, color: COLORS.muted, lineHeight: 1.7, maxWidth: 520, margin: '0 auto' }}>
               Health data is personal. Start with just a username, no email and no real name required. Your gut logs are private and only you can see them.
@@ -536,7 +536,7 @@ export default function Landing({ navigate, onDemo }) {
             Start understanding<br />your gut today.
           </h2>
           <p style={{ fontSize: 16, color: COLORS.muted, lineHeight: 1.7, margin: '0 0 36px' }}>
-            No email required. Takes 30 seconds to set up. Your first insight usually comes after three days of logging.
+            Email is not required. Takes 30 seconds to set up. Your first insight usually comes after three days of logging.
           </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>

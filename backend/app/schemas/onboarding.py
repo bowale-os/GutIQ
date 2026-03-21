@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from typing import Optional, Dict
+
 
 class OnboardingStatusResponse(BaseModel):
     is_complete: bool
@@ -7,11 +8,15 @@ class OnboardingStatusResponse(BaseModel):
 
 
 class OnboardingCompleteRequest(BaseModel):
-    digestive_condition: str = Field(..., min_length=1, max_length=100, description="Digestive condition being tracked")
-    goal: str = Field(..., max_length=150, description="Tracking goal")
-    age_range: str = Field(..., description="User age range")
-    reminder_time: Optional[str] = Field(default=None, description="Preferred log reminder time, e.g. '08:00'")
-    reminder_channel: Optional[str] = Field(default=None, description="'email' | 'push' | 'none'")
+    digestive_condition: str = Field(..., min_length=1, max_length=100)
+    goal: str = Field(..., max_length=150)
+    age_range:        Optional[str] = Field(default=None)
+    reminder_time:     Optional[str] = Field(default=None)   # "08:00"
+    reminder_channel:  Optional[str] = Field(default=None)   # "email" | "push" | "none"
+    reminder_timezone: Optional[str] = Field(default=None)   # IANA tz, e.g. "America/Chicago"
+    preferred_name:   Optional[str] = Field(default=None, max_length=60)
+    medications:      Optional[str] = Field(default=None, max_length=500)
+    dietary_protocol: Optional[str] = Field(default=None, max_length=100)
 
 
 class OnboardingCompleteResponse(BaseModel):

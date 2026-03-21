@@ -61,6 +61,7 @@ export default function GutCheck({ user, demoMode = false }) {
   const [streamedAnswer, setStreamedAnswer] = useState('');
   const [toolCallStates, setToolCallStates] = useState([]);
   const [sessionId, setSessionId] = useState(null);   // persists across turns
+  const [safetyLevel, setSafetyLevel] = useState('none'); // "none" | "see_doctor" | "emergency"
   const [error, setError] = useState(null);
 
   const inputRef = useRef(null);
@@ -94,6 +95,7 @@ export default function GutCheck({ user, demoMode = false }) {
 
     setCurrentQuestion(question);
     setStreamedAnswer('');
+    setSafetyLevel('none');
     setError(null);
     setPhase('thinking');
     setToolCallStates([]);
@@ -145,6 +147,10 @@ export default function GutCheck({ user, demoMode = false }) {
       onChunk: (text) => {
         setPhase('responding');
         setStreamedAnswer(prev => prev + text);
+      },
+
+      onSafety: (level) => {
+        setSafetyLevel(level);
       },
 
       onDone: () => {
@@ -328,6 +334,7 @@ export default function GutCheck({ user, demoMode = false }) {
             phase={phase}
             toolCallStates={toolCallStates}
             streamedAnswer={streamedAnswer}
+            safetyLevel={safetyLevel}
             onAskAnother={handleAskAnother}
           />
         )}
@@ -628,7 +635,7 @@ function ThinkingBubble({ toolCallStates }) {
   );
 }
 
-function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAskAnother }) {
+function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, safetyLevel, onAskAnother }) {
   return (
     <div style={{ marginBottom: 20, animation: 'fadeSlideUp 0.3s ease both' }}>
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
@@ -681,18 +688,42 @@ function ActiveExchange({ question, phase, toolCallStates, streamedAnswer, onAsk
                 </div>
               </div>
               {phase === 'done' && (
-                <button
-                  onClick={onAskAnother}
-                  style={{
-                    marginTop: 8, background: 'none',
-                    border: `1px solid ${COLORS.border}`,
-                    borderRadius: 8, padding: '7px 14px',
-                    fontSize: 13, fontFamily: FONTS.sans, fontWeight: 500,
-                    color: COLORS.muted, cursor: 'pointer',
-                  }}
-                >
-                  Ask another &#8594;
-                </button>
+                <>
+                  {safetyLevel === 'see_doctor' && (
+                    <div style={{
+                      marginTop: 10, padding: '9px 12px', borderRadius: 8,
+                      backgroundColor: '#fff7ed',
+                      border: '1px solid #fed7aa',
+                      fontFamily: FONTS.sans, fontSize: 12, color: '#92400e',
+                      lineHeight: 1.5, animation: 'fadeSlideUp 0.25s ease both',
+                    }}>
+                      This is worth discussing with your doctor or a healthcare professional.
+                    </div>
+                  )}
+                  {safetyLevel === 'emergency' && (
+                    <div style={{
+                      marginTop: 10, padding: '9px 12px', borderRadius: 8,
+                      backgroundColor: '#fef2f2',
+                      border: '1px solid #fecaca',
+                      fontFamily: FONTS.sans, fontSize: 12, color: '#991b1b',
+                      lineHeight: 1.5, animation: 'fadeSlideUp 0.25s ease both',
+                    }}>
+                      These symptoms need urgent medical attention. Please contact emergency services or go to your nearest emergency department now.
+                    </div>
+                  )}
+                  <button
+                    onClick={onAskAnother}
+                    style={{
+                      marginTop: 8, background: 'none',
+                      border: `1px solid ${COLORS.border}`,
+                      borderRadius: 8, padding: '7px 14px',
+                      fontSize: 13, fontFamily: FONTS.sans, fontWeight: 500,
+                      color: COLORS.muted, cursor: 'pointer',
+                    }}
+                  >
+                    Ask another &#8594;
+                  </button>
+                </>
               )}
             </div>
           )}
