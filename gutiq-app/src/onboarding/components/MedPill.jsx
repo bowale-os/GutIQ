@@ -13,6 +13,8 @@ export default function MedPill({ name, onRemove }) {
     }}>
       {name}
       <button
+        type="button"
+        aria-label={`Remove ${name}`}
         onClick={onRemove}
         style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, color: COLORS.teal, display: 'flex', alignItems: 'center' }}
       >

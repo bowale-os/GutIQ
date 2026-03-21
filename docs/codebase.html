@@ -785,7 +785,7 @@ function update() {
   let visible = 0;
 
   cards.forEach(card => {
-    const text = normalize(card.dataset.text || '') + ' ' + normalize(card.innerHTML);
+    const text = normalize(card.dataset.text || '') + ' ' + normalize(card.textContent);
     const tags = (card.dataset.tags || '').split(' ');
     const tagMatch = activeTag === 'all' || tags.includes(activeTag);
     const textMatch = !q || text.includes(q);

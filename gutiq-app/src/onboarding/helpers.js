@@ -5,6 +5,7 @@ import { CONDITIONS } from './constants';
 export function formatTime(value) {
   if (!value) return '';
   const [h, m] = value.split(':').map(Number);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return '';
   const ampm = h >= 12 ? 'PM' : 'AM';
   const hour = h % 12 || 12;
   return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;

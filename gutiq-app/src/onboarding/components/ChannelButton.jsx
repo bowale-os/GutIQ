@@ -4,6 +4,8 @@ import { FONTS } from '../../constants/styles';
 export default function ChannelButton({ icon: Icon, title, desc, selected, onClick, accent }) {
   return (
     <button
+      type="button"
+      aria-pressed={selected}
       onClick={onClick}
       style={{
         width: '100%', textAlign: 'left',

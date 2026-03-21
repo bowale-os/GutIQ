@@ -146,7 +146,16 @@ async def pain_relief_session(
         ) from exc
 
     # Merge: semantic may catch signals the keyword scan missed
-    if sem_flag and not result.is_red_flag:
+    if sem_flag is None:
+        # Semantic gate unavailable — keyword scan is the only safety signal.
+        # Log prominently so ops can detect outages; do not auto-escalate every
+        # request during an API outage (that would block all users from relief).
+        logger.error(
+            "Semantic red flag check unavailable | session=%s "
+            "— proceeding on keyword scan only",
+            result.session_id,
+        )
+    elif sem_flag and not result.is_red_flag:
         logger.warning(
             "Semantic red flag overrides keyword result | session=%s reason=%s",
             result.session_id, sem_reason,

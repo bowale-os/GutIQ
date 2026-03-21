@@ -17,7 +17,8 @@ export default function ScreenMedications({ finalCondition, medications, addMed,
   const handleKey = (e) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
-      if (medInput.trim()) { addMed(medInput); setMedInput(''); }
+      const trimmed = medInput.trim();
+      if (trimmed) { addMed(trimmed); setMedInput(''); }
     }
   };
 

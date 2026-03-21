@@ -46,7 +46,7 @@ async def semantic_red_flag_check(
     description: str,
     intensity: int,
     regions: list[str],
-) -> tuple[bool, str | None]:
+) -> tuple[bool | None, str | None]:
     """
     Returns (is_red_flag, reason).
 
@@ -67,7 +67,13 @@ async def semantic_red_flag_check(
             messages=[{"role": "user", "content": user_content}],
         )
         data = json.loads(msg.content[0].text.strip())
-        is_flag = bool(data.get("red_flag"))
+        raw = data.get("red_flag")
+        if isinstance(raw, bool):
+            is_flag = raw
+        elif isinstance(raw, str):
+            is_flag = raw.lower() == "true"
+        else:
+            is_flag = False
         reason  = data.get("reason") or None
         if is_flag:
             logger.warning(
@@ -76,5 +82,7 @@ async def semantic_red_flag_check(
             )
         return is_flag, reason
     except Exception:
-        logger.exception("semantic_red_flag_check failed — failing safe (False)")
-        return False, None
+        logger.exception(
+            "semantic_red_flag_check unavailable — caller must apply conservative path"
+        )
+        return None, "unavailable"

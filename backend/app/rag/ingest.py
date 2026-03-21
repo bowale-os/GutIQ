@@ -52,7 +52,8 @@ load_dotenv()
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 ROOT       = Path(__file__).resolve().parents[2]   # backend/
-CACHE_PATH = ROOT / "knowledge" / "cache" / "raw_docs.parquet"
+CACHE_PATH            = ROOT / "knowledge" / "cache" / "raw_docs.parquet"
+PUBMED_CHECKPOINT_PATH = ROOT / "knowledge" / "cache" / "pubmed_checkpoint.parquet"
 PDF_DIR    = ROOT / "knowledge" / "pdfs"
 TXT_DIR    = ROOT / "knowledge" / "txts"
 
@@ -244,11 +245,13 @@ def _fetch_pubmed() -> list[dict[str, Any]]:
     seen: set[str] = set()
     records: list[dict[str, Any]] = []
 
-    # Resume from checkpoint if it exists — skip already-seen PMIDs
-    if CACHE_PATH.exists():
+    # Resume from dedicated PubMed checkpoint — skip already-seen PMIDs.
+    # Uses PUBMED_CHECKPOINT_PATH (not CACHE_PATH) so mid-run saves never
+    # overwrite the full-corpus cache that --from-cache depends on.
+    if PUBMED_CHECKPOINT_PATH.exists():
         try:
-            cached_df = pd.read_parquet(CACHE_PATH)
-            cached    = cached_df[cached_df["source"] == "pubmed"].to_dict(orient="records")
+            cached_df = pd.read_parquet(PUBMED_CHECKPOINT_PATH)
+            cached    = cached_df.to_dict(orient="records")
             for r in cached:
                 pmid = str(r.get("pmid", ""))
                 if pmid and pmid not in seen:
@@ -256,7 +259,7 @@ def _fetch_pubmed() -> list[dict[str, Any]]:
                     records.append(r)
             print(f"  [checkpoint] Loaded {len(records)} previously fetched abstracts — skipping duplicates")
         except Exception:
-            pass  # corrupt or missing cache — start fresh
+            pass  # corrupt or missing checkpoint — start fresh
 
     for i, (condition, query, max_docs) in enumerate(PUBMED_QUERIES):
         print(f"  [{condition}] {query[:60]}...", end=" ", flush=True)
@@ -282,9 +285,10 @@ def _fetch_pubmed() -> list[dict[str, Any]]:
         except Exception as exc:
             print(f"✗ {exc}")
 
-        # Save checkpoint every 10 queries so --from-cache can resume if interrupted
+        # Save PubMed-only checkpoint every 10 queries so a crashed run can resume.
+        # Writes to PUBMED_CHECKPOINT_PATH — never touches the full-corpus CACHE_PATH.
         if (i + 1) % 10 == 0:
-            _save_cache(records)
+            _save_pubmed_checkpoint(records)
             print(f"  [checkpoint] Saved {len(records)} records after query {i + 1}/{len(PUBMED_QUERIES)}")
 
     print(f"  -> {len(records)} unique abstracts total")
@@ -401,6 +405,15 @@ def _load_txts() -> list[dict[str, Any]]:
 
 
 # ── Step 2 & 3: Parquet cache ──────────────────────────────────────────────────
+
+def _save_pubmed_checkpoint(records: list[dict[str, Any]]) -> None:
+    """Write PubMed-only mid-run checkpoint. Never touches CACHE_PATH."""
+    PUBMED_CHECKPOINT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    df = pd.DataFrame(records)
+    for col in df.columns:
+        df[col] = df[col].apply(lambda v: v.get("#text", str(v)) if isinstance(v, dict) else str(v) if v is not None else "")
+    df.to_parquet(PUBMED_CHECKPOINT_PATH, index=False)
+
 
 def _save_cache(records: list[dict[str, Any]]) -> None:
     CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
