@@ -564,28 +564,6 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
           <TimerRing seconds={sessionTimeLeft} total={sessionTotalTime} />
         </div>
 
-        {/* Breathing circle — only shown when the action is a breathing exercise */}
-        {/breath/i.test(current.action) && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 36 }}>
-            <div style={{ position: 'relative', width: 140, height: 140 }}>
-              <div style={{
-                position: 'absolute', inset: 0, borderRadius: '50%',
-                border: `1.5px solid ${COLORS.tealBorder}`,
-                animation: 'breatheSlow 5s ease-in-out infinite',
-              }} />
-              <div style={{
-                position: 'absolute', inset: 16, borderRadius: '50%',
-                border: `2px solid ${COLORS.teal}`,
-                animation: 'breatheExpand 5s ease-in-out infinite',
-              }} />
-              <div style={{
-                position: 'absolute', inset: 32, borderRadius: '50%',
-                backgroundColor: COLORS.tealLight,
-              }} />
-            </div>
-          </div>
-        )}
-
         {/* Right now label — frames this as a moment, not a list */}
         <p style={{
           fontFamily: FONTS.mono, fontSize: 10, color: COLORS.teal,
@@ -619,23 +597,42 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
           <CitationRow citations={citations} />
         )}
 
-        {/* Maintain + Avoid — whisper level, not advice */}
+        {/* Maintain + Avoid */}
         {(structured.maintain?.length > 0 || structured.avoid?.length > 0) && (
-          <div style={{
-            backgroundColor: COLORS.surfaceWarm, borderRadius: 12,
-            padding: '12px 16px', marginBottom: 20, opacity: 0.7,
-          }}>
+          <div style={{ marginBottom: 20 }}>
             {structured.maintain?.length > 0 && (
-              <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.muted, lineHeight: 1.7, marginBottom: structured.avoid?.length ? 6 : 0 }}>
-                <span style={{ fontFamily: FONTS.mono, fontSize: 9, color: COLORS.mutedLight, letterSpacing: '0.08em', textTransform: 'uppercase', marginRight: 6 }}>While you rest</span>
-                {structured.maintain.join(' · ')}
-              </p>
+              <div style={{
+                backgroundColor: COLORS.tealLight, borderRadius: 12,
+                padding: '14px 16px', marginBottom: 10,
+                border: `1px solid ${COLORS.tealBorder}`,
+              }}>
+                <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.teal, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                  While you rest
+                </p>
+                {structured.maintain.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: i < structured.maintain.length - 1 ? 8 : 0 }}>
+                    <span style={{ color: COLORS.teal, fontSize: 15, lineHeight: 1.5, flexShrink: 0 }}>✓</span>
+                    <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.teal, lineHeight: 1.5, margin: 0 }}>{item}</p>
+                  </div>
+                ))}
+              </div>
             )}
             {structured.avoid?.length > 0 && (
-              <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.muted, lineHeight: 1.6 }}>
-                <span style={{ fontFamily: FONTS.mono, fontSize: 9, color: COLORS.mutedLight, letterSpacing: '0.08em', textTransform: 'uppercase', marginRight: 6 }}>Step away from</span>
-                {structured.avoid.join(' · ')}
-              </p>
+              <div style={{
+                backgroundColor: COLORS.surfaceWarm, borderRadius: 12,
+                padding: '14px 16px',
+                border: `1px solid ${COLORS.border}`,
+              }}>
+                <p style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: 10 }}>
+                  Step away from
+                </p>
+                {structured.avoid.map((item, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: i < structured.avoid.length - 1 ? 8 : 0 }}>
+                    <span style={{ color: COLORS.mutedLight, fontSize: 15, lineHeight: 1.5, flexShrink: 0 }}>–</span>
+                    <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted, lineHeight: 1.5, margin: 0 }}>{item}</p>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

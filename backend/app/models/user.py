@@ -35,6 +35,13 @@ class User(SQLModel, table=True):
     profile_updated_at: Optional[datetime] = Field(default=None)
     logs_since_last_profile_change: int = Field(default=0)
 
+    # ── Pattern cache ─────────────────────────────────────────────────────────
+    # JSON string written by the pattern engine every 5 logs (same background
+    # task as health_profile_summary). Read by dashboard, GutCheck, post-save.
+    # Format: {"triggers": [...], "protective": [...], "log_count": 34}
+    pattern_cache: Optional[str] = Field(default=None)
+    pattern_cache_updated_at: Optional[datetime] = Field(default=None)
+
     created_at: datetime = Field(
         default_factory=utcnow,
         sa_column_kwargs={
