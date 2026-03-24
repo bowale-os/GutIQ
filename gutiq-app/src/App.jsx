@@ -264,6 +264,7 @@ export default function App() {
           onClose={closeLog}
           onSave={newLog => setLogs(prev => [apiLogToFrontend(newLog), ...prev])}
           demoMode={demoMode}
+          logCount={logs.length}
         />
       )}
     </div>

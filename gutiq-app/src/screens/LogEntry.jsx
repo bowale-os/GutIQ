@@ -3,6 +3,7 @@ import { Utensils, Activity, Brain, Moon, Dumbbell, Mic } from 'lucide-react';
 import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { preview, create } from '../api/logs';
+import { getInsights } from '../api/user';
 
 const TRANSCRIPT_LINES = [
   'Had coffee this morning...',
@@ -99,7 +100,7 @@ function EditRow({ label, children }) {
   );
 }
 
-export default function LogEntry({ onClose, onSave, demoMode = false }) {
+export default function LogEntry({ onClose, onSave, demoMode = false, logCount = 0 }) {
   const [phase, setPhase] = useState('idle');
   const [source, setSource] = useState('voice');
   const [rawContent, setRawContent] = useState('');
@@ -113,6 +114,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
   const [missingAccepted, setMissingAccepted] = useState(false);
   const [previewError, setPreviewError] = useState(null);
   const [saveError,    setSaveError]    = useState(null);
+  const [savedInsights, setSavedInsights] = useState(null);
 
   const lineRef = useRef(0);
   const discardTimer = useRef(null);
@@ -228,9 +230,11 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
           parsed_exercise: final.parsed_exercise,
         });
         onSave?.(result.log);
+        getInsights().then(setSavedInsights).catch(() => {});
       }
+      const newCount = logCount + 1;
       setPhase('saved');
-      setTimeout(() => onClose(), 1500);
+      if (newCount < 10) setTimeout(() => onClose(), 1500);
     } catch (err) {
       setSaveError(err.message || 'Save failed. Please try again.');
       setPhase('reviewing');
@@ -782,18 +786,40 @@ export default function LogEntry({ onClose, onSave, demoMode = false }) {
         </div>
       );
 
-      case 'saved': return (
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14 }}>
-          <div style={{
-            width: 64, height: 64, borderRadius: '50%',
-            backgroundColor: COLORS.tealLight, border: `2px solid ${COLORS.tealBorder}`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 28, animation: 'greenPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
-            color: COLORS.teal,
-          }}>✓</div>
-          <p style={{ fontFamily: FONTS.serif, fontSize: 26, color: COLORS.darkText, fontWeight: 400 }}>Logged</p>
-        </div>
-      );
+      case 'saved': {
+        const newCount = logCount + 1;
+        const topConfirmed = savedInsights?.confirmed_triggers?.[0];
+        const topTrigger   = savedInsights?.triggers?.[0];
+
+        let insight = null;
+        if (newCount >= 15 && topConfirmed) {
+          insight = `${topConfirmed.variable_value} shows up on your highest pain days — confirmed across ${topConfirmed.sample_size} logs.`;
+        } else if (newCount >= 10 && topTrigger) {
+          insight = topTrigger.text;
+        } else if (newCount < 10) {
+          insight = `${10 - newCount} more log${10 - newCount === 1 ? '' : 's'} and we'll start finding patterns.`;
+        }
+
+        return (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '0 24px' }}>
+            <div style={{
+              width: 64, height: 64, borderRadius: '50%',
+              backgroundColor: COLORS.tealLight, border: `2px solid ${COLORS.tealBorder}`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 28, animation: 'greenPop 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+              color: COLORS.teal,
+            }}>✓</div>
+            <p style={{ fontFamily: FONTS.serif, fontSize: 26, color: COLORS.darkText, fontWeight: 400 }}>Logged</p>
+            {insight && (
+              <p style={{
+                fontFamily: FONTS.sans, fontSize: 14, color: COLORS.darkMuted,
+                textAlign: 'center', lineHeight: 1.55, maxWidth: 300,
+                animation: 'fadeIn 0.4s ease 0.2s both',
+              }}>{insight}</p>
+            )}
+          </div>
+        );
+      }
 
       default: return null;
     }
