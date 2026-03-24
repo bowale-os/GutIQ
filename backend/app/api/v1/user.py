@@ -1,12 +1,14 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import timedelta, datetime
 from uuid import UUID
 
-
 from app.db import get_session
 from app.models import User
+from app.models.confirmed_trigger import ConfirmedTrigger
 from app.schemas import UserUpdateRequest, UserUpdateResponse
 from app.core.config import settings
 from app.api.deps import get_current_user
@@ -72,3 +74,54 @@ async def update_user_profile(
         age_range=current_user.age_range,
         updated_at=current_user.updated_at
     )
+
+
+@router.get("/insights")
+async def get_insights(
+    current_user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_session),
+):
+    """
+    Return the user's current pattern cache (triggers + protective factors)
+    and their permanently confirmed triggers.
+
+    Returns empty lists before enough logs exist (< 10 with severity).
+    """
+    # Parse cached pattern engine output
+    cache = {}
+    if current_user.pattern_cache:
+        try:
+            cache = json.loads(current_user.pattern_cache)
+        except json.JSONDecodeError:
+            cache = {}
+
+    # Load confirmed triggers
+    rows = (await session.execute(
+        select(ConfirmedTrigger)
+        .where(ConfirmedTrigger.user_id == current_user.id)
+        .order_by(ConfirmedTrigger.confirmed_at.desc())
+    )).scalars().all()
+
+    confirmed = [
+        {
+            "variable_type":   ct.variable_type,
+            "variable_value":  ct.variable_value,
+            "direction":       ct.direction,
+            "pain_delta":      ct.pain_delta,
+            "avg_pain_with":   ct.avg_pain_with,
+            "avg_pain_without": ct.avg_pain_without,
+            "sample_size":     ct.sample_size,
+            "confirmed_at":    ct.confirmed_at.isoformat(),
+        }
+        for ct in rows
+    ]
+
+    return {
+        "triggers":            cache.get("triggers",   []),
+        "protective":          cache.get("protective", []),
+        "log_count":           cache.get("log_count",  0),
+        "personal_range":      cache.get("personal_range", 0),
+        "confirmed_triggers":  confirmed,
+        "cache_updated_at":    current_user.pattern_cache_updated_at.isoformat()
+                               if current_user.pattern_cache_updated_at else None,
+    }
