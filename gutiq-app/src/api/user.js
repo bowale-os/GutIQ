@@ -16,6 +16,20 @@ export const getUserData = async () => {
 };
 
 
+// GET /users/insights
+export const getInsights = async () => {
+  const token = getToken();
+  const res = await fetch(`${BASE}/users/insights`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  await throwIfNotOk(res);
+  return res.json();
+};
+
+
 // PATCH /users/me
 export const update = async ({ email, digestive_condition, goal, age_range }) => {
   const token = getToken();
