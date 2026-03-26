@@ -29,7 +29,7 @@ class ParsedLogData(BaseModel):
     foods: List[FoodItem] = []
     symptoms: List[SymptomItem] = []
     wellness: WellnessData = WellnessData()
-    natural_summary: str = ""
+    natural_summary: Optional[str] = None
     confidence: str = "high"
     missing_critical_field: Optional[str] = None
     overall_severity: Optional[int] = None
@@ -47,7 +47,7 @@ class LogPreviewResponse(BaseModel):
     parsed_exercise: Optional[str] = None
     overall_severity: Optional[int] = None
     confidence: str = "high"
-    natural_summary: str = ""
+    natural_summary: Optional[str] = None
     missing_critical_field: Optional[str] = None
 
 

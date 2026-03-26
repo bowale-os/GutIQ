@@ -151,7 +151,7 @@ export const parseLogPreviewResponse = (raw = {}) => ({
   parsed_sleep:           raw.parsed_sleep                                 ?? null,
   parsed_exercise:        raw.parsed_exercise                              ?? null,
   confidence:             raw.confidence                                   ?? 'high',
-  natural_summary:        raw.natural_summary                              ?? '',
+  natural_summary:        raw.natural_summary                              ?? null,
   missing_critical_field: raw.missing_critical_field                       ?? null,
 });
 

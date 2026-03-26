@@ -31,7 +31,7 @@ Return ONLY valid JSON. No preamble, no explanation, no markdown fences.
     "sleep_hours": "float or null",
     "exercise": "none | light | moderate | intense | null"
   },
-  "natural_summary": "string — one calm sentence summarising what was logged, written as if confirming back to the user",
+  "natural_summary": "string — one calm sentence summarising what was logged, written as if confirming back to the user. Return null if the input is not a health log.",
   "confidence": "high | medium | low",
   "missing_critical_field": "string describing what's unclear, or null",
   "overall_severity": "integer 1–10 or null — only populate if the user gives a single overall score rather than per-symptom scores"
@@ -74,6 +74,7 @@ natural_summary
 - Write in second person, past tense, calm and factual.
 - Example: "You logged oat milk latte and toast this morning, with heartburn rated 7/10."
 - Do not mention fields that were absent. Do not add clinical commentary.
+- Return null if the input is not a health log (question, greeting, command, unrelated text).
 
 ## User history context (last 14 days)
 {user_history}

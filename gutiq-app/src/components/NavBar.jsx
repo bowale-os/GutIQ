@@ -4,7 +4,7 @@ import { FONTS } from '../constants/styles';
 const TABS = [
   { id: 'dashboard', icon: '⌂',  label: 'Home'     },
   { id: 'gutcheck',  icon: '✦',  label: 'Gut Check' },
-  { id: 'export',    icon: '↗',  label: 'Export'   },
+  { id: 'findings',  icon: '◎',  label: 'Findings' },
   { id: 'profile',   icon: '○',  label: 'Profile'  },
 ];
 

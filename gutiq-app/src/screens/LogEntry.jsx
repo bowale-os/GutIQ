@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Utensils, Activity, Brain, Moon, Dumbbell, Mic } from 'lucide-react';
+import { Activity, Brain, Moon, Dumbbell, Mic } from 'lucide-react';
 import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import { preview, create } from '../api/logs';
@@ -100,13 +100,14 @@ function EditRow({ label, children }) {
   );
 }
 
-export default function LogEntry({ onClose, onSave, demoMode = false, logCount = 0 }) {
+export default function LogEntry({ onClose, onSave, demoMode = false, logCount = 0, navigate }) {
   const [phase, setPhase] = useState('idle');
   const [source, setSource] = useState('voice');
   const [rawContent, setRawContent] = useState('');
   const [confirmed, setConfirmed] = useState({});
   const [transcript, setTranscript] = useState('');
   const [textFocused, setTextFocused] = useState(false);
+  const [catTooltip, setCatTooltip] = useState(null);
   const [discardGuard, setDiscardGuard] = useState(false);
   const [addFoodInput, setAddFoodInput] = useState('');
   const [showAddFood, setShowAddFood] = useState(false);
@@ -199,7 +200,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
       try {
         const data = await preview(rc);
         setConfirmed({ ...data });
-        setPhase('reviewing');
+        setPhase(!data.natural_summary ? 'redirect' : 'reviewing');
       } catch (err) {
         const msg = err.message?.toLowerCase().includes('raw_content')
           ? 'You left the log empty. Say or type something first.'
@@ -249,7 +250,8 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
   };
 
   const missing = useMemo(() => computeMissing(confirmed), [confirmed]);
-  const timeStr = logTime.current.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const timeStr = useMemo(() => logTime.current?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) ?? '', [phase]); // phase change is the signal to recompute
 
   const skipMissing = () => {
     const cats = (confirmed.log_categories || []).filter(c => c !== ({
@@ -279,10 +281,14 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
 
   const renderMissingPrompt = () => {
     if (missing === 'overall_severity') {
-      if (!missingAccepted) return <MissingOptIn label="Want to rate your pain level?" onAdd={() => setMissingAccepted(true)} onSkip={skipMissing} />;
+      const firstSymptom = confirmed.parsed_symptoms?.[0]?.name;
+      const severityLabel = firstSymptom
+        ? `How bad was the ${firstSymptom}?`
+        : 'How bad was the pain?';
+      if (!missingAccepted) return <MissingOptIn label={severityLabel} onAdd={() => setMissingAccepted(true)} onSkip={skipMissing} />;
       return (
         <div>
-          <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, marginBottom: 12 }}>Pain level (1–10)</p>
+          <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, marginBottom: 12 }}>{severityLabel} (1–10)</p>
           <div style={{ display: 'flex', gap: 6 }}>
             {SEVERITY_NUMS.map(n => {
               const c = SEV_COLOR(n);
@@ -389,16 +395,16 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
             ><Mic size={34} color="#fff" strokeWidth={1.5} /></button>
           </div>
           <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400, marginBottom: 8 }}>
-            Just talk
+            Talk to me...
           </p>
           <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, textAlign: 'center', lineHeight: 1.5, marginBottom: 14, maxWidth: 260 }}>
-            Include what you ate, any symptoms, stress, sleep, and exercise — the more detail, the better Tiwa can help.
+            Include what you ate, any symptoms, stress, sleep, and exercise. Extra detail helps me help you.
           </p>
           <button
             onClick={() => { setSource('text'); setPhase('capturing'); }}
             style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted }}
           >
-            type instead →
+            you can always type →
           </button>
         </div>
       );
@@ -406,6 +412,12 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
       case 'capturing': {
         if (source === 'voice') return (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 20 }}>
+            <button
+              onClick={() => { recognitionRef.current?.stop(); setTranscript(''); setRawContent(''); setPhase('idle'); }}
+              style={{ alignSelf: 'flex-start', fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted, background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12 }}
+            >
+              ← back
+            </button>
             <style>{`
               .sonar-cap {
                 position: absolute; inset: 0; margin: auto;
@@ -442,7 +454,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
             )}
             <button
               onClick={() => { recognitionRef.current?.stop(); setRawContent(transcript); callPreview(transcript); }}
-              style={{ marginTop: 14, fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, paddingBottom: 8 }}
+              style={{ marginTop: 14, fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted, background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0, paddingBottom: 4 }}
             >
               tap to finish →
             </button>
@@ -451,6 +463,12 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
 
         return (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <button
+              onClick={() => { setRawContent(''); setPhase('idle'); }}
+              style={{ alignSelf: 'flex-start', fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted, background: 'none', border: 'none', cursor: 'pointer', marginBottom: 12 }}
+            >
+              ← back
+            </button>
             <textarea
               value={rawContent}
               onChange={e => setRawContent(e.target.value)}
@@ -480,6 +498,39 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
           </div>
         );
       }
+
+      case 'redirect': return (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 12, padding: '0 4px' }}>
+          <p style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400, marginBottom: 4 }}>
+            Sorry, that's not really a log
+          </p>
+          <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, marginBottom: 8, lineHeight: 1.5 }}>
+            Where would you like to go?
+          </p>
+
+          {[
+            { label: 'Do you want to ask Tiwa a question?', sub: 'GutCheck can answer questions based on your logs', action: () => { onClose(); navigate('gutcheck'); } },
+            { label: "Are you in pain right now?", sub: 'Pain Relief gives you steps to relieve your pain', action: () => { onClose(); navigate('pain_relief'); } },
+            { label: 'Did you want to log something?', sub: 'You can tell Tiwa relevant stuff here', action: () => setPhase('idle') },
+          ].map(({ label, sub, action }) => (
+            <button
+              key={label}
+              onClick={action}
+              style={{
+                display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
+                width: '100%', textAlign: 'left',
+                background: COLORS.darkSurface,
+                border: `1px solid ${COLORS.darkBorder}`,
+                borderRadius: 14, padding: '14px 16px',
+                cursor: 'pointer',
+              }}
+            >
+              <span style={{ fontFamily: FONTS.sans, fontWeight: 600, fontSize: 14, color: COLORS.darkText, marginBottom: 3 }}>{label}</span>
+              <span style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.darkMuted }}>{sub}</span>
+            </button>
+          ))}
+        </div>
+      );
 
       case 'previewing': return (
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -530,58 +581,119 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
 
               <div style={{ height: 1, backgroundColor: COLORS.darkBorder, marginBottom: 12 }} />
 
-              {/* Category chips — always visible, tap to add or remove */}
               <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.darkMuted, marginBottom: 8 }}>
-                Tap to add or remove from your log
+                Click to add any to your log, hover for an explanation
               </p>
-              <style>{`
-                .chip-scroll::-webkit-scrollbar { display: none; }
-                .chip-scroll { -ms-overflow-style: none; scrollbar-width: none; }
-              `}</style>
-              <div className="chip-scroll" style={{ display: 'flex', gap: 6, overflowX: 'auto', flexWrap: 'nowrap', marginBottom: 14, paddingBottom: 2 }}>
-                {[
-                  ['food',     Utensils, 'Food'],
-                  ['symptom',  Activity, 'Symptoms'],
-                  ['stress',   Brain,    'Stress'],
-                  ['sleep',    Moon,     'Sleep'],
-                  ['exercise', Dumbbell, 'Exercise'],
-                ].map(([cat, Icon, label]) => {
-                  const active = (confirmed.log_categories || []).includes(cat);
-                  return (
-                    <button key={cat} onClick={() => {
-                      const cats = confirmed.log_categories || [];
-                      if (active) {
-                        upd('log_categories', cats.filter(c => c !== cat));
-                      } else {
-                        upd('log_categories', [...cats, cat]);
-                        setMissingAccepted(false);
-                        setMissingInput('');
-                      }
-                    }} style={{
-                      display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0,
-                      padding: '6px 12px', borderRadius: 20,
-                      border: `1.5px solid ${active ? COLORS.orange : COLORS.darkBorder}`,
-                      borderStyle: active ? 'solid' : 'dashed',
-                      backgroundColor: active ? COLORS.orangeLight : 'transparent',
-                      color: active ? COLORS.orange : COLORS.darkMuted,
-                      fontFamily: FONTS.sans, fontSize: 12, cursor: 'pointer',
-                      fontWeight: active ? 600 : 400,
-                      whiteSpace: 'nowrap',
-                    }}>
-                      <Icon size={13} strokeWidth={active ? 2.5 : 1.8} />
-                      {active ? null : <span style={{ fontSize: 10, opacity: 0.6 }}>+</span>}
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
+              {/* Category pills — 2 top, 3 bottom */}
+              {(() => {
+                const CATS = [
+                  ['food',     'Food',     'What you ate or drank'],
+                  ['symptom',  'Symptoms', 'What kind of symptom did you feel (cramping, nausea or something else)?'],
+                  ['stress',   'Stress',   'Stress directly affects gut health'],
+                  ['sleep',    'Sleep',    'Poor sleep might cause a flare.'],
+                  ['exercise', 'Exercise', 'Did execising help or worsen your symptoms?'],
+                ];
+                return (
+                  <div style={{ marginBottom: 14 }}>
+                    {[CATS.slice(0, 2), CATS.slice(2)].map((row, ri) => (
+                      <div key={ri} style={{ display: 'flex', gap: 6, marginBottom: 6, justifyContent: 'flex-start' }}>
+                        {row.map(([cat, label, hint]) => {
+                          const active = (confirmed.log_categories || []).includes(cat);
+                          return (
+                            <div key={cat} style={{ position: 'relative' }}>
+                              {catTooltip === cat && (
+                                <div style={{
+                                  position: 'absolute', bottom: '110%', left: 0,
+                                  backgroundColor: COLORS.darkSurface, border: `1px solid ${COLORS.darkBorder}`,
+                                  borderRadius: 8, padding: '7px 10px', zIndex: 20,
+                                  width: 150, pointerEvents: 'none',
+                                  boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+                                }}>
+                                  <p style={{ fontFamily: FONTS.sans, fontSize: 11, color: COLORS.darkMuted, lineHeight: 1.45, textAlign: 'center' }}>{hint}</p>
+                                </div>
+                              )}
+                              <button
+                                onMouseEnter={() => setCatTooltip(cat)}
+                                onMouseLeave={() => setCatTooltip(null)}
+                                onTouchStart={() => setCatTooltip(t => t === cat ? null : cat)}
+                                onClick={() => {
+                                  setCatTooltip(null);
+                                  const cats = confirmed.log_categories || [];
+                                  if (active) {
+                                    upd('log_categories', cats.filter(c => c !== cat));
+                                  } else {
+                                    upd('log_categories', [...cats, cat]);
+                                    setMissingAccepted(false);
+                                    setMissingInput('');
+                                  }
+                                }}
+                                style={{
+                                  padding: '6px 14px',
+                                  borderRadius: 20,
+                                  border: `1.5px solid ${active ? COLORS.orange : COLORS.darkBorder}`,
+                                  borderStyle: active ? 'solid' : 'dashed',
+                                  backgroundColor: active ? COLORS.orangeLight : 'transparent',
+                                  color: active ? COLORS.orange : COLORS.darkMuted,
+                                  fontFamily: FONTS.sans, fontSize: 12, cursor: 'pointer',
+                                  fontWeight: active ? 600 : 400,
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {label}
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
 
               {/* Foods */}
               {foods.length > 0 && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-                  {foods.map(f => (
-                    <span key={f} style={{ ...STYLES.chip, backgroundColor: COLORS.orangeLight, color: COLORS.orange, border: `1px solid ${COLORS.orangeBorder}` }}>{f}</span>
-                  ))}
+                <div style={{ marginBottom: 10 }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+                    <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, lineHeight: 1.5, margin: 0 }}>
+                      <span style={{ color: COLORS.orange, fontWeight: 600 }}>Food: </span>
+                      {foods.join(', ')}
+                    </p>
+                    <button
+                      onClick={() => setShowAddFood(v => !v)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTS.mono, fontSize: 10, color: COLORS.darkMuted, padding: 0, opacity: 0.6 }}
+                    >
+                      edit
+                    </button>
+                  </div>
+                  {showAddFood && (
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 6 }}>
+                        {foods.map(f => (
+                          <span
+                            key={f}
+                            onClick={() => upd('parsed_foods', foods.filter(x => x !== f))}
+                            style={{ ...STYLES.chip, backgroundColor: COLORS.orangeLight, color: COLORS.orange, border: `1px solid ${COLORS.orangeBorder}`, cursor: 'pointer', gap: 4 }}
+                          >
+                            {f} <span style={{ opacity: 0.6 }}>×</span>
+                          </span>
+                        ))}
+                      </div>
+                      <input
+                        value={addFoodInput}
+                        autoFocus
+                        onChange={e => setAddFoodInput(e.target.value)}
+                        onKeyDown={e => {
+                          if (e.key === 'Enter' && addFoodInput.trim()) {
+                            upd('parsed_foods', [...foods, addFoodInput.trim()]);
+                            setAddFoodInput('');
+                          }
+                          if (e.key === 'Escape') { setShowAddFood(false); setAddFoodInput(''); }
+                        }}
+                        placeholder="add food..."
+                        style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.orange}`, color: COLORS.darkText, padding: '6px 10px', fontSize: 13, width: '100%' }}
+                      />
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -652,11 +764,14 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
                     {saveError}
                   </p>
                 )}
+                <button onClick={() => callSave()} style={{ ...STYLES.btnPrimary, width: '100%', marginBottom: 8 }}>
+                  Share with Tiwa
+                </button>
                 <button
-                  onClick={() => callSave()}
-                  style={{ ...STYLES.btnPrimary, width: '100%' }}
+                  onClick={() => { setConfirmed({}); setRawContent(''); setTranscript(''); setPhase('idle'); }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', fontFamily: FONTS.sans, fontSize: 12, color: COLORS.darkMuted, padding: '4px 0' }}
                 >
-                  Save ✓
+                  Tiwa got something wrong? Sorry, log again.
                 </button>
               </div>
             )}
@@ -817,6 +932,17 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
                 animation: 'fadeIn 0.4s ease 0.2s both',
               }}>{insight}</p>
             )}
+            <button
+              onClick={onClose}
+              style={{
+                marginTop: 8, background: 'none', border: 'none', cursor: 'pointer',
+                fontFamily: FONTS.mono, fontSize: 11, color: COLORS.darkMuted,
+                letterSpacing: '0.06em', opacity: 0.5,
+                animation: 'fadeIn 0.4s ease 0.3s both',
+              }}
+            >
+              Done
+            </button>
           </div>
         );
       }
@@ -825,11 +951,12 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
     }
   };
 
-  const showX = !['saving', 'saved'].includes(phase);
+  const showX = !['saving'].includes(phase);
   const headerContent = {
-    idle: <h2 style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400 }}>Tell me about it...</h2>,
-    capturing: source === 'text' ? <h2 style={{ fontFamily: FONTS.serif, fontSize: 22, color: COLORS.darkText, fontWeight: 400 }}>Tell me about it...</h2> : <span />,
+    idle: <span />,
+    capturing: <span />,
     previewing: <span />,
+    redirect: <span />,
     reviewing: <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.1em' }}>REVIEW</p>,
     editing: <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.1em' }}>ADJUSTING</p>,
     saving: <span />,

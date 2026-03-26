@@ -64,7 +64,7 @@ function buildRequest(chips, freeText, intensity) {
   const chipText   = chips.length ? `Experiencing: ${chips.map(c => c.label.toLowerCase()).join(', ')}.` : '';
   const enrichment = chips.map(c => c.searchTerms).filter(Boolean).join(' ');
   const description = [chipText, freeText.trim(), enrichment].filter(Boolean).join(' ')
-    || `Gut discomfort, intensity ${intensity}/10.`;
+    || `Gut discomfort, intensity ${intensity ?? 5}/10.`;
 
   const seenRegions = new Set();
   const body_clicks = chips.length
@@ -215,7 +215,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
 
   // Intake
   const [selectedChips, setSelectedChips] = useState([]);
-  const [intensity,     setIntensity]     = useState(6);
+  const [intensity,     setIntensity]     = useState(null);
   const [freeText,      setFreeText]      = useState('');
   const [showFreeText,  setShowFreeText]  = useState(false);
   const [isListening,   setIsListening]   = useState(false);
@@ -249,6 +249,13 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
 
   // ── Chip toggle ─────────────────────────────────────────────────────────────────
   const toggleChip = (chip) => {
+    // Selecting a chip clears any free text / voice input
+    if (!selectedChips.find(c => c.label === chip.label)) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      setFreeText('');
+      setShowFreeText(false);
+    }
     setSelectedChips(prev =>
       prev.find(c => c.label === chip.label)
         ? prev.filter(c => c.label !== chip.label)
@@ -261,6 +268,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
     if (isListening) { recognitionRef.current?.stop(); return; }
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) { setError('Voice input not supported in this browser.'); return; }
+    setSelectedChips([]);
     setShowFreeText(true);
     const recognition = new SR();
     recognitionRef.current = recognition;
@@ -293,6 +301,10 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       setIsSoftFlag(true);
       setRedFlagReason('Chest pain alongside gut symptoms should be evaluated by a doctor today.');
       setView('redflag');
+      return;
+    }
+    if (intensity === null) {
+      setError('Please drag the slider to rate your pain level.');
       return;
     }
     if (selectedChips.length === 0 && freeText.trim().length < 5) {
@@ -413,14 +425,14 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
         Tiwa · Pain Relief
       </p>
       <h1 style={{ fontFamily: FONTS.serif, fontSize: 'clamp(22px, 6vw, 28px)', color: COLORS.text, lineHeight: 1.25, marginBottom: 6 }}>
-        Let me help you through this.
+        Describe the way you are feeling...
       </h1>
       <p style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.muted, lineHeight: 1.5, marginBottom: 28 }}>
-        What's happening right now?
+        ...and I'll provide pain relief steps...
       </p>
 
       {/* Chips */}
-      <p style={{ ...STYLES.label, marginBottom: 12 }}>Select what you're feeling</p>
+      <p style={{ ...STYLES.label, marginBottom: 12 }}>Select one or more</p>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 28 }}>
         {SYMPTOM_CHIPS.map(chip => {
           const active = selectedChips.find(c => c.label === chip.label);
@@ -438,14 +450,26 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       </div>
 
       {/* Intensity */}
-      <div style={{ ...STYLES.card, padding: '18px 20px', marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+      <div style={{
+        ...STYLES.card, padding: '18px 20px', marginBottom: 16,
+        border: intensity === null ? `1.5px solid ${COLORS.orangeBorder}` : undefined,
+        transition: 'border-color 0.2s ease',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: intensity === null ? 6 : 14 }}>
           <p style={STYLES.label}>How bad is it?</p>
-          <span style={{ fontFamily: FONTS.mono, fontSize: 'clamp(22px, 6vw, 28px)', fontWeight: 500, color: COLORS.teal, lineHeight: 1 }}>
-            {intensity}<span style={{ fontSize: 13, color: COLORS.muted, fontWeight: 400 }}>/10</span>
-          </span>
+          {intensity !== null
+            ? <span style={{ fontFamily: FONTS.mono, fontSize: 'clamp(22px, 6vw, 28px)', fontWeight: 500, color: COLORS.teal, lineHeight: 1 }}>
+                {intensity}<span style={{ fontSize: 13, color: COLORS.muted, fontWeight: 400 }}>/10</span>
+              </span>
+            : <span style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.orange, letterSpacing: '0.06em' }}>REQUIRED</span>
+          }
         </div>
-        <input type="range" min={1} max={10} value={intensity}
+        {intensity === null && (
+          <p style={{ fontFamily: FONTS.sans, fontSize: 12, color: COLORS.muted, marginBottom: 10 }}>
+            Drag the slider to rate your pain — this helps us find the right steps.
+          </p>
+        )}
+        <input type="range" min={1} max={10} value={intensity ?? 5}
           onChange={e => setIntensity(Number(e.target.value))}
           style={{ width: '100%', accentColor: COLORS.teal, cursor: 'pointer', margin: 0 }}
         />
@@ -482,7 +506,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
             <textarea
               placeholder="Describe what you're feeling — or tap the mic and speak..."
               value={freeText}
-              onChange={e => setFreeText(e.target.value)}
+              onChange={e => { setSelectedChips([]); setFreeText(e.target.value); }}
               rows={4}
               style={{
                 ...STYLES.input, resize: 'none', fontSize: 14, lineHeight: 1.6, paddingRight: 52,
@@ -512,7 +536,7 @@ export default function PainRelief({ navigate, logs = [], demoMode = false }) {
       {error && <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.danger, marginBottom: 12 }}>{error}</p>}
 
       <button onClick={() => handleSubmit(false)} style={{ ...STYLES.btnPrimary, backgroundColor: COLORS.teal }}>
-        Get my relief steps →
+        Get your relief steps →
       </button>
     </>
   );

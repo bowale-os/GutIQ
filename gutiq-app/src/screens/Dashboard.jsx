@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { HeartPulse, Mic, TrendingUp, TrendingDown } from 'lucide-react';
+import { HeartPulse, Mic } from 'lucide-react';
 import { COLORS, getSeverityColor } from '../constants/colors';
 import { FONTS, STYLES } from '../constants/styles';
 import LogCard from '../components/LogCard';
-import { getInsights } from '../api/user';
 
 function Sparkline({ logs }) {
   const [visible, setVisible] = useState(false);
@@ -93,74 +92,6 @@ function Sparkline({ logs }) {
   );
 }
 
-function FindingsCard({ insights }) {
-  const top    = insights.triggers?.[0];
-  const protect = insights.protective?.[0];
-  if (!top && !protect) return null;
-
-  return (
-    <div style={{
-      ...STYLES.card,
-      padding: '16px 18px',
-      marginBottom: 16,
-      borderLeft: `3px solid ${COLORS.orange}`,
-    }}>
-      <p style={{ ...STYLES.label, marginBottom: 10 }}>What your data shows</p>
-
-      {top && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: protect ? 10 : 0 }}>
-          <TrendingUp size={15} color={COLORS.danger} strokeWidth={2} style={{ marginTop: 2, flexShrink: 0 }} />
-          <div>
-            <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.text, lineHeight: 1.45 }}>
-              {top.text}
-            </p>
-            <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.muted, marginTop: 2 }}>
-              {top.label} · {top.sample_size} logs
-              {top.confirmable && (
-                <span style={{
-                  marginLeft: 6,
-                  backgroundColor: COLORS.orangeLight,
-                  color: COLORS.orange,
-                  borderRadius: 4,
-                  padding: '1px 5px',
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '0.04em',
-                }}>CONFIRMED</span>
-              )}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {protect && (
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10 }}>
-          <TrendingDown size={15} color={COLORS.teal} strokeWidth={2} style={{ marginTop: 2, flexShrink: 0 }} />
-          <div>
-            <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.text, lineHeight: 1.45 }}>
-              {protect.text}
-            </p>
-            <p style={{ fontFamily: FONTS.mono, fontSize: 10, color: COLORS.muted, marginTop: 2 }}>
-              {protect.label} · {protect.sample_size} logs
-              {protect.confirmable && (
-                <span style={{
-                  marginLeft: 6,
-                  backgroundColor: COLORS.tealLight,
-                  color: COLORS.teal,
-                  borderRadius: 4,
-                  padding: '1px 5px',
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '0.04em',
-                }}>CONFIRMED</span>
-              )}
-            </p>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 
 export default function Dashboard({ user, logs, navigate, openLog }) {
@@ -215,11 +146,6 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
       </div>
     </div>
   );
-
-  const [insights, setInsights] = useState(null);
-  useEffect(() => {
-    getInsights().then(setInsights).catch(() => {});
-  }, []);
 
   const lastLog    = logs[0];
   const recentLogs = logs.slice(0, 3);
@@ -330,9 +256,6 @@ export default function Dashboard({ user, logs, navigate, openLog }) {
             <p style={{ fontSize: 11, color: COLORS.muted, marginTop: 2 }}>{lastLog.date}</p>
           </div>
         </div>
-
-        {/* Findings card */}
-        {insights && <FindingsCard insights={insights} />}
 
         {/* 14-day chart */}
         <div style={{ ...STYLES.card, padding: '16px 16px 12px', marginBottom: 20 }}>
