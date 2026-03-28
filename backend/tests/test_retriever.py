@@ -52,11 +52,11 @@ class TestCheckRedFlags:
         assert reason is not None
 
     def test_rebound_tenderness_fires(self):
-        is_flag, reason = _check_red_flags(_req("I have rebound tenderness in my abdomen", 7))
+        is_flag, _ = _check_red_flags(_req("I have rebound tenderness in my abdomen", 7))
         assert is_flag is True
 
     def test_rebound_pain_fires(self):
-        is_flag, reason = _check_red_flags(_req("there is rebound pain when I release pressure", 6))
+        is_flag, _ = _check_red_flags(_req("there is rebound pain when I release pressure", 6))
         assert is_flag is True
 
     def test_bare_rebound_word_does_not_fire(self):
