@@ -112,10 +112,8 @@ async def run_gutcheck(
     yield _sse("session_id", id=str(session_id))
 
     # ── 2. Load data ───────────────────────────────────────────────────────────
-    recent_logs, confirmed = await asyncio.gather(
-        _fetch_recent_logs(user.id, db_session, days=RECENT_DAYS),
-        _fetch_confirmed_triggers(user.id, db_session),
-    )
+    recent_logs = await _fetch_recent_logs(user.id, db_session, days=RECENT_DAYS)
+    confirmed   = await _fetch_confirmed_triggers(user.id, db_session)
     history = await _load_history(session_id, db_session)
     system  = build_system_prompt(user, recent_logs, user.health_profile_summary, confirmed)
 
