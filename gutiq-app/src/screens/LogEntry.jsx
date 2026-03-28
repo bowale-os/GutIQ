@@ -535,8 +535,8 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
           </p>
 
           {[
-            { label: 'Do you want to ask Tiwa a question?', sub: 'GutCheck can answer questions based on your logs', action: () => { onClose(); navigate('gutcheck'); } },
-            { label: "Are you in pain right now?", sub: 'Pain Relief gives you steps to relieve your pain', action: () => { onClose(); navigate('pain_relief'); } },
+            { label: 'Do you want to ask Tiwa a question?', sub: 'GutCheck can answer questions based on your logs', action: () => { onClose(); navigate?.('gutcheck'); } },
+            { label: "Are you in pain right now?", sub: 'Pain Relief gives you steps to relieve your pain', action: () => { onClose(); navigate?.('pain_relief'); } },
             { label: 'Did you want to log something?', sub: 'You can tell Tiwa relevant stuff here', action: () => setPhase('idle') },
           ].map(({ label, sub, action }) => (
             <button
@@ -992,7 +992,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
               }}>{insight}</p>
             )}
             <button
-              onClick={() => { onClose(); navigate('findings'); }}
+              onClick={() => { onClose(); navigate?.('findings'); }}
               style={{
                 marginTop: 8, background: 'none',
                 border: `1px solid ${COLORS.darkBorder}`,

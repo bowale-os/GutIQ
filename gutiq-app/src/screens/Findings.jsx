@@ -45,13 +45,18 @@ function SignalRow({ signal, direction }) {
   );
 }
 
-export default function Findings({ user, logs, navigate }) {
+export default function Findings({ user, logs, navigate, demoMode }) {
   const [insights, setInsights] = useState(null);
+  const [loading, setLoading]   = useState(!demoMode);
   const logCount = logs.length;
 
   useEffect(() => {
-    getInsights().then(setInsights).catch(() => {});
-  }, []);
+    if (demoMode) return;
+    getInsights()
+      .then(setInsights)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [demoMode]);
 
   // ── State 1: too few logs ──────────────────────────────────────────────────
   if (logCount < 10) {
@@ -99,6 +104,9 @@ export default function Findings({ user, logs, navigate }) {
       </div>
     );
   }
+
+  // ── Loading: wait for insights before deciding which state to show ──────────
+  if (loading) return null;
 
   // ── State 2: enough logs but patterns still forming (10–14, no confirmed) ──
   const triggers   = insights?.triggers   || [];

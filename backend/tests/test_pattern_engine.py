@@ -158,10 +158,9 @@ def test_not_confirmable_small_sample():
         repeat(make_log(2, foods=[]),         8)
     )
     result = run(logs)
-    if result["triggers"]:
-        coffee_list = [t for t in result["triggers"] if t["variable_value"] == "coffee"]
-        if coffee_list:
-            assert coffee_list[0]["confirmable"] is False
+    coffee = next((t for t in result["triggers"] if t["variable_value"] == "coffee"), None)
+    assert coffee is not None, "coffee should appear as a trigger"
+    assert coffee["confirmable"] is False
 
 
 def test_none_fields_dont_crash():

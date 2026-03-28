@@ -235,7 +235,7 @@ export default function App() {
       case 'dashboard':   return <Dashboard user={user} logs={logs} navigate={navigate} openLog={openLog} />;
       case 'gutcheck':    return <GutCheck user={user} demoMode={demoMode} />;
       case 'export':      return <Export user={user} logs={logs} navigate={navigate} />;
-      case 'findings':    return <Findings user={user} logs={logs} navigate={navigate} />;
+      case 'findings':    return <Findings user={user} logs={logs} navigate={navigate} demoMode={demoMode} />;
       case 'profile':     return <Profile user={user} navigate={navigate} onUpdate={updated => setUser(u => ({ ...u, ...updated }))} />;
       case 'pain_relief': return <PainRelief navigate={navigate} logs={logs} demoMode={demoMode} />;
       default:            return <Landing navigate={navigate} onDemo={startDemo} />;

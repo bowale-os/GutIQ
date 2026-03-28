@@ -16,6 +16,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
+from sqlalchemy import UniqueConstraint
 from sqlmodel import SQLModel, Field
 
 from app.core.utils import utcnow
@@ -23,6 +24,9 @@ from app.core.utils import utcnow
 
 class ConfirmedTrigger(SQLModel, table=True):
     __tablename__ = "confirmed_triggers"
+    __table_args__ = (
+        UniqueConstraint("user_id", "variable_type", "variable_value", "direction", name="uq_confirmed_trigger"),
+    )
 
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="users.id", index=True)

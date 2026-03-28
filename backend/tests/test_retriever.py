@@ -9,7 +9,7 @@ Coverage:
     - "rebound tenderness" fires (not just "rebound")
     - "rebound pain" fires
     - "gas pain" does NOT match "gastroparesis" (CodeRabbit fix)
-    - "gas pain" DOES match "gas pain"
+    - "gas pain" does NOT fire a red flag (it is a keyword weight, not a red flag pattern)
     - Appendicitis structural rule (lower_right + high intensity)
     - Appendicitis rule does NOT fire at low intensity
     - No flags returns (False, None)
@@ -126,7 +126,7 @@ class TestResolveCondition:
         condition = _resolve_condition(req.body_clicks, req.description, req.pain_character)
         # gastroparesis text alone shouldn't push gas_bloating to the top
         # upper_center maps to acid_reflux as primary — that should win
-        assert condition != GutCondition.gas_bloating
+        assert condition == GutCondition.acid_reflux
 
     def test_heartburn_keyword_scores_acid_reflux(self):
         req = _req("terrible heartburn after eating pizza", 5, region=AnteriorRegion.upper_center)

@@ -82,7 +82,7 @@ def run(logs: list[dict[str, Any]]) -> dict[str, Any]:
     with_sev = [l for l in logs if l.get("severity") is not None]
 
     if len(with_sev) < MIN_LOGS:
-        return {"triggers": [], "protective": [], "log_count": len(logs),
+        return {"triggers": [], "protective": [], "log_count": len(with_sev),
                 "personal_range": 0, "noise_floor": 0}
 
     severities     = [l["severity"] for l in with_sev]
@@ -114,8 +114,8 @@ def run(logs: list[dict[str, Any]]) -> dict[str, Any]:
 
     # Sleep
     c = _signal(
-        [l for l in with_sev if (l.get("sleep_hours") or 99) < 6],
-        [l for l in with_sev if (l.get("sleep_hours") or 0) >= 7],
+        [l for l in with_sev if l.get("sleep_hours") is not None and l["sleep_hours"] < 6],
+        [l for l in with_sev if l.get("sleep_hours") is not None and l["sleep_hours"] >= 7],
         "sleep", "sleep_lt_6", floor,
     )
     if c:

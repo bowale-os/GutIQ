@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from app.models import User, Log, FoodEntry, SymptomEntry, WellnessEntry
+from app.models.confirmed_trigger import ConfirmedTrigger                                  # noqa: F401
 from app.models.pain_relief import PainReliefSession, PainReliefChunk, PainReliefFeedback  # noqa: F401
 from app.models.gut_check import GutCheckSession, GutCheckMessage                          # noqa: F401
 from app.core.config import settings

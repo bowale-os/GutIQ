@@ -16,9 +16,11 @@ Debug tip:
 
 import json
 import logging
+import uuid
 from datetime import datetime
 
 import anthropic
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
@@ -177,23 +179,10 @@ async def update_pattern_cache(user: User, logs: list[Log], db_session: AsyncSes
     confirmable = [s for s in result["triggers"] + result["protective"] if s.get("confirmable")]
 
     for signal in confirmable:
-        existing = (await db_session.execute(
-            select(ConfirmedTrigger).where(
-                ConfirmedTrigger.user_id        == user.id,
-                ConfirmedTrigger.variable_type  == signal["variable_type"],
-                ConfirmedTrigger.variable_value == signal["variable_value"],
-                ConfirmedTrigger.direction      == signal["direction"],
-            )
-        )).scalar_one_or_none()
-
-        if existing:
-            existing.pain_delta       = signal["delta"]
-            existing.avg_pain_with    = signal["avg_with"]
-            existing.avg_pain_without = signal["avg_without"]
-            existing.sample_size      = signal["sample_size"]
-            existing.confirmed_at     = utcnow()
-        else:
-            db_session.add(ConfirmedTrigger(
+        stmt = (
+            pg_insert(ConfirmedTrigger)
+            .values(
+                id              = uuid.uuid4(),
                 user_id         = user.id,
                 variable_type   = signal["variable_type"],
                 variable_value  = signal["variable_value"],
@@ -202,7 +191,20 @@ async def update_pattern_cache(user: User, logs: list[Log], db_session: AsyncSes
                 avg_pain_with   = signal["avg_with"],
                 avg_pain_without= signal["avg_without"],
                 sample_size     = signal["sample_size"],
-            ))
+                confirmed_at    = utcnow(),
+            )
+            .on_conflict_do_update(
+                constraint="uq_confirmed_trigger",
+                set_=dict(
+                    pain_delta       = signal["delta"],
+                    avg_pain_with    = signal["avg_with"],
+                    avg_pain_without = signal["avg_without"],
+                    sample_size      = signal["sample_size"],
+                    confirmed_at     = utcnow(),
+                ),
+            )
+        )
+        await db_session.execute(stmt)
 
     logger.info(
         "update_pattern_cache | user=%s triggers=%d protective=%d confirmable=%d",
