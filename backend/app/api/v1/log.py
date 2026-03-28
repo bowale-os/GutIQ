@@ -84,7 +84,6 @@ async def preview_log(
         parsed_stress=parsed.wellness.stress,
         parsed_sleep=parsed.wellness.sleep_hours,
         parsed_exercise=parsed.wellness.exercise,
-        overall_severity=parsed.overall_severity,
         confidence=parsed.confidence,
         natural_summary=parsed.natural_summary,
         missing_critical_field=parsed.missing_critical_field,
@@ -125,8 +124,7 @@ async def create_log(
         SymptomEntry(
             log_id=log.id, user_id=current_user.id, logged_at=ts,
             name=item.name,
-            # Fall back to overall_severity when per-symptom severity is absent
-            severity=item.severity if item.severity is not None else body.overall_severity,
+            severity=item.severity,
         )
         for item in (body.parsed_symptoms or [])
     ]

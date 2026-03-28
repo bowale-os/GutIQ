@@ -16,9 +16,11 @@ Debug tip:
 
 import json
 import logging
+import uuid
 from datetime import datetime
 
 import anthropic
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
@@ -27,7 +29,9 @@ from app.core.config import settings
 from app.core.utils import utcnow
 from app.models.log import Log
 from app.models.user import User
+from app.models.confirmed_trigger import ConfirmedTrigger
 from app.ai_llm.gut_check_prompt import format_log
+from app.ai_llm import pattern_engine
 
 logger = logging.getLogger(__name__)
 
@@ -125,6 +129,7 @@ async def regenerate_profile(user_id, db_session: AsyncSession) -> None:
         user.profile_updated_at            = utcnow()
         user.logs_since_last_profile_change = 0
 
+        await update_pattern_cache(user, logs, db_session)
         await db_session.commit()
 
         logger.info(
@@ -140,3 +145,68 @@ async def regenerate_profile(user_id, db_session: AsyncSession) -> None:
 def should_regenerate(user: User) -> bool:
     """Return True if the profile is due for an update."""
     return user.logs_since_last_profile_change >= 5
+
+
+# ── Pattern cache ──────────────────────────────────────────────────────────────
+
+def _logs_to_pattern_payload(logs: list[Log]) -> list[dict]:
+    """Convert ORM Log objects to the flat dicts pattern_engine.run() expects."""
+    rows = []
+    for log in logs:
+        severities = [s.severity for s in log.symptom_entries if s.severity is not None]
+        rows.append({
+            "severity":    sum(severities) / len(severities) if severities else None,
+            "foods":       [f.name for f in log.food_entries],
+            "stress":      log.wellness_entry.stress      if log.wellness_entry else None,
+            "sleep_hours": log.wellness_entry.sleep_hours if log.wellness_entry else None,
+            "exercise":    log.wellness_entry.exercise    if log.wellness_entry else None,
+        })
+    return rows
+
+
+async def update_pattern_cache(user: User, logs: list[Log], db_session: AsyncSession) -> None:
+    """
+    Run the pattern engine over all user logs, write result to pattern_cache,
+    and upsert any confirmable signals into confirmed_triggers.
+    Called from regenerate_profile — never blocks a request.
+    """
+    payload = _logs_to_pattern_payload(logs)
+    result  = pattern_engine.run(payload)
+
+    user.pattern_cache            = json.dumps(result)
+    user.pattern_cache_updated_at = utcnow()
+
+    confirmable = [s for s in result["triggers"] + result["protective"] if s.get("confirmable")]
+
+    for signal in confirmable:
+        stmt = (
+            pg_insert(ConfirmedTrigger)
+            .values(
+                id              = uuid.uuid4(),
+                user_id         = user.id,
+                variable_type   = signal["variable_type"],
+                variable_value  = signal["variable_value"],
+                direction       = signal["direction"],
+                pain_delta      = signal["delta"],
+                avg_pain_with   = signal["avg_with"],
+                avg_pain_without= signal["avg_without"],
+                sample_size     = signal["sample_size"],
+                confirmed_at    = utcnow(),
+            )
+            .on_conflict_do_update(
+                constraint="uq_confirmed_trigger",
+                set_=dict(
+                    pain_delta       = signal["delta"],
+                    avg_pain_with    = signal["avg_with"],
+                    avg_pain_without = signal["avg_without"],
+                    sample_size      = signal["sample_size"],
+                    confirmed_at     = utcnow(),
+                ),
+            )
+        )
+        await db_session.execute(stmt)
+
+    logger.info(
+        "update_pattern_cache | user=%s triggers=%d protective=%d confirmable=%d",
+        user.id, len(result["triggers"]), len(result["protective"]), len(confirmable),
+    )

@@ -41,6 +41,7 @@ from sqlmodel import select
 from app.core.config import settings
 from app.core.utils import utcnow
 from app.db import AsyncSessionLocal
+from app.models.confirmed_trigger import ConfirmedTrigger
 from app.models.gut_check import GutCheckMessage, GutCheckSession
 from app.models.log import Log
 from app.models.user import User
@@ -111,9 +112,10 @@ async def run_gutcheck(
     yield _sse("session_id", id=str(session_id))
 
     # ── 2. Load data ───────────────────────────────────────────────────────────
-    recent_logs  = await _fetch_recent_logs(user.id, db_session, days=RECENT_DAYS)
-    history      = await _load_history(session_id, db_session)
-    system       = build_system_prompt(user, recent_logs, user.health_profile_summary)
+    recent_logs = await _fetch_recent_logs(user.id, db_session, days=RECENT_DAYS)
+    confirmed   = await _fetch_confirmed_triggers(user.id, db_session)
+    history = await _load_history(session_id, db_session)
+    system  = build_system_prompt(user, recent_logs, user.health_profile_summary, confirmed)
 
     if LOG_PROMPTS:
         logger.info("=== GUTCHECK SYSTEM PROMPT ===\n%s", system)
@@ -243,6 +245,25 @@ async def _fetch_recent_logs(user_id, db_session: AsyncSession, days: int) -> li
         .order_by(Log.logged_at.asc())
     )
     return [format_log(l) for l in result.scalars().all()]
+
+
+async def _fetch_confirmed_triggers(user_id, db_session: AsyncSession) -> list[dict]:
+    result = await db_session.execute(
+        select(ConfirmedTrigger)
+        .where(ConfirmedTrigger.user_id == user_id)
+        .order_by(ConfirmedTrigger.confirmed_at.desc())
+    )
+    return [
+        {
+            "variable_type":    ct.variable_type,
+            "variable_value":   ct.variable_value,
+            "direction":        ct.direction,
+            "avg_pain_with":    ct.avg_pain_with,
+            "avg_pain_without": ct.avg_pain_without,
+            "sample_size":      ct.sample_size,
+        }
+        for ct in result.scalars().all()
+    ]
 
 
 async def _load_history(session_id: uuid.UUID, db_session: AsyncSession) -> list[dict]:

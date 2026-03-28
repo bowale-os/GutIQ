@@ -29,10 +29,9 @@ class ParsedLogData(BaseModel):
     foods: List[FoodItem] = []
     symptoms: List[SymptomItem] = []
     wellness: WellnessData = WellnessData()
-    natural_summary: str = ""
+    natural_summary: Optional[str] = None
     confidence: str = "high"
     missing_critical_field: Optional[str] = None
-    overall_severity: Optional[int] = None
 
 
 # ── Preview (returned to client after parsing, before save) ───────────────────
@@ -45,9 +44,8 @@ class LogPreviewResponse(BaseModel):
     parsed_stress: Optional[str] = None
     parsed_sleep: Optional[float] = None
     parsed_exercise: Optional[str] = None
-    overall_severity: Optional[int] = None
     confidence: str = "high"
-    natural_summary: str = ""
+    natural_summary: Optional[str] = None
     missing_critical_field: Optional[str] = None
 
 
@@ -61,7 +59,6 @@ class LogCreateRequest(BaseModel):
     confidence: Optional[str] = None
     parsed_foods: Optional[List[str]] = None
     parsed_symptoms: Optional[List[SymptomItem]] = None
-    overall_severity: Optional[int] = Field(None, ge=1, le=10)
     parsed_stress: Optional[Literal["low", "medium", "high"]] = None
     parsed_sleep: Optional[float] = Field(None, ge=0, le=24)
     parsed_exercise: Optional[Literal["none", "light", "moderate", "intense"]] = None

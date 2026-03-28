@@ -41,7 +41,7 @@ export default function LogCard({ log, delay = 0 }) {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted }}>😴 {log.parsed_sleep != null ? `${log.parsed_sleep}h` : '—'}</span>
+        <span style={{ fontFamily: FONTS.mono, fontSize: 11, color: COLORS.muted }}>Sleep: {log.parsed_sleep != null ? `${log.parsed_sleep}h` : '—'}</span>
         <span style={{ fontSize: 10, color: COLORS.mutedLight }}>{expanded ? '▲' : '▼'}</span>
       </div>
 

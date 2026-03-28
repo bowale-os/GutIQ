@@ -59,14 +59,16 @@ def build_system_prompt(
     user: User,
     recent_logs: list[dict],
     profile: Optional[str],
+    confirmed_triggers: Optional[list[dict]] = None,
 ) -> str:
     """
     Build the full system prompt injected on every GutCheck call.
 
     Args:
-        user:         The authenticated User object.
-        recent_logs:  Last 30 days of logs, already formatted via format_log().
-        profile:      The stored health profile summary string, or None.
+        user:               The authenticated User object.
+        recent_logs:        Last 30 days of logs, already formatted via format_log().
+        profile:            The stored health profile summary string, or None.
+        confirmed_triggers: Rows from confirmed_triggers table for this user, or None.
     """
     log_count = len(recent_logs)
     date_range = _date_range(recent_logs)
@@ -102,6 +104,8 @@ def build_system_prompt(
         else "No logs in the last 30 days."
     )
 
+    confirmed_section = _format_confirmed_triggers(confirmed_triggers or [])
+
     return f"""\
 You are Tiwa, a personal gut health analyst built into GutIQ.
 You are talking to {user.name}.
@@ -132,7 +136,7 @@ foods, what happened and when. Avoid vague statements. Instead say: \
 
 ━━━ LONG-TERM HEALTH PROFILE ━━━
 {profile_section}
-
+{confirmed_section}
 ━━━ RECENT LOGS — last 30 days ({log_count} entries{date_range}) ━━━
 {recent_section}
 
@@ -155,6 +159,44 @@ This tag is stripped before being shown to the user. It is for system use only.\
 
 
 # ── Internal helpers ───────────────────────────────────────────────────────────
+
+def _format_confirmed_triggers(triggers: list[dict]) -> str:
+    """
+    Format confirmed triggers into a prompt section.
+    Returns an empty string if there are none so the prompt stays clean.
+    """
+    if not triggers:
+        return ""
+
+    bad  = [t for t in triggers if t["direction"] == "trigger"]
+    good = [t for t in triggers if t["direction"] == "protective"]
+
+    lines = ["\n━━━ CONFIRMED PATTERNS (verified from this user's full history) ━━━",
+             "These are statistically significant findings from their own data.",
+             "Reference them confidently when relevant — they are not guesses.\n"]
+
+    if bad:
+        lines.append("Raise pain:")
+        for t in bad:
+            lines.append(
+                f"  {t['variable_value']} ({t['variable_type']}): "
+                f"avg pain {t['avg_pain_with']:.1f} on days with it vs "
+                f"{t['avg_pain_without']:.1f} without — "
+                f"{t['sample_size']} logs"
+            )
+
+    if good:
+        lines.append("Lower pain:")
+        for t in good:
+            lines.append(
+                f"  {t['variable_value']} ({t['variable_type']}): "
+                f"avg pain {t['avg_pain_with']:.1f} on days with it vs "
+                f"{t['avg_pain_without']:.1f} without — "
+                f"{t['sample_size']} logs"
+            )
+
+    return "\n".join(lines) + "\n"
+
 
 def _date_range(logs: list[dict]) -> str:
     if not logs:

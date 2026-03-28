@@ -92,6 +92,8 @@ function Sparkline({ logs }) {
   );
 }
 
+
+
 export default function Dashboard({ user, logs, navigate, openLog }) {
   if (logs.length === 0) return (
     <div style={{ ...STYLES.page, paddingBottom: 90 }}>
