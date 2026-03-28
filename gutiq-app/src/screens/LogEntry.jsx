@@ -20,7 +20,6 @@ const MOCK_PREVIEW = {
     { name: 'heartburn', severity: 6 },
     { name: 'bloating',  severity: null },
   ],
-  overall_severity: null,
   parsed_stress: 'medium',
   parsed_sleep: 6,
   parsed_exercise: null,
@@ -36,31 +35,20 @@ const STRESS_OPTIONS = Object.entries(STRESS_LABELS);
 const EXERCISE_OPTIONS = Object.entries(EXERCISE_LABELS);
 const SEVERITY_NUMS = [1,2,3,4,5,6,7,8,9,10];
 
-function computeMissing(c) {
+function computeMissing(c, skippedSymptoms, reRatingSymptom) {
+  if (reRatingSymptom) return `symptom_severity::${reRatingSymptom}`;
   const cats = c.log_categories || [];
   const symptoms = c.parsed_symptoms || [];
-  const hasAnySeverity = symptoms.some(s => s.severity != null) || c.overall_severity != null;
-  if (cats.includes('symptom') && !hasAnySeverity) return 'overall_severity';
+  if (cats.includes('symptom')) {
+    const unrated = symptoms.find(s => s.severity == null && !skippedSymptoms.has(s.name));
+    if (unrated) return `symptom_severity::${unrated.name}`;
+  }
   if (cats.includes('sleep') && c.parsed_sleep == null) return 'parsed_sleep';
   if (cats.includes('food') && !(c.parsed_foods?.length)) return 'parsed_foods';
   if (cats.includes('stress') && !c.parsed_stress) return 'parsed_stress';
   return null;
 }
 
-function DataRow({ icon, label, value, unit = '', color }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 0' }}>
-      <span style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.darkMuted, display: 'flex', alignItems: 'center', gap: 6 }}>{icon}{label}</span>
-      <span style={{
-        fontFamily: FONTS.mono, fontSize: 14,
-        color: value != null ? (color || COLORS.darkText) : COLORS.darkMuted,
-        opacity: value != null ? 1 : 0.4,
-      }}>
-        {value != null ? `${value}${unit}` : '—'}
-      </span>
-    </div>
-  );
-}
 
 function ToggleGroup({ options, value, onChange }) {
   return (
@@ -113,6 +101,10 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
   const [showAddFood, setShowAddFood] = useState(false);
   const [missingInput, setMissingInput] = useState('');
   const [missingAccepted, setMissingAccepted] = useState(false);
+  const [skippedSymptoms, setSkippedSymptoms] = useState(new Set());
+  const [reRatingSymptom, setReRatingSymptom] = useState(null);
+  const [editingField, setEditingField] = useState(null);
+  const [editingInput, setEditingInput] = useState('');
   const [previewError, setPreviewError] = useState(null);
   const [saveError,    setSaveError]    = useState(null);
   const [savedInsights, setSavedInsights] = useState(null);
@@ -121,6 +113,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
   const discardTimer = useRef(null);
   const logTime = useRef(new Date());
   const recognitionRef = useRef(null);
+  const initialLogCount = useRef(logCount);
 
   useEffect(() => {
     if (phase !== 'capturing' || source !== 'voice') return;
@@ -183,6 +176,8 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
     clearTimeout(discardTimer.current);
     setMissingInput('');
     setMissingAccepted(false);
+    setSkippedSymptoms(new Set());
+    setReRatingSymptom(null);
   }, [phase]);
 
   const upd = (field, val) => setConfirmed(prev => ({ ...prev, [field]: val }));
@@ -225,7 +220,6 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
           confidence:      final.confidence,
           parsed_foods:    final.parsed_foods,
           parsed_symptoms: final.parsed_symptoms,
-          overall_severity: final.overall_severity,
           parsed_stress:   final.parsed_stress,
           parsed_sleep:    final.parsed_sleep,
           parsed_exercise: final.parsed_exercise,
@@ -233,9 +227,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
         onSave?.(result.log);
         getInsights().then(setSavedInsights).catch(() => {});
       }
-      const newCount = logCount + 1;
       setPhase('saved');
-      if (newCount < 10) setTimeout(() => onClose(), 1500);
     } catch (err) {
       setSaveError(err.message || 'Save failed. Please try again.');
       setPhase('reviewing');
@@ -249,16 +241,26 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
     discardTimer.current = setTimeout(() => setDiscardGuard(false), 2500);
   };
 
-  const missing = useMemo(() => computeMissing(confirmed), [confirmed]);
+  const missing = useMemo(() => computeMissing(confirmed, skippedSymptoms, reRatingSymptom), [confirmed, skippedSymptoms, reRatingSymptom]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const timeStr = useMemo(() => logTime.current?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) ?? '', [phase]); // phase change is the signal to recompute
 
   const skipMissing = () => {
+    if (missing?.startsWith('symptom_severity::')) {
+      const name = missing.split('::')[1];
+      if (reRatingSymptom) {
+        setReRatingSymptom(null);
+      } else {
+        setSkippedSymptoms(prev => new Set([...prev, name]));
+      }
+      setMissingAccepted(false);
+      setMissingInput('');
+      return;
+    }
     const cats = (confirmed.log_categories || []).filter(c => c !== ({
-      overall_severity: 'symptom',
-      parsed_stress:    'stress',
-      parsed_sleep:     'sleep',
-      parsed_foods:     'food',
+      parsed_stress: 'stress',
+      parsed_sleep:  'sleep',
+      parsed_foods:  'food',
     }[missing]));
     upd('log_categories', cats);
     setMissingAccepted(false);
@@ -280,24 +282,32 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
   };
 
   const renderMissingPrompt = () => {
-    if (missing === 'overall_severity') {
-      const firstSymptom = confirmed.parsed_symptoms?.[0]?.name;
-      const severityLabel = firstSymptom
-        ? `How bad was the ${firstSymptom}?`
-        : 'How bad was the pain?';
-      if (!missingAccepted) return <MissingOptIn label={severityLabel} onAdd={() => setMissingAccepted(true)} onSkip={skipMissing} />;
+    if (missing?.startsWith('symptom_severity::')) {
+      const symptomName = missing.split('::')[1];
+      const currentSev = (confirmed.parsed_symptoms || []).find(s => s.name === symptomName)?.severity ?? null;
+      const label = `How bad was the ${symptomName}?`;
+      if (!missingAccepted) return <MissingOptIn label={label} onAdd={() => setMissingAccepted(true)} onSkip={skipMissing} />;
       return (
         <div>
-          <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, marginBottom: 12 }}>{severityLabel} (1–10)</p>
+          <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, marginBottom: 12 }}>{label} (1–10)</p>
           <div style={{ display: 'flex', gap: 6 }}>
             {SEVERITY_NUMS.map(n => {
               const c = SEV_COLOR(n);
+              const selected = currentSev === n;
               return (
-                <button key={n} onClick={() => fillMissing('overall_severity', n)} style={{
+                <button key={n} onClick={() => {
+                  const updated = (confirmed.parsed_symptoms || []).map(s =>
+                    s.name === symptomName ? { ...s, severity: n } : s
+                  );
+                  upd('parsed_symptoms', updated);
+                  setReRatingSymptom(null);
+                  setMissingAccepted(false);
+                  setMissingInput('');
+                }} style={{
                   flex: 1, height: 40, borderRadius: 8,
-                  border: `1.5px solid ${c}55`,
-                  backgroundColor: `${c}22`,
-                  color: c,
+                  border: `1.5px solid ${selected ? c : `${c}55`}`,
+                  backgroundColor: selected ? c : `${c}22`,
+                  color: selected ? '#fff' : c,
                   fontFamily: FONTS.mono, fontSize: 13, fontWeight: 700, cursor: 'pointer',
                 }}>{n}</button>
               );
@@ -346,18 +356,34 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
 
     if (missing === 'parsed_foods') {
       if (!missingAccepted) return <MissingOptIn label="Want to add what you ate or drank?" onAdd={() => setMissingAccepted(true)} onSkip={skipMissing} />;
+      const addedFoods = confirmed.parsed_foods || [];
+      const addOne = () => {
+        if (!missingInput.trim()) return;
+        upd('parsed_foods', [...addedFoods, missingInput.trim()]);
+        setMissingInput('');
+      };
       return (
         <div>
           <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.darkMuted, marginBottom: 10 }}>What did you eat or drink?</p>
+          {addedFoods.length > 0 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 8 }}>
+              {addedFoods.map(f => (
+                <span key={f} onClick={() => upd('parsed_foods', addedFoods.filter(x => x !== f))}
+                  style={{ ...STYLES.chip, backgroundColor: COLORS.orangeLight, color: COLORS.orange, border: `1px solid ${COLORS.orangeBorder}`, cursor: 'pointer', gap: 4 }}>
+                  {f} <span style={{ opacity: 0.6 }}>×</span>
+                </span>
+              ))}
+            </div>
+          )}
           <div style={{ display: 'flex', gap: 8 }}>
             <input
               value={missingInput} onChange={e => setMissingInput(e.target.value)}
-              onKeyDown={e => { if (e.key === 'Enter' && missingInput.trim()) fillMissing('parsed_foods', missingInput.trim().split(',').map(s => s.trim()).filter(Boolean)); }}
-              placeholder="coffee, pizza..."
+              onKeyDown={e => { if (e.key === 'Enter') addOne(); }}
+              placeholder="e.g. oat milk latte"
               style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.darkBorder}`, color: COLORS.darkText, flex: 1 }}
             />
-            <button onClick={() => { if (missingInput.trim()) fillMissing('parsed_foods', missingInput.trim().split(',').map(s => s.trim()).filter(Boolean)); }} disabled={!missingInput.trim()}
-              style={{ ...STYLES.btnPrimary, width: 'auto', padding: '12px 20px', opacity: missingInput.trim() ? 1 : 0.4 }}>Done</button>
+            <button onClick={addOne} disabled={!missingInput.trim()}
+              style={{ ...STYLES.btnPrimary, width: 'auto', padding: '12px 20px', opacity: missingInput.trim() ? 1 : 0.4 }}>Add</button>
           </div>
           {backBtn}
         </div>
@@ -659,10 +685,10 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
                       {foods.join(', ')}
                     </p>
                     <button
-                      onClick={() => setShowAddFood(v => !v)}
+                      onClick={() => { setShowAddFood(v => !v); setAddFoodInput(''); }}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', fontFamily: FONTS.mono, fontSize: 10, color: COLORS.darkMuted, padding: 0, opacity: 0.6 }}
                     >
-                      edit
+                      {showAddFood ? 'done' : 'edit'}
                     </button>
                   </div>
                   {showAddFood && (
@@ -678,20 +704,27 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
                           </span>
                         ))}
                       </div>
-                      <input
-                        value={addFoodInput}
-                        autoFocus
-                        onChange={e => setAddFoodInput(e.target.value)}
-                        onKeyDown={e => {
-                          if (e.key === 'Enter' && addFoodInput.trim()) {
-                            upd('parsed_foods', [...foods, addFoodInput.trim()]);
-                            setAddFoodInput('');
-                          }
-                          if (e.key === 'Escape') { setShowAddFood(false); setAddFoodInput(''); }
-                        }}
-                        placeholder="add food..."
-                        style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.orange}`, color: COLORS.darkText, padding: '6px 10px', fontSize: 13, width: '100%' }}
-                      />
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <input
+                          value={addFoodInput}
+                          autoFocus
+                          onChange={e => setAddFoodInput(e.target.value)}
+                          onKeyDown={e => {
+                            if (e.key === 'Enter' && addFoodInput.trim()) {
+                              upd('parsed_foods', [...foods, addFoodInput.trim()]);
+                              setAddFoodInput('');
+                            }
+                            if (e.key === 'Escape') { setShowAddFood(false); setAddFoodInput(''); }
+                          }}
+                          placeholder="e.g. oat milk latte"
+                          style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.orange}`, color: COLORS.darkText, padding: '6px 10px', fontSize: 13, flex: 1 }}
+                        />
+                        <button
+                          onClick={() => { if (addFoodInput.trim()) { upd('parsed_foods', [...foods, addFoodInput.trim()]); setAddFoodInput(''); } }}
+                          disabled={!addFoodInput.trim()}
+                          style={{ ...STYLES.btnPrimary, width: 'auto', padding: '6px 16px', opacity: addFoodInput.trim() ? 1 : 0.4 }}
+                        >Add</button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -701,9 +734,17 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
               {symptoms.length > 0 && (
                 <div style={{ marginBottom: 8 }}>
                   {symptoms.map(s => {
-                    const sev = s.severity ?? confirmed.overall_severity ?? null;
+                    const sev = s.severity ?? null;
                     return (
-                      <div key={s.name} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0' }}>
+                      <button
+                        key={s.name}
+                        onClick={() => {
+                          setSkippedSymptoms(prev => { const n = new Set(prev); n.delete(s.name); return n; });
+                          setReRatingSymptom(s.name);
+                          setMissingAccepted(true);
+                        }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '7px 0', width: '100%', background: 'none', border: 'none', cursor: 'pointer' }}
+                      >
                         <span style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.darkMuted, display: 'flex', alignItems: 'center', gap: 6 }}><Activity size={14} strokeWidth={1.8} />{s.name}</span>
                         <span style={{
                           fontFamily: FONTS.mono, fontSize: 14,
@@ -712,7 +753,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
                         }}>
                           {sev != null ? `${sev}/10` : '—'}
                         </span>
-                      </div>
+                      </button>
                     );
                   })}
                 </div>
@@ -721,13 +762,50 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
               {/* Data rows — only shown when category is active */}
               <div>
                 {(confirmed.log_categories || []).includes('stress') && (
-                  <DataRow icon={<Brain size={14} strokeWidth={1.8} />}    label="Stress"   value={stress   ? STRESS_LABELS[stress]     : null} />
+                  editingField === 'stress' ? (
+                    <div style={{ padding: '8px 0' }}>
+                      <ToggleGroup options={STRESS_OPTIONS} value={stress} onChange={v => { upd('parsed_stress', v); setEditingField(null); }} />
+                    </div>
+                  ) : (
+                    <button onClick={() => setEditingField('stress')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
+                      <span style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.darkMuted, display: 'flex', alignItems: 'center', gap: 6 }}><Brain size={14} strokeWidth={1.8} />Stress</span>
+                      <span style={{ fontFamily: FONTS.mono, fontSize: 14, color: stress ? COLORS.darkText : COLORS.darkMuted, opacity: stress ? 1 : 0.4 }}>{stress ? STRESS_LABELS[stress] : '—'}</span>
+                    </button>
+                  )
                 )}
                 {(confirmed.log_categories || []).includes('sleep') && (
-                  <DataRow icon={<Moon size={14} strokeWidth={1.8} />}     label="Sleep"    value={sleep}   unit="h" />
+                  editingField === 'sleep' ? (
+                    <div style={{ padding: '8px 0', display: 'flex', gap: 8 }}>
+                      <input
+                        type="number" min="0" max="24" step="0.5"
+                        value={editingInput}
+                        autoFocus
+                        onChange={e => setEditingInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter' && editingInput) { upd('parsed_sleep', parseFloat(editingInput)); setEditingField(null); setEditingInput(''); } if (e.key === 'Escape') { setEditingField(null); setEditingInput(''); } }}
+                        placeholder={sleep != null ? String(sleep) : 'hrs'}
+                        style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.orange}`, color: COLORS.darkText, width: 80, textAlign: 'center' }}
+                      />
+                      <button onClick={() => { if (editingInput) { upd('parsed_sleep', parseFloat(editingInput)); } setEditingField(null); setEditingInput(''); }}
+                        style={{ ...STYLES.btnPrimary, width: 'auto', padding: '8px 16px' }}>Done</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => { setEditingField('sleep'); setEditingInput(sleep != null ? String(sleep) : ''); }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
+                      <span style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.darkMuted, display: 'flex', alignItems: 'center', gap: 6 }}><Moon size={14} strokeWidth={1.8} />Sleep</span>
+                      <span style={{ fontFamily: FONTS.mono, fontSize: 14, color: sleep != null ? COLORS.darkText : COLORS.darkMuted, opacity: sleep != null ? 1 : 0.4 }}>{sleep != null ? `${sleep}h` : '—'}</span>
+                    </button>
+                  )
                 )}
                 {(confirmed.log_categories || []).includes('exercise') && (
-                  <DataRow icon={<Dumbbell size={14} strokeWidth={1.8} />} label="Exercise" value={exercise ? EXERCISE_LABELS[exercise] : null} />
+                  editingField === 'exercise' ? (
+                    <div style={{ padding: '8px 0' }}>
+                      <ToggleGroup options={EXERCISE_OPTIONS} value={exercise} onChange={v => { upd('parsed_exercise', v); setEditingField(null); }} />
+                    </div>
+                  ) : (
+                    <button onClick={() => setEditingField('exercise')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', background: 'none', border: 'none', cursor: 'pointer', padding: '8px 0' }}>
+                      <span style={{ fontFamily: FONTS.sans, fontSize: 14, color: COLORS.darkMuted, display: 'flex', alignItems: 'center', gap: 6 }}><Dumbbell size={14} strokeWidth={1.8} />Exercise</span>
+                      <span style={{ fontFamily: FONTS.mono, fontSize: 14, color: exercise ? COLORS.darkText : COLORS.darkMuted, opacity: exercise ? 1 : 0.4 }}>{exercise ? EXERCISE_LABELS[exercise] : '—'}</span>
+                    </button>
+                  )
                 )}
               </div>
 
@@ -756,32 +834,33 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
               </p>
             )}
 
-            {/* Actions — only show Save when nothing is missing */}
-            {!missing && (
-              <div style={{ paddingBottom: 32, flexShrink: 0 }}>
-                {saveError && (
-                  <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.danger, textAlign: 'center', marginBottom: 8 }}>
-                    {saveError}
-                  </p>
-                )}
-                <button onClick={() => callSave()} style={{ ...STYLES.btnPrimary, width: '100%', marginBottom: 8 }}>
-                  Share with Tiwa
-                </button>
-                <button
-                  onClick={() => { setConfirmed({}); setRawContent(''); setTranscript(''); setPhase('idle'); }}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', fontFamily: FONTS.sans, fontSize: 12, color: COLORS.darkMuted, padding: '4px 0' }}
-                >
-                  Tiwa got something wrong? Sorry, log again.
-                </button>
-              </div>
-            )}
+            {/* Actions */}
+            <div style={{ paddingBottom: 32, flexShrink: 0 }}>
+              {!missing && (
+                <>
+                  {saveError && (
+                    <p style={{ fontFamily: FONTS.sans, fontSize: 13, color: COLORS.danger, textAlign: 'center', marginBottom: 8 }}>
+                      {saveError}
+                    </p>
+                  )}
+                  <button onClick={() => callSave()} style={{ ...STYLES.btnPrimary, width: '100%', marginBottom: 8 }}>
+                    Share with Tiwa
+                  </button>
+                </>
+              )}
+              <button
+                onClick={() => { setConfirmed({}); setRawContent(''); setTranscript(''); setPhase('idle'); }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', fontFamily: FONTS.sans, fontSize: 12, color: COLORS.darkMuted, padding: '4px 0' }}
+              >
+                Tiwa got something wrong? Sorry, log again.
+              </button>
+            </div>
           </div>
         );
       }
 
       case 'editing': {
         const foods    = confirmed.parsed_foods    || [];
-        const sev      = confirmed.overall_severity ?? null;
         const stress   = confirmed.parsed_stress;
         const sleep    = confirmed.parsed_sleep;
         const exercise = confirmed.parsed_exercise;
@@ -825,26 +904,6 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
                       style={{ ...STYLES.input, backgroundColor: COLORS.darkSurface, border: `1.5px solid ${COLORS.orange}`, color: COLORS.darkText, width: 110, padding: '4px 10px', fontSize: 13 }}
                     />
                   )}
-                </div>
-              </EditRow>
-
-              <div style={{ height: 1, backgroundColor: COLORS.darkBorder }} />
-
-              <EditRow label="Pain level">
-                <div style={{ display: 'flex', gap: 6 }}>
-                  {SEVERITY_NUMS.map(n => {
-                    const c = SEV_COLOR(n);
-                    const selected = sev === n;
-                    return (
-                      <button key={n} onClick={() => upd('overall_severity', n)} style={{
-                        flex: 1, height: 40, borderRadius: 8,
-                        border: `1.5px solid ${selected ? c : `${c}44`}`,
-                        backgroundColor: selected ? c : `${c}18`,
-                        color: selected ? '#fff' : c,
-                        fontFamily: FONTS.mono, fontSize: 13, fontWeight: 700, cursor: 'pointer',
-                      }}>{n}</button>
-                    );
-                  })}
                 </div>
               </EditRow>
 
@@ -902,7 +961,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
       );
 
       case 'saved': {
-        const newCount = logCount + 1;
+        const newCount = initialLogCount.current + 1;
         const topConfirmed = savedInsights?.confirmed_triggers?.[0];
         const topTrigger   = savedInsights?.triggers?.[0];
 
@@ -912,7 +971,7 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
         } else if (newCount >= 10 && topTrigger) {
           insight = topTrigger.text;
         } else if (newCount < 10) {
-          insight = `${10 - newCount} more log${10 - newCount === 1 ? '' : 's'} and we'll start finding patterns.`;
+          insight = `${10 - newCount} more log${10 - newCount === 1 ? '' : 's'} and I'll start finding patterns.`;
         }
 
         return (
@@ -933,15 +992,17 @@ export default function LogEntry({ onClose, onSave, demoMode = false, logCount =
               }}>{insight}</p>
             )}
             <button
-              onClick={onClose}
+              onClick={() => { onClose(); navigate('findings'); }}
               style={{
-                marginTop: 8, background: 'none', border: 'none', cursor: 'pointer',
-                fontFamily: FONTS.mono, fontSize: 11, color: COLORS.darkMuted,
-                letterSpacing: '0.06em', opacity: 0.5,
+                marginTop: 8, background: 'none',
+                border: `1px solid ${COLORS.darkBorder}`,
+                borderRadius: 99, cursor: 'pointer',
+                fontFamily: FONTS.mono, fontSize: 13, color: COLORS.darkMuted,
+                padding: '10px 32px',
                 animation: 'fadeIn 0.4s ease 0.3s both',
               }}
             >
-              Done
+              See my findings
             </button>
           </div>
         );

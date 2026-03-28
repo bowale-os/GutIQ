@@ -133,7 +133,6 @@ const parseSymptomItem = (raw = {}) => ({
  * @property {string[]}       log_categories
  * @property {string[]}       parsed_foods
  * @property {SymptomItem[]}  parsed_symptoms      - one object per symptom
- * @property {number|null}    overall_severity     - fallback when no per-symptom scores
  * @property {string|null}    parsed_stress        - "low"|"medium"|"high"
  * @property {number|null}    parsed_sleep         - hours
  * @property {string|null}    parsed_exercise      - "none"|"light"|"moderate"|"intense"
@@ -146,7 +145,6 @@ export const parseLogPreviewResponse = (raw = {}) => ({
   log_categories:         raw.log_categories                               ?? [],
   parsed_foods:           raw.parsed_foods                                 ?? [],
   parsed_symptoms:        (raw.parsed_symptoms ?? []).map(parseSymptomItem),
-  overall_severity:       raw.overall_severity                             ?? null,
   parsed_stress:          raw.parsed_stress                                ?? null,
   parsed_sleep:           raw.parsed_sleep                                 ?? null,
   parsed_exercise:        raw.parsed_exercise                              ?? null,
@@ -164,7 +162,6 @@ export const parseLogPreviewResponse = (raw = {}) => ({
  * @property {string|null}     confidence
  * @property {string[]|null}   parsed_foods
  * @property {SymptomItem[]|null} parsed_symptoms
- * @property {number|null}     overall_severity   - fallback severity applied to symptoms with null severity
  * @property {string|null}     parsed_stress
  * @property {number|null}     parsed_sleep
  * @property {string|null}     parsed_exercise
@@ -177,13 +174,12 @@ export const makeLogCreateRequest = ({
   confidence       = null,
   parsed_foods     = null,
   parsed_symptoms  = null,
-  overall_severity = null,
   parsed_stress    = null,
   parsed_sleep     = null,
   parsed_exercise  = null,
 } = {}) => ({
   source, raw_content, transcript, natural_summary, confidence,
-  parsed_foods, parsed_symptoms, overall_severity,
+  parsed_foods, parsed_symptoms,
   parsed_stress, parsed_sleep, parsed_exercise,
 });
 

@@ -22,8 +22,7 @@ Return ONLY valid JSON. No preamble, no explanation, no markdown fences.
   ],
   "symptoms": [
     {
-      "name": "string — use clinical terms where clear: heartburn, bloating, nausea, acid reflux, stomach pain, chest pain, chest tightness, chest pressure, cramping, burping, indigestion, diarrhea, constipation",
-      "severity": "integer 1–10 or null if not mentioned"
+      "name": "string — use clinical terms where clear: heartburn, bloating, nausea, acid reflux, stomach pain, chest pain, chest tightness, chest pressure, cramping, burping, indigestion, diarrhea, constipation"
     }
   ],
   "wellness": {
@@ -33,8 +32,7 @@ Return ONLY valid JSON. No preamble, no explanation, no markdown fences.
   },
   "natural_summary": "string — one calm sentence summarising what was logged, written as if confirming back to the user. Return null if the input is not a health log.",
   "confidence": "high | medium | low",
-  "missing_critical_field": "string describing what's unclear, or null",
-  "overall_severity": "integer 1–10 or null — only populate if the user gives a single overall score rather than per-symptom scores"
+  "missing_critical_field": "string describing what's unclear, or null"
 }
 
 ## Field rules
@@ -47,9 +45,7 @@ foods
 symptoms
 - Only extract symptoms the user explicitly describes. Do not infer.
 - Normalise to clinical terms: "burning feeling" → "heartburn", "feeling bloated" → "bloating".
-- If the user gives one severity score for multiple symptoms, apply it to each symptom and
-  set overall_severity to that value.
-- If the user gives no severity at all, set severity to null on each symptom.
+- Do not extract or infer severity — severity is collected separately from the user.
 
 wellness
 - stress: map casual language → "I'm really stressed" → high, "a bit stressed" → medium,
@@ -65,14 +61,13 @@ confidence
 
 missing_critical_field
 - Populate only when something material is genuinely absent and would improve the log quality.
-  Good examples: severity when symptoms are described, which meal caused symptoms.
-- Do not populate for optional fields like exercise or stress.
+  Good example: which meal caused symptoms.
+- Do not populate for severity, exercise, or stress — these are collected separately.
 - Keep it short — this becomes a question shown to the user.
-  Example: "How severe were the symptoms on a scale of 1–10?"
 
 natural_summary
 - Write in second person, past tense, calm and factual.
-- Example: "You logged oat milk latte and toast this morning, with heartburn rated 7/10."
+- Example: "You logged oat milk latte and toast this morning, with heartburn and bloating."
 - Do not mention fields that were absent. Do not add clinical commentary.
 - Return null if the input is not a health log (question, greeting, command, unrelated text).
 

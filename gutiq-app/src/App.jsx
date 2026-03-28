@@ -192,7 +192,7 @@ export default function App() {
     }
   }, [currentScreen]);
 
-  const LOG_SCREENS = new Set(['dashboard', 'export', 'pain_relief']);
+  const LOG_SCREENS = new Set(['dashboard', 'export', 'pain_relief', 'findings']);
   useEffect(() => {
     if (!LOG_SCREENS.has(currentScreen)) return;
     if (demoMode) { setLogs(mockLogs); return; }
